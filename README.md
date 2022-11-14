@@ -5,5 +5,7 @@ Watch ERC20 transactions live. Categorize on-chain actions and give friendly lab
 using:
 
 -MERNS stack (mongo, express, react, node, solidity)
+
 -openAI to prototype scaffold faster
+
 -Moralis framework for on-chain data
