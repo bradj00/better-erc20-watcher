@@ -1,12 +1,17 @@
 console.clear();
 
-
+const TimeAgo = require('javascript-time-ago');
+const en = require('javascript-time-ago/locale/en')
+const chalk = require('chalk');
 const axios = require('axios');
 const MongoClient = require('mongodb').MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'watchedTokens';
-
 const moralisApiKey = "T7pqHUU2RfiIe9i7Ppo0WNC3trCzDRs6bWAMhraTZSJBU1KqiJoLpHKejgUrNQJD";
+const apiRateLimitMs = 5000;
+const helpers = require('./helpers/helpers.js');
+
+TimeAgo.addDefaultLocale(en)
 
 //runs once upon script startup. 
 function coldStart(){
@@ -25,6 +30,8 @@ function coldStart(){
 
 
 function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount){
+    
+
     const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&limit="+limit+"&offset="+offset
     // axios.post(url, data, {
     axios.get(url ,{
@@ -35,14 +42,25 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount)
         },
     })
     .then(({data}) => {
+        console.log('fetched page: ', pageCount  ," / ", Math.ceil((data.total / limit)) );
 
-        // console.log('transactions: ', data.result[0]);
+        const timeAgo = new TimeAgo('en-US')
+
         console.log(Object.keys(data), data.result.length);
-        // console.log('\n',data.total, data.page, data.result.length)
+        console.log(data.result[0]);
+        data.result.map((tx, index) => {
+            console.log(chalk.cyan(timeAgo.format(new Date(tx.block_timestamp)))+'\n  ',chalk.rgb(0,255,0)(helpers.getEllipsisTxt( tx.transaction_hash, 6 )), tx.from_address, tx.to_address, (tx.value / (10**18)).toFixed(4));
+        });
+
+
+
         if (offset + limit < data.total){
-            console.log('getting page: ', pageCount+1  ," / ", Math.ceil((data.total / limit)) );
-            getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1);
-        }  
+            setTimeout( ()=>{
+                getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1);
+            }, apiRateLimitMs);
+        } else {
+            console.log('done fetching token: ', tokenAddress);
+        }
 
     })
 }
