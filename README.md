@@ -11,5 +11,5 @@ using:
 -Moralis framework for on-chain data
 
 
-[ chainData.js component acquiring and caching token data to mongo ]
-![image](https://user-images.githubusercontent.com/99688245/201833046-6a8356e4-4c7b-43eb-8ada-6bd96cfc2a22.png)
+<sub>( chainData.js component acquiring and caching token data to mongo )</sub>
+![image](https://user-images.githubusercontent.com/99688245/201833228-c40982b2-3193-4759-a2f0-698de4459154.png)
