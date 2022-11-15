@@ -8,9 +8,37 @@ exports.getEllipsisTxt = (str, n = 6) => {
     return "";
   };
 
-exports.bullet = (str) => {
+exports.fancylog = (str, bracketedStr, red, green, blue) => {
     if (str) {
-      return console.log(chalk.bold.rgb(0,255,0)(` ♣`)+`\t[ `+Date().substr(15,9)+` ]\t${str}`);
+      if (bracketedStr) {
+        switch (bracketedStr){
+          case 'moralis':
+            red = 0;
+            green = 255;
+            blue = 0;
+            break;
+          case 'mongo':
+            red = 255;
+            green = 255;
+            blue = 0;
+            break;
+          case 'error':
+            red = 255;
+            green = 0;
+            blue = 0;
+            break;
+          default: 
+            red = 255;
+            green = 255;
+            blue = 255;
+            
+        }
+
+        
+        return console.log(`  [ `+Date().substr(15,9)+` ] `+"[" + chalk.bold.rgb(red, green, blue)(bracketedStr) + "]"+'  '+`${str}`);
+      }else {
+        return console.log(`  [ `+Date().substr(15,9)+` ] ${str}`);
+      }
     }
     return "";
   };
