@@ -8,7 +8,7 @@ exports.getEllipsisTxt = (str, n = 6) => {
     return "";
   };
 
-exports.bullets = (str) => {
+exports.bullet = (str) => {
     if (str) {
       return console.log(chalk.bold.rgb(0,255,0)(` ♣`)+`\t[ `+Date().substr(15,9)+` ]\t${str}`);
     }
