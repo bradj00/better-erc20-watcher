@@ -18,20 +18,20 @@ TimeAgo.addDefaultLocale(en)
 
 //runs once upon script startup. 
 function coldStart(){
-    console.log(chalk.cyan.underline('cold start'));
-
+    console.log(chalk.cyan.underline.inverse('chainData.js')+'\n');
+    helpers.bullets('cold start...');
     //get all collection names from mongo for database "watchedTokens"
     MongoClient.connect(mongoUrl, function(err, client) {
         if (err) throw err;
         const db = client.db(dbName);
         db.listCollections().toArray(function(err, collections) {
             if (err) throw err;
-            // console.log(collections);
+            // helpers.bullets(collections);
             let temp = [];
             collections.forEach(collection => {
                 temp.push(collection.name);
             });
-            // console.log(temp);
+            // helpers.bullets(temp);
             // for each in array, filter from all documents sorted by timestamp and select the most recent one
             temp.map((collectionName, index) => {
                 const collection = db.collection(collectionName);
@@ -40,13 +40,16 @@ function coldStart(){
                     if (err) throw err; 
                     if (result.length > 0){
                         const timeAgo = new TimeAgo('en-US')
-                        console.log( chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) ));
-                        console.log('most recent tx for [ '+chalk.cyan(collectionName)+' ]: ',result[0]);
+                        helpers.bullets('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ');
+
+                        console.log('\n');
+                        console.log(result[0]);
+                        console.log('\n');
                         getTokenTranscationsFromMoralis(0, 100, collectionName, 1, parseInt(result[0].block_number));
 
                     }else {
                         
-                        console.log(chalk.red('no txs for: '), collectionName );
+                        helpers.bullets(chalk.red('no txs for: '), collectionName );
                         
                         //                             (offset, limit, tokenAddress, pageCount, fromBlock)
                         getTokenTranscationsFromMoralis(0, 100, collectionName, 1, 0); //from block 0
@@ -56,15 +59,6 @@ function coldStart(){
             // client.close();
         });
     });
-
-    // get timestamp of latest tx. 
-    // poll Moralis for token transactions from that timestamp forward
-
-    // if no entries for token, poll for all transactions (watching new token)
-
-
-
-
 
 
 }
@@ -77,12 +71,12 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
         fromBlock = 0;
     }
     
-    // console.log('getting Moralis txs for: ', tokenAddress);
-    // console.log(chalk.red('offset: '), offset);
-    // console.log(chalk.red('limit: '), limit);
-    // console.log(chalk.red('pageCount: '), pageCount);
-    // console.log(chalk.red('fromBlock: '), fromBlock);
-    // console.log(chalk.red('-----------------------'));
+    // helpers.bullets('getting Moralis txs for: ', tokenAddress);
+    // helpers.bullets(chalk.red('offset: '), offset);
+    // helpers.bullets(chalk.red('limit: '), limit);
+    // helpers.bullets(chalk.red('pageCount: '), pageCount);
+    // helpers.bullets(chalk.red('fromBlock: '), fromBlock);
+    // helpers.bullets(chalk.red('-----------------------'));
 
     const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&limit="+limit+"&offset="+offset+"&from_block="+fromBlock+"&to_block="+(new Date().getTime() );
     
@@ -96,15 +90,15 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
         },
     })
     .then(({data}) => {
-        console.log('[ '+data.total+' total ]\tfetched page: ', pageCount  ," / ", Math.ceil((data.total / limit)) );
-        // console.log(typeof (data.result));
-        // console.log(data.result);
+        helpers.bullets('[ '+data.total+' total ]\tfetched page: ', pageCount  ," / ", Math.ceil((data.total / limit)) );
+        // helpers.bullets(typeof (data.result));
+        // helpers.bullets(data.result);
         const timeAgo = new TimeAgo('en-US')
 
-        // console.log(Object.keys(data), data.result.length);
-        // console.log(data.result[0]);
+        // helpers.bullets(Object.keys(data), data.result.length);
+        // helpers.bullets(data.result[0]);
         // data.result.map((tx, index) => {
-        //     console.log(chalk.cyan(timeAgo.format(new Date(tx.block_timestamp)))+'\n  ',chalk.rgb(0,255,0)(helpers.getEllipsisTxt( tx.transaction_hash, 6 )), tx.from_address, tx.to_address, (tx.value / (10**18)).toFixed(4));
+        //     helpers.bullets(chalk.cyan(timeAgo.format(new Date(tx.block_timestamp)))+'\n  ',chalk.rgb(0,255,0)(helpers.getEllipsisTxt( tx.transaction_hash, 6 )), tx.from_address, tx.to_address, (tx.value / (10**18)).toFixed(4));
         // });
 
         //for each tx in data.result, push to tokenTxs array
@@ -116,24 +110,33 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                 getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock);
             }, apiRateLimitMs);
         } else {
-            console.log('done fetching token: ', tokenAddress);
-            console.log('total txs: ', tokenTxs.length);
-            // console.log(tokenTxs);
+            helpers.bullets('done fetching token: ', tokenAddress);
+            helpers.bullets('total txs: ', tokenTxs.length);
+            // helpers.bullets(tokenTxs);
 
             //put tokenTxs into mongoDB
-            console.log(chalk.cyan('putting tokens into mongo...') );
+            
             var duplicateCount = 0;
 
+            // helpers.bullets(chalk.cyan('putting tokens into mongo...') );
             MongoClient.connect(mongoUrl, function(err, client) {
                 if (err) throw err;
                 const db = client.db(dbName);
                 const collection = db.collection("a_"+tokenAddress);
                 collection.insertMany(tokenTxs, function(err, res) {
-                    if (err && err.errmsg.includes("ignoring duplicate tx")){
-                        duplicateCount++;
-                        console.log(chalk.red('[ '+duplicateCount+' ] duplicate key error collection'));
+                    if (err) {
+                        // helpers.bullets('err:\t',Object.keys(err));
+                        // helpers.bullets('err:\t',err.writeErrors[0].errmsg);
+                        if (err && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
+                            duplicateCount++;
+                            helpers.bullets(chalk.red('[ '+duplicateCount+' ] ignoring duplicate tx'));
+                        } else if (res && res.insertedCount) {
+                            helpers.bullets("Number of documents inserted: " + res.insertedCount);
+                        } else {
+                            helpers.bullets(chalk.red('err: '), err);
+                        }
                     } else {
-                        console.log("Number of documents inserted: " + res.insertedCount);
+                        helpers.bullets('caching '+chalk.cyan('new TXs')+' into mongo...') ;
                     }
                     client.close();
                 });
@@ -145,23 +148,3 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
     })
 }
 
-
-
-// function giveMeAName(){
-//     MongoClient.connect(mongoUrl, function(err, client) {
-//     console.log("Connected successfully to server");
-    
-//     const db = client.db(dbName);
-    
-//     db.listCollections().toArray().then(function(docs) {
-//         console.log("Available collections:");
-//         docs.forEach(function(doc) {
-//         console.log(doc.name);
-//         });
-//     }).catch(function(err) {
-//         console.log(err);
-//     });
-    
-//     client.close();
-//     });
-// }
