@@ -7,7 +7,7 @@ const getEllipsisTxt = (str, n = 6) => {
   }
   return "";
 };
-const fancylog = (str, bracketedStr) => {
+const fancylog = (str, bracketedStr, tokenAddress) => {
   if (str) {
     if (bracketedStr) {
       switch (bracketedStr){
@@ -33,12 +33,17 @@ const fancylog = (str, bracketedStr) => {
           
       }
 
-      
-      return console.log(`  [ `+Date().substr(15,9)+` ] `+"[" + chalk.bold.rgb(red, green, blue)(bracketedStr) + "]"+'  '+`${str}`);
+      if (tokenAddress){
+        return console.log(`  [ `+Date().substr(15,9)+` ] `+"[" + chalk.bold.rgb(red, green, blue)(bracketedStr) + "]"+' '+"[" + chalk.bold.rgb(0,255,0)(getEllipsisTxt(tokenAddress,3)) + "]"+'  '+`${str}`);
+      }else {
+        return console.log(`  [ `+Date().substr(15,9)+` ] `+"[" + chalk.bold.rgb(red, green, blue)(bracketedStr) + "] "+`${str}`);
+      }
     }else {
       return console.log(`  [ `+Date().substr(15,9)+` ] ${str}`);
     }
   }
+
+
   return "";
 };
 
