@@ -67,9 +67,10 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
         (acc, collectionName) =>
         acc.then((res) =>
             new Promise((resolve) =>{
-                
+                var tokenTxs = [];
                 //if collectionName is "isSyncing" then skip
                 if (collectionName == "isSyncing"){
+                    // console.log(chalk.cyan('IGNORING isSyncing collection'));
                     resolve(true);
                     return;
                 }
@@ -78,12 +79,12 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                 collectionName = collectionName.replace(/._/g,"");
                 checkIfSyncing(collectionName).then((isSyncing)=>{
                     if (!isSyncing){
-                        h.fancylog('not syncing. Proceeding to gathering updated TXs..', 'mongo', collectionName);
+                        h.fancylog('not in the middle of a sync. Proceeding to gathering updated TXs..', 'mongo', collectionName);
 
 
                         MongoClient.connect(mongoUrl, function(err, client) {
                             const db = client.db(dbName);        
-                            const collection = db.collection(collectionName);
+                            const collection = db.collection(("a_"+collectionName));
                             collection.find().sort({block_timestamp: -1}).limit(1).toArray(function(err, result) {
                                 if (err) throw err; 
                                 if (result.length > 0){
@@ -97,20 +98,20 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                         console.log(result[0]);
                                         console.log('\n');
                                     }
-                                    getTokenTranscationsFromMoralis(0, 100, collectionName, 1, parseInt(result[0].block_number), coldStart, resolve);
+                                    getTokenTranscationsFromMoralis(0, 100, collectionName, 1, parseInt(result[0].block_number), coldStart, resolve, tokenTxs);
                                     // client.close();
                                     // if (!spinner.isSpinning){spinner.start();}
                                     
                                 }else {
                                     
                                     if (!coldStart){h.fancylog('no txs for token (empty collection?)', 'mongo', collectionName  );}
-                                    if (!coldStart){console.log(result);}
+                                   
 
                                     let q = 0;
                                     if (collectionName != "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"){
                                         q = 15978891;   //super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
                                     }
-                                    getTokenTranscationsFromMoralis(0, 100, collectionName, 1, q, coldStart, resolve); 
+                                    getTokenTranscationsFromMoralis(0, 100, collectionName, 1, q, coldStart, resolve, tokenTxs); 
                                 }
                             });
                         });
@@ -166,12 +167,12 @@ function updateAllWatchedTokens(coldStart){
             collections.forEach(collection => {
                 watchedTokenContracts.push(collection.name);
             });
-            // h.fancylog(watchedTokenContracts);
+            // h.fancylog(watchedTokenContracts,'watched tokens');
             
           
 
             updateSingleTokenList(watchedTokenContracts, coldStart).then((q) =>
-                console.log(`all token TXs are up to date for all watched tokens. sleeping..`)
+                h.fancylog(`all token TXs are up to date for all watched tokens. sleeping..`, 'system')
             );
 
             watchedTokenContracts.map((collectionName, index) => {
@@ -185,14 +186,13 @@ function updateAllWatchedTokens(coldStart){
 }
 
 
-var tokenTxs = [];
 
 
-function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve){
+
+function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
     if ((fromBlock == undefined)){
         fromBlock = 0;
     }
-    
 
     const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&limit="+limit+"&offset="+offset+"&from_block="+(fromBlock+1)+"&to_block="+(new Date().getTime() );
 
@@ -220,10 +220,10 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
         //for each tx in data.result, push to tokenTxs array
         data.result.map((tx, index) => {
             tokenTxs.push(tx);
-        });
+        }); 
         if (offset + limit < data.total){
             setTimeout( ()=>{
-                getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve);
+                getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
             }, apiRateLimitMs);
         } else {
             // h.fancylog('total txs: ', tokenTxs.length);
@@ -235,39 +235,42 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
 
             //if there are TXs to put into mongo
             if (tokenTxs.length > 0){
-            if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', 'mongo', tokenAddress) ;}
-            MongoClient.connect(mongoUrl, function(err, client) {
-                if (err) throw err;
-                const db = client.db(dbName);
-                const collection = db.collection("a_"+tokenAddress);
-                collection.insertMany(tokenTxs, function(err, res) {
-                    if (err) {
-                        // h.fancylog('err:\t',Object.keys(err));
-                        // h.fancylog('err:\t',err.writeErrors[0].errmsg);
-                        if (err && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
-                            duplicateCount++;
-                            h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', 'mongo') ;
-                        } else if (res && res.insertedCount) {
-                            h.fancylog("Number of documents inserted: " + res.insertedCount, 'mongo') ;
+                if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', 'mongo', tokenAddress) ;}
+                
+                MongoClient.connect(mongoUrl, function(err, client) {
+                    if (err) throw err;
+                    const db = client.db(dbName);
+                    const collection = db.collection("a_"+tokenAddress);
+                    collection.insertMany(tokenTxs, function(err, res) {
+                        if (err) {
+                            // h.fancylog('err:\t',Object.keys(err));
+                            // h.fancylog('err:\t',err.writeErrors[0].errmsg);
+                            if (err && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
+                                duplicateCount++;
+                                h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', 'mongo') ;
+                            } else if (res && res.insertedCount) {
+                                h.fancylog("Number of documents inserted: " + res.insertedCount, 'mongo') ;
+                            } else {
+                                h.fancylog(chalk.red('err: '), err, 'mongo') ;
+                            }
+                            resolve(true);
                         } else {
-                            h.fancylog(chalk.red('err: '), err, 'mongo') ;
+                            h.fancylog('caching '+chalk.cyan('new TXs')+' into mongo...', 'mongo') ;
+                            resolve(true);
+                            // client.close();
                         }
-                        resolve(true);
-                    } else {
-                        h.fancylog('caching '+chalk.cyan('new TXs')+' into mongo...', 'mongo') ;
-                        resolve(true);
                         // client.close();
-                    }
-                    // client.close();
+                    });
                 });
-            });
-            }  else {
+            }  
+            else {
                 if (!coldStart){
                     // h.fancylog('no new TXs to cache', 'moralis');
                     // if (!spinner.isSpinning){spinner.start();}else {spinner.succeed('ayyyyy')}
                     // if (!spinner.isSpinning){spinner.start();}
                 }
                 else {  }
+                resolve(true);
             } 
 
 

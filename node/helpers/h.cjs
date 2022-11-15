@@ -26,6 +26,11 @@ const fancylog = (str, bracketedStr, tokenAddress) => {
           green = 0;
           blue = 0;
           break;
+        case 'system':
+          red = 0;
+          green = 255;
+          blue = 255;
+          break;
         default: 
           red = 255;
           green = 255;
