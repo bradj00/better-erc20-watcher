@@ -13,13 +13,14 @@ const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'watchedTokens';
 
+const sleepTimer = 60000; //delay for Moralis API limit
 
 const moralisApiKey = "T7pqHUU2RfiIe9i7Ppo0WNC3trCzDRs6bWAMhraTZSJBU1KqiJoLpHKejgUrNQJD";
 const apiRateLimitMs = 500;
 import * as h from './helpers/h.cjs';
 TimeAgo.addDefaultLocale(en)
 
-const spinner = ora(' Listening for new TXs...');
+const spinner = ora(`[`+Date().substr(15,9)+` ] `+'Sleep '+chalk.magenta(sleepTimer/1000+'s')+' then checking '+chalk.magenta('Moralis')+' for new TXs...');
 
 
 
