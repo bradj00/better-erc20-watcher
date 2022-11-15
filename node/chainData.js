@@ -1,31 +1,51 @@
 console.clear();
 
-const TimeAgo = require('javascript-time-ago');
-const en = require('javascript-time-ago/locale/en')
-const chalk = require('chalk');
-const axios = require('axios');
+// const TimeAgo = require('javascript-time-ago');
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
 
-const MongoClient = require('mongodb').MongoClient;
+import chalk from 'chalk';
+import axios from 'axios';
+import ora from 'ora';
+
+import * as MongoClientQ from 'mongodb';
+const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'watchedTokens';
 
 
 const moralisApiKey = "T7pqHUU2RfiIe9i7Ppo0WNC3trCzDRs6bWAMhraTZSJBU1KqiJoLpHKejgUrNQJD";
 const apiRateLimitMs = 500;
-const h = require('./helpers/h.js');
-
+import * as h from './helpers/h.cjs';
 TimeAgo.addDefaultLocale(en)
 
-//runs once upon script startup. 
-function coldStart(){
-    console.log(chalk.cyan.underline.inverse('chainData.js')+'\n');
-    h.fancylog('cold start...');
+const spinner = ora(' Listening for new TXs...');
+
+
+
+
+
+setInterval(()=>{
+    updateAllWatchedTokens('not cold start');
+},5000);
+
+updateAllWatchedTokens();
+function updateAllWatchedTokens(coldStart){
+    
+
+
+    if (!coldStart){
+        console.log(chalk.cyan.underline.inverse('chainData.js')+'\n');
+        h.fancylog('cold start...');
+    }
     //get all collection names from mongo for database "watchedTokens"
     MongoClient.connect(mongoUrl, function(err, client) {
         if (err) throw err;
         const db = client.db(dbName);
         db.listCollections().toArray(function(err, collections) {
             if (err) throw err;
+            
+
             // h.fancylog(collections);
             let watchedTokenContracts = [];
             collections.forEach(collection => {
@@ -40,43 +60,44 @@ function coldStart(){
                     if (err) throw err; 
                     if (result.length > 0){
                         const timeAgo = new TimeAgo('en-US')
-                        h.fancylog('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', 'mongo');
+                        if (!coldStart){h.fancylog('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', 'mongo');}
 
-                        console.log('\n');
-                        console.log(result[0]);
-                        console.log('\n');
-                        getTokenTranscationsFromMoralis(0, 100, collectionName, 1, parseInt(result[0].block_number));
-
+                        if (!coldStart){
+                            console.log('\n');
+                            console.log(result[0]);
+                            console.log('\n');
+                        }
+                        getTokenTranscationsFromMoralis(0, 100, collectionName, 1, parseInt(result[0].block_number, coldStart));
+                        client.close();
+                        if (!spinner.isSpinning){spinner.start();}
+                        
                     }else {
                         
-                        h.fancylog(chalk.red('no txs for: '), collectionName );
+                        if (!coldStart){h.fancylog(chalk.red('no txs for: '), collectionName );}
                         
                         //                             (offset, limit, tokenAddress, pageCount, fromBlock)
-                        getTokenTranscationsFromMoralis(0, 100, collectionName, 1, 0); //from block 0
+                        getTokenTranscationsFromMoralis(0, 100, collectionName, 1, 0, coldStart); //from block 0
+                        client.close();
+                        if (!spinner.isSpinning){spinner.start();}
                     }
                 });
             });
-            // client.close();
+            
         });
     });
 
 
 }
-coldStart();
+
 
 var tokenTxs = [];
 
-function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock){
+
+function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart){
     if (fromBlock == undefined){
         fromBlock = 0;
     }
     
-    // h.fancylog('getting Moralis txs for: ', tokenAddress);
-    // h.fancylog(chalk.red('offset: '), offset);
-    // h.fancylog(chalk.red('limit: '), limit);
-    // h.fancylog(chalk.red('pageCount: '), pageCount);
-    // h.fancylog(chalk.red('fromBlock: '), fromBlock);
-    // h.fancylog(chalk.red('-----------------------'));
 
     const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&limit="+limit+"&offset="+offset+"&from_block="+(fromBlock+1)+"&to_block="+(new Date().getTime() );
     
@@ -109,7 +130,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
         });
         if (offset + limit < data.total){
             setTimeout( ()=>{
-                getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock);
+                getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart);
             }, apiRateLimitMs);
         } else {
             // h.fancylog('total txs: ', tokenTxs.length);
@@ -121,7 +142,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
 
             //if there are TXs to put into mongo
             if (tokenTxs.length > 0){
-            h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', 'mongo') ;
+            if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', 'mongo') ;}
             MongoClient.connect(mongoUrl, function(err, client) {
                 if (err) throw err;
                 const db = client.db(dbName);
@@ -140,12 +161,17 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                         }
                     } else {
                         h.fancylog('caching '+chalk.cyan('new TXs')+' into mongo...', 'mongo') ;
+                        client.close();
                     }
                     client.close();
                 });
             });
             }  else {
-                h.fancylog('no new TXs to cache', 'moralis');
+                if (!coldStart){
+                    // h.fancylog('no new TXs to cache', 'moralis');
+                    if (!spinner.isSpinning){spinner.start();}
+                }
+                else {  }
             } 
 
 
