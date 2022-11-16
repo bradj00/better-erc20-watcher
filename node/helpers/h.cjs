@@ -7,7 +7,11 @@ const getEllipsisTxt = (str, n = 6) => {
   }
   return "";
 };
-const fancylog = (str, bracketedStr, tokenAddress) => {
+const fancylog = (str, bracketedStr, tokenAddress, spinner) => {
+  if (spinner){
+    spinner.stop();
+  }
+
   if (str) {
     if (bracketedStr) {
       switch (bracketedStr){
@@ -16,7 +20,7 @@ const fancylog = (str, bracketedStr, tokenAddress) => {
           green = 255;
           blue = 0;
           break;
-        case 'mongo':
+        case ' mongo ':
           red = 255;
           green = 255;
           blue = 0;
@@ -26,7 +30,7 @@ const fancylog = (str, bracketedStr, tokenAddress) => {
           green = 0;
           blue = 0;
           break;
-        case 'system':
+        case 'system ':
           red = 0;
           green = 255;
           blue = 255;

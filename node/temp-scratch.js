@@ -2,7 +2,7 @@ const tokenAddresses = [111, 222, 333, 444, 555, 666];
 
 
 updateSingleTokenList(tokenAddresses).then((q) =>
-console.log(`all resolved!`)
+    console.log(`all resolved!`)
 );
 function updateSingleTokenList(tokenAddresses) {
     return tokenAddresses.reduce(
