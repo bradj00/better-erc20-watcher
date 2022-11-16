@@ -13,8 +13,9 @@ using:
 -React webUI frontend for better visualization and management
 
 
-<sub>( chainData.js component acquiring and caching token data to mongo )</sub>
-![image](https://user-images.githubusercontent.com/99688245/201833228-c40982b2-3193-4759-a2f0-698de4459154.png)
+<sub>( chainData.js ingestion engine fetching and caching blockchain token TXs to mongo )</sub>
+![chainData_action](https://user-images.githubusercontent.com/99688245/202078438-05a839b5-f258-4e94-b2d3-f0d78301fea8.gif)
+
 
 <sub>( OneNote User Guide detailing mechanical operation and use )</sub>
 ![image](https://user-images.githubusercontent.com/99688245/201840676-3fedcf9d-adc2-4f10-8afb-2a1b1bba0dce.png)
