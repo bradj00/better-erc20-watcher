@@ -7,7 +7,15 @@
     "mongodb": "^4.11.0",
     "ora": "^6.1.2"
   },
-  "type": "module"
-
-  
+  "type": "module",
+  "name": "node",
+  "version": "1.0.0",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

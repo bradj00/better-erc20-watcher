@@ -1,14 +1,16 @@
+import axios from 'axios';
+import chalk from 'chalk';
 import * as MongoClientQ from 'mongodb';
 const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
-const dbName = 'watchedTokens';
-
+const dbNameQueryAddys = 'watchedTokens';
+const dbNameFriendlyNames = 'friendlyNames';
 var uniqueAddys = [];
 
 //connect to mongodb, use db named "watchedTokens". Query each collection for the following columns: "to_address", "from_address", "address" and add all the addresses to the "coolAddresses" array. make coolAddresses unique.
 async function getAddresses() {
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
-    const db = client.db(dbName);
+    const db = client.db(dbNameQueryAddys);
     const collections = await db.listCollections().toArray();
     const coolAddresses = [];
     for (const collection of collections) {
@@ -33,13 +35,6 @@ getAddresses()
 
 getAddresses().then((q) => 
 {
-    // for (let i =0; i < uniqueAddys.length; i++){
-    //     setTimeout(()=>{
-    //         console.log('looking up [ '+uniqueAddys[i]+' ]');
-    //     }, 20*i);
-    // }
-
-    //rewrite the above for-loop as a promise chain with a random delay up to 500ms between each lookup
     updateSingleTokenList(uniqueAddys).then((q) =>
        console.log(`all resolved!`)
     );
@@ -48,25 +43,52 @@ getAddresses().then((q) =>
            (acc, uniqueAddy) =>
            acc.then((res) =>
                new Promise((resolve) =>{
-                var delay = Math.floor(Math.random() * 500);
+                setTimeout(() => {
+                    checkAddress(uniqueAddy, resolve)
+                    .then((q) => {
+                        console.log('looking up [ '+uniqueAddy+' ]', q=='0x000'?chalk.red(q) : chalk.rgb(0,255,0)(q));
 
-                if (delay <= 400) {
-                  delay = Math.floor(Math.random() * 50);
-                }
-               console.log(delay);
-               setTimeout(() => {
-                   console.log(`${uniqueAddy} resolved!`)
-                   resolve(uniqueAddy);
-               }, delay)
-               }
-               )
+                        //store the address and the username in the db "friendlyNames" collection "friendlyNames" with columns of "address" and "friendlyName"
+                        MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        const db = client.db(dbNameFriendlyNames);
+
+                        try {
+                            db.collection("lookup").insertOne( { address: uniqueAddy, friendlyName: q} );
+                            console.log('wrote to db'+uniqueAddy+' '+q);
+                            resolve(uniqueAddy);
+                        } catch (e) {
+                            print (e);
+                            resolve(uniqueAddy);
+                            };
+
+                    });
+
+                        // resolve(uniqueAddy);
+                    });
+
+                }, 500)
+               })
            ),
            Promise.resolve()
        )
     }
-
-
-    var delay = Math.floor(Math.random() * 500);
-
+    var delay = Math.floor(Math.random() * 1000);
 });
+
+async function checkAddress(address, resolve) {
+    const url = 'https://api.opensea.io/user/' + address + '?format=json';
+    try {
+        const { data } = await axios.get(url, {})
+        // console.log(data);
+        return data.username;
+    }
+    catch(error){
+        return '0x000'
+    }
+    
+
+}
 
