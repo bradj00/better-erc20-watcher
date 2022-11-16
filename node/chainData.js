@@ -268,7 +268,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                             }
                             resolve(true);
                         } else {
-                            h.fancylog('caching ('+chalk.cyan(res.insertedCount)+') new TXs into mongo...', ' mongo ', tokenAddress, spinner) ;
+                            h.fancylog('caching ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
                             resolve(true);
                             // client.close();
                         }
