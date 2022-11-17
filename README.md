@@ -12,9 +12,11 @@ using:
 
 -React webUI frontend for better visualization and management
 
-
 <sub>( chainData.js ingestion engine fetching and caching blockchain token TXs to mongo )</sub>
 ![chainData_action](https://user-images.githubusercontent.com/99688245/202078438-05a839b5-f258-4e94-b2d3-f0d78301fea8.gif)
+
+<sub>( translator.js service querying OpenSea api for account name and caching to mongo )</sub>
+![image](https://user-images.githubusercontent.com/99688245/202107232-82cb591c-a2cf-423a-b455-df82a6be85a0.png)
 
 
 <sub>( OneNote User Guide detailing mechanical operation and use )</sub>
