@@ -8,7 +8,7 @@ import chalk from 'chalk';
 import axios from 'axios';
 import ora from 'ora';
 
-import  {lookupSingleAddress} from './translator.js';
+import  lookupSingleAddress from './translator.js';
 
 import * as MongoClientQ from 'mongodb';
 const MongoClient = MongoClientQ.MongoClient;
@@ -16,7 +16,7 @@ const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'watchedTokens';
 
 const apiRateLimitMs = 1000; //delay for Moralis API limit when fetching new pages
-const sleepTimer = 15000;    //delay for Moralis API limit for how often to update token TXs
+const sleepTimer = 60000;    //delay for Moralis API limit for how often to update token TXs
 var latestBlock = 0;
 
 
@@ -234,9 +234,16 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
         // });
 
         //for each tx in data.result, push to tokenTxs array
-        data.result.map((tx, index) => {
-            lookupSingleAddress(tx.from_address).then((q) => {
-                lookupSingleAddress(tx.to_address).then((x) => {
+
+        let delay5 = 0;
+        // for (tx in data.result) {
+        for (let i = 0; i < data.result.length; i++) {
+            delay5++;
+            let tx = data.result[i];
+        // data.result.map((tx, index) => {
+            // setTimeout(()=>{
+            lookupSingleAddress(tx.from_address, delay5).then((q) => {
+                lookupSingleAddress(tx.to_address, delay5).then((x) => {
                     tokenTxs.push({
                         block_number: tx.block_number,
                         block_timestamp: tx.block_timestamp,
@@ -247,11 +254,13 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                         from_address_friendlyName: q,
                         to_address_friendlyName: x
                     });
-                    console.log('\nfrom: '+chalk.cyan(q)+' to: '+chalk.cyan(x));
+                    // console.log('\nfrom: '+chalk.cyan(q)+' to: '+chalk.cyan(x));
                 });
             });
+            // }, delay5 * 500);
             tokenTxs.push(tx);
-        }); 
+        // });
+        } 
         if (offset + limit < data.total){
             setTimeout( ()=>{
                 getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
