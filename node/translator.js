@@ -1,3 +1,9 @@
+//sources to pull friendly names from:
+// open sea
+// mcp api (in-game name)
+// ens
+
+
 import axios from 'axios';
 import chalk from 'chalk';
 import * as MongoClientQ from 'mongodb';
@@ -34,10 +40,10 @@ async function getAddresses() {
 }
 
 //uncomment when running script directly. comment when running chainData.js since it imports and I cant stop this from auto calling. research?
-getAddresses()
-.then(() => {
-    checkAddresses();
-})
+// getAddresses()
+// .then(() => {
+//     checkAddresses();
+// })
 //then for each address, check if mongodb database "friendlyNames" has a collection with the same name as the address. if it does, check if the "username" column has a value. if it does, do nothing. if it doesn't, query opensea for the username and add it to the collection.
 async function checkAddresses() {
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });

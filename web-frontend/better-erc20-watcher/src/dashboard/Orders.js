@@ -55,15 +55,15 @@ function preventDefault(event) {
 export default function Orders() {
   return (
     <React.Fragment>
-      <Title>Recent Orders</Title>
+      <Title>Transactions</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Ship To</TableCell>
-            <TableCell>Payment Method</TableCell>
-            <TableCell align="right">Sale Amount</TableCell>
+            <TableCell>tx hash</TableCell>
+            <TableCell>date</TableCell>
+            <TableCell>from</TableCell>
+            <TableCell>to</TableCell>
+            <TableCell align="right">amount</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -79,7 +79,7 @@ export default function Orders() {
         </TableBody>
       </Table>
       <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
-        See more orders
+        See more
       </Link>
     </React.Fragment>
   );

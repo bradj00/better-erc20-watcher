@@ -81,7 +81,11 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-const mdTheme = createTheme();
+const mdTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
 function DashboardContent() {
   const [open, setOpen] = React.useState(true);
@@ -188,12 +192,34 @@ function DashboardContent() {
                   <Deposits />
                 </Paper>
               </Grid>
+
               {/* Recent Orders */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Orders />
                 </Paper>
               </Grid>
+
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant="h6" gutterBottom component="div">
+                    Orders
+                  </Typography>
+                  
+                  <Box sx={{ pt: 3 }}>
+                    
+                  </Box>
+                </Paper>
+              </Grid>
+
+
+
+
+
+
+
+
+
             </Grid>
             <Copyright sx={{ pt: 4 }} />
           </Container>
