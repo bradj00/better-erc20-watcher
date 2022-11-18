@@ -1,13 +1,28 @@
 import Dashboard from './dashboard/Dashboard.js';
+import DatabaseInfoGrabber from './dashboard/DatabaseInfoGrabber.js';
+import React, {useContext, useEffect, useState} from 'react';
+
+
+export const GeneralContext   = React.createContext({});
+
 
 function App() {
-  return (
-    <>
-    {/* <div  style={{backgroundColor:'#333',position:'absolute', width:'100vw', height:'100vh', display:'flex', justifyContent:'center', alignItems:'center', fontSize:'1vw', color:'#fff'}}> */}
-      <Dashboard />
-    {/* </div> */}
-    </>
-  );
+//create context for the app
+const [txData, settxData] = useState(null);
+
+const contextObj = {
+  txData, settxData,
+
+}
+
+return (
+  <>
+    <GeneralContext.Provider value={contextObj} >
+    <Dashboard />
+    <DatabaseInfoGrabber />
+    </GeneralContext.Provider>
+  </>
+);
 }
 
 export default App;

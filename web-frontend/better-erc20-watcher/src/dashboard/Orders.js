@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -6,6 +6,18 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
+import TimeAgo from 'react-timeago'
+import '../App.css';
+
+import {GeneralContext} from '../App.js';
+import {getEllipsisTxt} from './helpers/h.js';
+
+import engStrings from 'react-timeago/lib/language-strings/en'
+import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
+
+const formatter = buildFormatter(engStrings)
+
+
 
 // Generate Order Data
 function createData(id, date, name, shipTo, paymentMethod, amount) {
@@ -52,7 +64,17 @@ function preventDefault(event) {
   event.preventDefault();
 }
 
+
+
 export default function Orders() {
+  
+  const {txData, settxData} = useContext(GeneralContext);
+
+  useEffect(() => {
+    console.log('txData: ', txData);
+  },[txData])
+
+
   return (
     <React.Fragment>
       <Title>Transactions</Title>
@@ -67,15 +89,18 @@ export default function Orders() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.date}</TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.shipTo}</TableCell>
-              <TableCell>{row.paymentMethod}</TableCell>
-              <TableCell align="right">{`$${row.amount}`}</TableCell>
-            </TableRow>
-          ))}
+          {txData? txData.map((row) => {
+
+            return(
+              <TableRow key={row.id}>
+                <TableCell><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
+                <TableCell><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell>
+                <TableCell>{row.from_address_friendlyName == "0x000"? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
+                <TableCell>{row.to_address_friendlyName == "0x000"? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
+                <TableCell align="right">{`${(row.value / (10**18))}`}</TableCell>
+              </TableRow>
+            )})
+          : <></>}
         </TableBody>
       </Table>
       <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>

@@ -36,3 +36,14 @@
     transform: rotate(360deg);
   }
 }
+
+
+a {
+  color: #61dafb;
+}
+a:visited {
+  color: #217a2b;
+}
+a:hover {
+  color: #fff
+}

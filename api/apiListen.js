@@ -2,6 +2,9 @@ console.clear();
 
 import * as MongoClientQ from 'mongodb';
 import express from 'express';
+import cors from 'cors';
+import chalk from 'chalk';
+
 
 
 const MongoClient = MongoClientQ.MongoClient;
@@ -23,17 +26,19 @@ app.listen(listenPort, () => {
         console.log('MongoDB Connected');
     
 
-        app.get('/', (req, res) => {
-            res.send('root')
-            console.log('got something..')
+        app.get('/', cors(),(req, res) => {
+            const timestamp = new Date().getTime();
+            res.send(timestamp.toString()) // used for heartbeat
+            
         }) 
-        app.get('/txs/:collectionName', async (req, res) => {
+        app.get('/txs/:collectionName', cors(), async (req, res) => {
             const db = client.db(dbName);
             const collection = db.collection(("a_"+req.params.collectionName));
             collection.find().sort({block_timestamp: -1}).limit(50).toArray(function(err, result) {
-
+                
                 res.send(result)
             });
+
             
         
     }); 
