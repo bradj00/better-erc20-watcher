@@ -71,7 +71,9 @@ export default function Orders() {
   const {txData, settxData} = useContext(GeneralContext);
 
   useEffect(() => {
-    console.log('txData: ', txData);
+    if (txData !== null){
+      console.log('txData: ', txData);
+    }
   },[txData])
 
 
@@ -81,23 +83,22 @@ export default function Orders() {
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>tx hash</TableCell>
+            <TableCell align="left">amount</TableCell>
             <TableCell>date</TableCell>
             <TableCell>from</TableCell>
             <TableCell>to</TableCell>
-            <TableCell align="right">amount</TableCell>
+            <TableCell>tx hash</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {txData? txData.map((row) => {
-
+          {txData? txData.map((row, index) => {
             return(
-              <TableRow key={row.id}>
-                <TableCell><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
+              <TableRow key={index}>
+                <TableCell align="left">{`${parseFloat(row.value / (10**18)).toFixed(4)}`}</TableCell>
                 <TableCell><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell>
-                <TableCell>{row.from_address_friendlyName == "0x000"? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
-                <TableCell>{row.to_address_friendlyName == "0x000"? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
-                <TableCell align="right">{`${(row.value / (10**18))}`}</TableCell>
+                <TableCell>{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
+                <TableCell>{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
+                <TableCell><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
               </TableRow>
             )})
           : <></>}
