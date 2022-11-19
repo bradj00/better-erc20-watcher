@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useContext} from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -21,6 +21,7 @@ import { mainListItems, secondaryListItems } from './listItems';
 import Chart from './Chart';
 import Deposits from './Deposits';
 import Orders from './Orders';
+import { GeneralContext } from '../App';
 
 function Copyright(props) {
   return (
@@ -92,6 +93,8 @@ function DashboardContent() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
 
   return (
     <ThemeProvider theme={mdTheme}>

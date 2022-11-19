@@ -40,10 +40,13 @@ async function getAddresses() {
 }
 
 //uncomment when running script directly. comment when running chainData.js since it imports and I cant stop this from auto calling. research?
-// getAddresses()
-// .then(() => {
-//     checkAddresses();
-// })
+getAddresses()
+.then(() => {
+    checkAddresses();
+})
+
+
+
 //then for each address, check if mongodb database "friendlyNames" has a collection with the same name as the address. if it does, check if the "username" column has a value. if it does, do nothing. if it doesn't, query opensea for the username and add it to the collection.
 async function checkAddresses() {
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
@@ -55,6 +58,7 @@ async function checkAddresses() {
         count++;
         countTrue++;
         const collection = await dbFN.collection('lookup').find({address: address}).toArray();
+        
         // console.log('COLLECTION IS: ');
         // console.log(collection);
 
@@ -75,12 +79,13 @@ async function checkAddresses() {
                         const addresses = await dbWT.collection(collection.name).find({ $or: [ { to_address: address }, { from_address: address } ] }, { projection: { to_address: 1, from_address: 1, address: 1 } }).toArray();
                         for (const address2 of addresses) {
                             if (address2 && address2.to_address === address) {
+
                                 await dbWT.collection(collection.name).updateOne
                                 (
                                     { to_address: address2.to_address },
                                     { $set: { to_address_friendlyName: data } }
                                 );
-                                // console.log('updated to_address_friendlyName in collection: '+collection.name);
+                                console.log('[ '+chalk.cyan(data)+' ] updated TO in collection: '+collection.name);
                             }
                             if (address2 && address2.from_address === address) {
                                 await dbWT.collection(collection.name).updateOne
@@ -88,7 +93,7 @@ async function checkAddresses() {
                                     { from_address: address2.to_address },
                                     { $set: { from_address_friendlyName: data } }
                                 );
-                                // console.log('updated from_address_friendlyName in collection: '+collection.name);
+                                console.log('[ '+chalk.cyan(data)+' ] updated FROM in collection: '+collection.name);
                             }
                         }
                     }
@@ -103,6 +108,10 @@ async function checkAddresses() {
         } else {
             // console.log(chalk.yellow(countTrue+' / '+uniqueAddys.length+`  Already have username for ${address}\t ${collection[0].friendlyName}`));
             count--;
+
+
+
+            
 
             // also list all transactions from all collections in the watchedTokens database that have the address as the from_address or to_address and add the username to the collection
             const dbWT = client.db(dbNameQueryAddys);

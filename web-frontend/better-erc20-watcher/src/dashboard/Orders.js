@@ -67,8 +67,13 @@ function preventDefault(event) {
 
 
 export default function Orders() {
-  
+  const [currentTime, setCurrentTime] = useState(new Date());
+
   const {txData, settxData} = useContext(GeneralContext);
+
+  useEffect(() => {
+    setTimeout(()=>{console.log('update');setCurrentTime(new Date().toLocaleString());}, 1000);
+  },[currentTime])
 
   useEffect(() => {
     if (txData !== null){
@@ -93,11 +98,11 @@ export default function Orders() {
         <TableBody>
           {txData? txData.map((row, index) => {
             return(
-              <TableRow key={index}>
-                <TableCell align="left">{`${parseFloat(row.value / (10**18)).toFixed(4)}`}</TableCell>
+              <TableRow className="rowHover" style={{backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
+                <TableCell align="left">{`${parseFloat(row.value / (10**18)).toFixed(4)}`}</TableCell> 
                 <TableCell><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell>
-                <TableCell>{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
-                <TableCell>{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
+                <TableCell style={{color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}>{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
+                <TableCell style={{color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}>{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
                 <TableCell><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
               </TableRow>
             )})

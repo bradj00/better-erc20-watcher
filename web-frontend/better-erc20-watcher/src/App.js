@@ -9,9 +9,11 @@ export const GeneralContext   = React.createContext({});
 function App() {
 //create context for the app
 const [txData, settxData] = useState(null);
+const [getnewTxData, setgetnewTxData] = useState(null);
 
 const contextObj = {
   txData, settxData,
+  getnewTxData, setgetnewTxData,
 
 }
 

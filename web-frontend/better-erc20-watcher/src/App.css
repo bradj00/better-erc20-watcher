@@ -42,8 +42,15 @@ a {
   color: #61dafb;
 }
 a:visited {
-  color: #217a2b;
+  color: #0dd;
 }
 a:hover {
   color: #fff
+}
+
+.rowHover {
+  
+}
+.rowHover:hover {
+  border: 1px solid #fff;
 }

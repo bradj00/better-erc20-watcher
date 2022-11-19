@@ -8,12 +8,13 @@ import chalk from 'chalk';
 import axios from 'axios';
 import ora from 'ora';
 
-import  lookupSingleAddress from './translator.js';
+// import  lookupSingleAddress from './translator.js';
 
 import * as MongoClientQ from 'mongodb';
 const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'watchedTokens';
+const dbNameFriendlyNames = 'friendlyNames';
 
 const apiRateLimitMs = 1000; //delay for Moralis API limit when fetching new pages
 const sleepTimer = 60000;    //delay for Moralis API limit for how often to update token TXs
@@ -29,7 +30,36 @@ var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') 
 // const spinner = ora(`[`+Date().substr(15,9)+` ] `+'Begin checking '+chalk.magenta('Moralis')+' every '+chalk.magenta(sleepTimer/1000+'s')+' for new TXs...');
 spinner.color = 'white'
 
+function lookupSingleAddress(address, delay5){
+    return new Promise(async (resolve, reject) => {
+    const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
+    const dbFN = client.db(dbNameFriendlyNames);
+    const collection = await dbFN.collection('lookup').find({address: address}).toArray();
 
+    if (collection.length === 0) {
+        // even if it's blank lets move the task of looking up new addresses to translator.js and only use this function for mongo lookups
+        // setTimeout( async ()=>{
+        //     // console.log(count+' / '+uniqueAddys.length+'\tOpenSea lookup: ' + address);
+        //     const data  = await checkAddress(address);
+        //     if (data ) {
+        //         // console.log(chalk.green(`Found username ${data}`));
+        //         resolve(data);
+        //         client.close();
+        //     } 
+        //     else {
+        //         // console.log(chalk.red(`No username found for ${address}`));
+        //         resolve(data);
+        //         client.close();
+        //     }
+        // }, 500 * delay5);
+        resolve(address);
+    } else {
+        resolve(collection[0].friendlyName);
+    }
+    
+    
+    });
+}
 
 //function that connects to mongodb, uses db "watchedTokens" and for each collection, check if document exists where field "isSyncing" is true. If so console.log('syncing...') and resolve true.
 function checkIfSyncing(tokenName){
@@ -281,6 +311,9 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                     if (err) throw err;
                     const db = client.db(dbName);
                     const collection = db.collection("a_"+tokenAddress);
+
+                    
+                        
                     collection.insertMany(tokenTxs, function(err, res) {
                         if (err) {
                             // h.fancylog('err:\t',Object.keys(err));
@@ -295,6 +328,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                             }
                             resolve(true);
                         } else {
+                            //there's no error and insertion was successful. 
                             h.fancylog('caching ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
                             resolve(true);
                             // client.close();
