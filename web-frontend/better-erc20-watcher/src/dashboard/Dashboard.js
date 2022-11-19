@@ -27,12 +27,12 @@ import AudioToggle from './subcomponents/AudioToggle';
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
+      {/* {'Copyright © '}
       <Link color="inherit" href="https://mui.com/">
         Your Website
       </Link>{' '}
       {new Date().getFullYear()}
-      {'.'}
+      {'.'} */}
     </Typography>
   );
 }
@@ -98,6 +98,7 @@ function DashboardContent() {
   const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
 
   return (
+      <div style={{overflow:'hidden'}}>
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
@@ -173,7 +174,7 @@ function DashboardContent() {
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Container maxWidth="xl" sx={{ mt: 4, mb: 1 }}>
             <Grid container spacing={3}>
               {/* Chart */}
               <Grid item xs={12} md={8} lg={9}>
@@ -202,14 +203,14 @@ function DashboardContent() {
                 </Paper>
               </Grid>
 
-              {/* Recent Orders */}
+              {/* Recent TXs */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Orders />
                 </Paper>
               </Grid>
 
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Typography variant="h6" gutterBottom component="div">
                     Orders
@@ -219,7 +220,7 @@ function DashboardContent() {
                     
                   </Box>
                 </Paper>
-              </Grid>
+              </Grid> */}
 
 
 
@@ -235,6 +236,7 @@ function DashboardContent() {
         </Box>
       </Box>
     </ThemeProvider>
+      </div>
   );
 }
 

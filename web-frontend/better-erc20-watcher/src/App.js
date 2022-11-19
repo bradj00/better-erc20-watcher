@@ -14,14 +14,14 @@ const [audioEnabled, setAudioEnabled] = useState(true)
 const contextObj = {
   txData, settxData,
   getnewTxData, setgetnewTxData,
-  audioEnabled, setAudioEnabled,
+  audioEnabled, setAudioEnabled
 
 }
 
 return (
   <>
     <GeneralContext.Provider value={contextObj} >
-    <Dashboard />
+    <div style={{overflow:'hidden', border:'0px solid #0f0'}}><Dashboard /></div>
     <DatabaseInfoGrabber />
     </GeneralContext.Provider>
   </>

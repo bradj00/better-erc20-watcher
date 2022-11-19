@@ -43,7 +43,7 @@ const fancylog = (str, bracketedStr, tokenAddress, spinner) => {
       }
 
       if (tokenAddress){
-        return console.log(`  [ `+Date().substr(15,9)+` ] `+"[" + chalk.bold.rgb(red, green, blue)(bracketedStr) + "]"+' '+"[" + chalk.bold.rgb(0,255,0)(getEllipsisTxt(tokenAddress,3)) + "]"+'  '+`${str}`);
+        return console.log(`  [ `+Date().substr(15,9)+` ] `+"[" + chalk.bold.rgb(red, green, blue)(bracketedStr) + "]"+' '+"[" + chalk.bold.rgb(( parseInt(tokenAddress.substr(3,8), 16) % 255 ),( parseInt(tokenAddress.substr(9,13), 16) % 255 ),( parseInt(tokenAddress.substr(14,19), 16) % 255 ))(getEllipsisTxt(tokenAddress,3)) + "]"+'  '+`${str}`);
       }else {
         return console.log(`  [ `+Date().substr(15,9)+` ] `+"[" + chalk.bold.rgb(red, green, blue)(bracketedStr) + "] "+`${str}`);
       }
