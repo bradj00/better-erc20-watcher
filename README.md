@@ -19,7 +19,7 @@ using:
 ![image](https://user-images.githubusercontent.com/99688245/202107232-82cb591c-a2cf-423a-b455-df82a6be85a0.png)
 
 <sub>( combo actions from the same TX hash are subtly grouped by color in the web frontend )</sub>
-![image](https://user-images.githubusercontent.com/99688245/202835727-fe443a08-59fe-4234-b660-dc9c037e126f.png)
+![image](https://user-images.githubusercontent.com/99688245/202835986-943d0743-7dcc-4875-a8e9-f515b58ae5bf.png)
 
 <sub>( OneNote User Guide detailing mechanical operation and use )</sub>
 ![image](https://user-images.githubusercontent.com/99688245/201840676-3fedcf9d-adc2-4f10-8afb-2a1b1bba0dce.png)
