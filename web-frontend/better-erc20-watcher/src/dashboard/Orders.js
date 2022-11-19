@@ -91,6 +91,7 @@ export default function Orders() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [play] = useSound(boopSfx);
   const [oldtxData, setOldtxData] = useState([]);
+  const [expandTxView, setexpandTxView] = useState(false);
   const {txData, settxData} = useContext(GeneralContext);
   const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
 
@@ -105,7 +106,7 @@ export default function Orders() {
       if (oldtxData && oldtxData.length>0 && (txData[0].transaction_hash != oldtxData[0].transaction_hash)){
         console.log('new data: ', txData, oldtxData);
         if (audioEnabled){play();}
-        
+
       }else {
         console.log('no new data');
         // console.log('txData: ', txData);
@@ -118,35 +119,39 @@ export default function Orders() {
   return (
     <React.Fragment>
       <Title>Transactions</Title>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell align="left">amount</TableCell>
-            <TableCell>date</TableCell>
-            <TableCell>from</TableCell>
-            <TableCell>to</TableCell>
-            <TableCell>tx hash</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {txData? txData.map((row, index) => {
-            const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
-            // console.log(parseInt(rowAge)+' seconds old');
-            return(
+      <div style={{overflowY:'scroll', height:expandTxView? 'auto':'44vh'}}>
+        <Table size="small" >
+          <TableHead >
+            <TableRow>
+              <TableCell align="left">amount</TableCell>
+              <TableCell>date</TableCell>
+              <TableCell>from</TableCell>
+              <TableCell>to</TableCell>
+              <TableCell>tx hash</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {txData? txData.map((row, index) => {
+              const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
+              // console.log(parseInt(rowAge)+' seconds old');
+              return(
 
-              <TableRow className={rowAge > 100? "": "transactionRow"} style={{backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
-                <TableCell align="left">{`${parseFloat(row.value / (10**18)).toFixed(4)}`}</TableCell> 
-                <TableCell><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell>
-                <TableCell style={{color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}>{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
-                <TableCell style={{color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}>{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
-                <TableCell><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
-              </TableRow>
-            )})
-          : <></>}
-        </TableBody>
-      </Table>
-      <Link color="primary" href="#" onClick={preventDefault} sx={{ mt: 3 }}>
-        See more
+                <TableRow className={rowAge > 100? "": "transactionRow"} style={{backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
+                  <TableCell align="left">{`${parseFloat(row.value / (10**18)).toFixed(4)}`}</TableCell> 
+                  <TableCell><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell>
+                  <TableCell style={{color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}>{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
+                  <TableCell style={{color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}>{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
+                  <TableCell><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
+                </TableRow>
+              )})
+            : <></>}
+          </TableBody>
+        </Table>
+      </div>
+
+
+      <Link color="primary" href="#" onClick={ ()=>{ setexpandTxView(!expandTxView) } } sx={{ mt: 3 }}>
+        {!expandTxView? "See more":"See less"}
       </Link>
     </React.Fragment>
   );

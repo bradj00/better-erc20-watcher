@@ -75,3 +75,12 @@ a:hover {
     border-right: 5px solid rgba(255,255,255,0);
   }
 }
+
+::-webkit-scrollbar {
+  width: 2px;
+  background-color: #888;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #000;
+}
