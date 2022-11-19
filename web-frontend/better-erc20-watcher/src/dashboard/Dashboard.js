@@ -22,6 +22,7 @@ import Chart from './Chart';
 import Deposits from './Deposits';
 import Orders from './Orders';
 import { GeneralContext } from '../App';
+import AudioToggle from './subcomponents/AudioToggle';
 
 function Copyright(props) {
   return (
@@ -100,12 +101,14 @@ function DashboardContent() {
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
+
         <AppBar position="absolute" open={open}>
           <Toolbar
             sx={{
               pr: '24px', // keep right padding when drawer closed
             }}
           >
+            
             <IconButton
               edge="start"
               color="inherit"
@@ -125,11 +128,14 @@ function DashboardContent() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              (Selected Token Name)
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <NotificationsIcon />
+                <div style={{position:'absolute', left: '-8vw', top:'0vh',zIndex:'9999',}}>
+                  <AudioToggle />
+                </div>
               </Badge>
             </IconButton>
           </Toolbar>
@@ -192,7 +198,7 @@ function DashboardContent() {
                     height: 240,
                   }}
                 >
-                  <Deposits />
+                  <div style={{border:'0px solid #0f0',position:'relative', display:'flex',justifyContent:'center',height:'200%', }}><Deposits /></div>
                 </Paper>
               </Grid>
 

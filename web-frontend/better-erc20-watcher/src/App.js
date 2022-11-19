@@ -10,10 +10,11 @@ function App() {
 //create context for the app
 const [txData, settxData] = useState(null);
 const [getnewTxData, setgetnewTxData] = useState(null);
-
+const [audioEnabled, setAudioEnabled] = useState(true)
 const contextObj = {
   txData, settxData,
   getnewTxData, setgetnewTxData,
+  audioEnabled, setAudioEnabled,
 
 }
 

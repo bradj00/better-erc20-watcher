@@ -30,7 +30,7 @@ export const mainListItems = (
 );
 
 
-const fakeTokenList = [ "MEGA", "UNI", "RARI", "Add New"]
+const fakeTokenList = [ "MEGA", "UNI",  "Add New"]
 
 export const secondaryListItems = (
   <React.Fragment>

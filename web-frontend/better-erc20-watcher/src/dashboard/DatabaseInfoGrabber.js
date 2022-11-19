@@ -22,7 +22,7 @@ const DatabaseInfoGrabber = () => {
         fetchTransactions()
         setInterval(()=>{
             fetchTransactions()
-        }, 15000);
+        }, 5000);
     },[])
 
     useEffect(() => {
