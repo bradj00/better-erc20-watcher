@@ -8,7 +8,7 @@ using:
 
 -openAI to prototype scaffold faster
 
--Moralis framework for on-chain data
+-Moralis API for blockchain data
 
 -React webUI frontend for better visualization and management
 
