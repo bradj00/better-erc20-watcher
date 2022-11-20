@@ -10,64 +10,44 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
   
-export const mainListItems = (
+// export const mainListItems = (
     
 
 
-  <React.Fragment>
-    <ListSubheader component="div" >
+//   <React.Fragment>
+//     <ListSubheader component="div" >
       
-    </ListSubheader>
+//     </ListSubheader>
 
-    <ListItemButton>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Dashboard" />
-    </ListItemButton>
+//     <ListItemButton>
+//       <ListItemIcon>
+//         <DashboardIcon />
+//       </ListItemIcon>
+//       <ListItemText primary="Dashboard" />
+//     </ListItemButton>
 
-  </React.Fragment>
-);
+//   </React.Fragment>
+// );
 
 
-const fakeTokenList = [ "MEGA", "UNI",  "Add New"]
+// const fakeTokenList = [ "MEGA", "UNI",  "Add New"]
 
-export const secondaryListItems = (
-  <React.Fragment>
-    {/* <ListSubheader component="div" inset> */}
-    <ListSubheader component="div" style={{fontSize:'1.5vw'}}>
-    💰
-    </ListSubheader>
+// export const secondaryListItems = (
+//   <React.Fragment>
+//     {/* <ListSubheader component="div" inset> */}
+//     <ListSubheader component="div" style={{fontSize:'1.5vw'}}>
+//     💰
+//     </ListSubheader>
+//   {watchedTokenList? watchedTokenList.length > 0? watchedTokenList.map((token) => (
+//     <ListItemButton onClick={()=>{console.log('clicked: ',token)}}>
+//       <ListItemIcon>
+//         <AssignmentIcon />
+//       </ListItemIcon>
+//       <ListItemText primary={token} />
+//     </ListItemButton>
+//   )): <></>: <></>
 
-  {fakeTokenList.map((token) => (
-    <ListItemButton onClick={()=>{console.log('clicked: ',token)}}>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary={token} />
-    </ListItemButton>
-  ))}
+//   }
 
-  
-  
-
-    {/* <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Current month" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Last quarter" />
-    </ListItemButton>
-    <ListItemButton>
-      <ListItemIcon>
-        <AssignmentIcon />
-      </ListItemIcon>
-      <ListItemText primary="Year-end sale" />
-    </ListItemButton> */}
-  </React.Fragment>
-);
+//   </React.Fragment>
+// );

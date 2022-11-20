@@ -104,11 +104,11 @@ export default function Orders() {
     if (txData !== null){
 
       if (oldtxData && oldtxData.length>0 && (txData[0].transaction_hash != oldtxData[0].transaction_hash)){
-        console.log('new data: ', txData, oldtxData);
+        // console.log('new data: ', txData, oldtxData);
         if (audioEnabled){play();}
 
       }else {
-        console.log('no new data');
+        // console.log('no new data');
         // console.log('txData: ', txData);
       }
       setOldtxData(txData);

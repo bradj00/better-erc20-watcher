@@ -23,6 +23,9 @@ import Deposits from './Deposits';
 import Orders from './Orders';
 import { GeneralContext } from '../App';
 import AudioToggle from './subcomponents/AudioToggle';
+import SearchIcon from '@mui/icons-material/Search';
+import SecondaryList from './subcomponents/SecondaryList';
+import MainList from './subcomponents/MainList';
 
 function Copyright(props) {
   return (
@@ -96,6 +99,9 @@ function DashboardContent() {
   };
 
   const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
+  const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+  const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+  
 
   return (
       <div style={{overflow:'hidden'}}>
@@ -129,7 +135,7 @@ function DashboardContent() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              (Selected Token Name)
+              {viewingTokenAddress? viewingTokenAddress: <>0x000...</>}&nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SearchIcon />&nbsp;{clickedDetailsAddress? clickedDetailsAddress: <>0x000...</>} 
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
@@ -156,9 +162,11 @@ function DashboardContent() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {mainListItems}
+            {/* {mainListItems} */}
+            <MainList />
             <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
+            {/* {secondaryListItems} */}
+            <SecondaryList />
           </List>
         </Drawer>
         <Box
