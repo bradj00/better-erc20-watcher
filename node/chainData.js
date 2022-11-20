@@ -230,6 +230,9 @@ function getLatestBlockFromMoralis(){
     .then(({data}) => {
         latestBlock = data.block;
     })
+    .catch((error) => {
+        console.error('error fetching new block from moralis: ',error)
+    })
 
 
 }

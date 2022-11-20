@@ -10,6 +10,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import {GeneralContext} from '../../App.js';
+import tokenImage from '../images/token_image.png';
 
 const SecondaryList = () => {
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
@@ -27,11 +28,11 @@ const SecondaryList = () => {
             </ListSubheader>
         {watchedTokenList? watchedTokenList.length > 0? watchedTokenList.map((token, index) => (
             token? token.tokenAddress?
-                <ListItemButton  key={index} onClick={()=>{console.log('clicked: ',token); setviewingTokenAddress(token.tokenAddress.address)}}>
+                <ListItemButton  style={{backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(255,255,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} onClick={()=>{console.log('clicked: ',token); setviewingTokenAddress(token.tokenAddress.address)}}>
                 {/* <ListItemIcon>
                     <AssignmentIcon />
                 </ListItemIcon> */}
-                <img src={token.tokenAddress.logo? token.tokenAddress.logo : <></>} style={{height:'3vh'}} ></img>&nbsp;&nbsp;
+                <img src={token.tokenAddress.logo? token.tokenAddress.logo : tokenImage } style={{marginLeft:token.tokenAddress.logo?'0':'-0.5vh', height:token.tokenAddress.logo?'3vh':'4vh'}} />{token.tokenAddress.logo?<>&nbsp;&nbsp;</>: <>&nbsp;</>}
                 <ListItemText primary={token.tokenAddress.symbol} />
                 </ListItemButton>
             : <div key={index}></div> : <div key={index}></div>
