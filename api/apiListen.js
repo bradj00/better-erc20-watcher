@@ -81,25 +81,40 @@ app.listen(listenPort, () => {
             });
 
 
+            // let temp = [{}];
+            // for (let i = 0; i < filteredList2.length; i++) {
+            //     const tokenAddress = filteredList2[i];
+
+            //     const url = 'http://10.0.3.2:4000/tokenInfo/'+tokenAddress;
+            //     axios.get(url ,{
+            //     })
+            //     .then(({data}) => {
+            //         temp.push({tokenAddress :  data[0] });
+            //         // console.log('temp: ', temp);
+            //         if (i === filteredList2.length - 1) {
+            //             res.send(temp);
+            //         }
+            //     }) 
+            // }
+            
+            // rewrite the above function to wait for all the axios calls to finish before sending the response
             let temp = [{}];
+            let promises = [];
             for (let i = 0; i < filteredList2.length; i++) {
                 const tokenAddress = filteredList2[i];
 
                 const url = 'http://10.0.3.2:4000/tokenInfo/'+tokenAddress;
-                axios.get(url ,{
+                promises.push(axios.get(url ,{
                 })
-                .then(({data}) => {
-                    temp.push({tokenAddress :  data[0] });
-                    // console.log('temp: ', temp);
-                    if (i === filteredList2.length - 1) {
-                        res.send(temp);
-                    }
-                })
-
-
-      
+                )
                 
             }
+            Promise.all(promises).then(function(values) {
+                for(let i = 0; i < values.length; i++) {
+                    temp.push({tokenAddress :  values[i].data[0] });
+                }
+                res.send(temp);
+            })
             
             
 
