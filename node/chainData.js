@@ -231,7 +231,7 @@ function getLatestBlockFromMoralis(){
         latestBlock = data.block;
     })
     .catch((error) => {
-        console.error('error fetching new block from moralis: ',error)
+        console.error('error fetching new block from moralis: ',error.code)
     })
 
 
@@ -355,7 +355,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
 
     })
     .catch(function (error) {
-        console.log(chalk.red('there was an error making the web fetch call: '),error);
+        console.log(chalk.red('there was an error making the web fetch call: '),error.code);
       })
 }
 

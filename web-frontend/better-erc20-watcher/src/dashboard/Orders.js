@@ -94,16 +94,21 @@ export default function Orders() {
   const [expandTxView, setexpandTxView] = useState(false);
   const {txData, settxData} = useContext(GeneralContext);
   const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
-
+  const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+  const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
 
   useEffect(() => {
     setTimeout(()=>{console.log('update');setCurrentTime(new Date().toLocaleString());}, 1000);
   },[currentTime])
 
   useEffect(() => {
+    console.log('filteredtxData: ',filteredtxData)
+  },[filteredtxData])
+
+  useEffect(() => {
     if (txData !== null){
 
-      if (oldtxData && oldtxData.length>0 && (txData[0].transaction_hash != oldtxData[0].transaction_hash)){
+      if (oldtxData && oldtxData[0] && oldtxData.length>0 && txData[0] && (txData[0].transaction_hash != oldtxData[0].transaction_hash)){
         // console.log('new data: ', txData, oldtxData);
         if (audioEnabled){play();}
 
@@ -131,7 +136,7 @@ export default function Orders() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {txData? txData.map((row, index) => {
+            {!filteredtxData? txData? txData.map((row, index) => {
               const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
               // console.log(parseInt(rowAge)+' seconds old');
               return(
@@ -139,12 +144,27 @@ export default function Orders() {
                 <TableRow className={rowAge > 100? "": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
                   <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
                   <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell>
-                  <TableCell style={{fontSize:'1vw',color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}>{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
-                  <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}>{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
+                  <TableCell style={{fontSize:'1vw',color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}  onClick={ ()=>{console.log('clicked:',row.from_address); setclickedDetailsAddress(row.from_address) } }   >{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
+                  <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}      onClick={ ()=>{console.log('clicked:',row.to_address);   setclickedDetailsAddress(row.to_address) } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
                   <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
                 </TableRow>
               )})
-            : <></>}
+            : <></>
+          :
+          filteredtxData.map((row, index) => {
+            const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
+            // console.log(parseInt(rowAge)+' seconds old');
+            return(
+
+              <TableRow className={rowAge > 100? "": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
+                <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
+                <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell>
+                <TableCell style={{fontSize:'1vw',color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}  onClick={ ()=>{console.log('clicked:',row.from_address); setclickedDetailsAddress(row.from_address) } }   >{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
+                <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}      onClick={ ()=>{console.log('clicked:',row.to_address);   setclickedDetailsAddress(row.to_address) } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
+                <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
+              </TableRow>
+            )})
+          }
           </TableBody>
         </Table>
       </div>

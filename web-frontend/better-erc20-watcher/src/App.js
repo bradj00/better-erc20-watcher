@@ -16,6 +16,7 @@ const [audioEnabled, setAudioEnabled] = useState(true)
 const [clickedDetailsAddress, setclickedDetailsAddress] = useState();
 const [viewingTokenAddress, setviewingTokenAddress] = useState();
 const [watchedTokenList, setWatchedTokenList] = useState();
+const [filteredtxData, setfilteredtxData] = useState();
 
 
 
@@ -26,6 +27,7 @@ const contextObj = {
   clickedDetailsAddress, setclickedDetailsAddress,
   viewingTokenAddress, setviewingTokenAddress,
   watchedTokenList, setWatchedTokenList,
+  filteredtxData, setfilteredtxData,
 
 }
 

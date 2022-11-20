@@ -6,8 +6,10 @@ import {GeneralContext} from '../App.js'
 const DatabaseInfoGrabber = () => {
     // fetch data from api and store it in state
     const [data, setData] = useState(null)
+    const [filteredAddyData, setFilteredAddyData] = useState(null)
     const [intervalQ, setintervalQ] = useState(null)
     const {txData, settxData} = useContext(GeneralContext);
+    const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
     const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
     
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
@@ -34,7 +36,26 @@ const DatabaseInfoGrabber = () => {
     },[watchedTokenList]);
 
 
+    useEffect(() => {
+        if (clickedDetailsAddress){
+            console.log('clickedDetailsAddress: ', clickedDetailsAddress);
+            fetchAddressFilteredTransactions(viewingTokenAddress, clickedDetailsAddress);
+        }else {
+            setFilteredAddyData();
+        }
+    },[clickedDetailsAddress]);
+    
+
     //fetch result from the following URL http://10.0.3.2:4000/txs/0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e
+    function fetchAddressFilteredTransactions( viewingTokenAddress, clickedDetailsAddress ){
+        fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress+'/'+clickedDetailsAddress)
+        .then(response => response.json())
+        .then(data => {
+
+            setFilteredAddyData(data)
+        })
+    }
+
     function fetchTransactions( viewingTokenAddress ){
         fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress)
         // fetch('http://10.0.3.2:4000/txs/0x0f5d2fb29fb7d3cfee444a200298f468908cc942')
@@ -69,6 +90,11 @@ const DatabaseInfoGrabber = () => {
     useEffect(() => {
         settxData(data)
     },[data])
+
+    useEffect(() => {
+        console.log('filteredAddyData: ',filteredAddyData);
+        setfilteredtxData(filteredAddyData)
+    },[filteredAddyData])
     
     return (
         <>

@@ -21,7 +21,7 @@ const MainList = () => {
             <ListItemIcon>
                 <DashboardIcon />
             </ListItemIcon>
-            <ListItemText primary="Dashboard" />
+            <ListItemText primary="Watched Tokens" />
             </ListItemButton>
 
         </React.Fragment>
