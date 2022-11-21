@@ -137,9 +137,9 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
 
                                     result[0].value = parseFloat(result[0].value/(10**18).toFixed(4));
                                     if (!coldStart){
-                                        console.log('\n');
-                                        console.log(result[0]);
-                                        console.log('\n');
+                                        // console.log('\n');
+                                        // // console.log(result[0]);
+                                        // console.log('\n');
                                     }
                                     getTokenTranscationsFromMoralis(0, 100, collectionName, 1, parseInt(result[0].block_number), coldStart, resolve, tokenTxs);
                                     // client.close();
@@ -241,6 +241,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
     if ((fromBlock == undefined)){
         fromBlock = 0;
     }
+    
 
     const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&limit="+limit+"&offset="+offset+"&from_block="+(fromBlock+1)+"&to_block="+(new Date().getTime() );
 
@@ -256,27 +257,19 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
             h.fancylog('[ '+chalk.cyan(data.total+' TXs')+' ]\tfetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) , 'moralis', tokenAddress, spinner) ;
         }
 
-        // h.fancylog(typeof (data.result));
-        // h.fancylog(data.result);
         const timeAgo = new TimeAgo('en-US')
 
-        // h.fancylog(Object.keys(data), data.result.length);
-        // h.fancylog(data.result[0]);
-        // data.result.map((tx, index) => {
-        //     h.fancylog(chalk.cyan(timeAgo.format(new Date(tx.block_timestamp)))+'\n  ',chalk.rgb(0,255,0)(h.getEllipsisTxt( tx.transaction_hash, 6 )), tx.from_address, tx.to_address, (tx.value / (10**18)).toFixed(4));
-        // });
-
-        //for each tx in data.result, push to tokenTxs array
 
         let delay5 = 0;
-        // for (tx in data.result) {
+
         for (let i = 0; i < data.result.length; i++) {
             delay5++;
             let tx = data.result[i];
-        // data.result.map((tx, index) => {
-            // setTimeout(()=>{
+
             lookupSingleAddress(tx.from_address, delay5).then((q) => {
                 lookupSingleAddress(tx.to_address, delay5).then((x) => {
+                    // console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
+
                     tokenTxs.push({
                         block_number: tx.block_number,
                         block_timestamp: tx.block_timestamp,
@@ -287,26 +280,22 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                         from_address_friendlyName: q,
                         to_address_friendlyName: x
                     });
-                    // console.log('\nfrom: '+chalk.cyan(q)+' to: '+chalk.cyan(x));
+
                 });
             });
-            // }, delay5 * 500);
-            tokenTxs.push(tx);
-        // });
+
+            // tokenTxs.push(tx);
+
         } 
         if (offset + limit < data.total){
             setTimeout( ()=>{
                 getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
             }, apiRateLimitMs);
         } else {
-            // h.fancylog('total txs: ', tokenTxs.length);
-            // h.fancylog(tokenTxs);
 
-            //put tokenTxs into mongoDB
-            
             var duplicateCount = 0;
 
-            //if there are TXs to put into mongo
+
             if (tokenTxs.length > 0){
                 if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;}
                 
@@ -319,8 +308,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                         
                     collection.insertMany(tokenTxs, function(err, res) {
                         if (err) {
-                            // h.fancylog('err:\t',Object.keys(err));
-                            // h.fancylog('err:\t',err.writeErrors[0].errmsg);
+
                             if (err && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
                                 duplicateCount++;
                                 h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
@@ -358,4 +346,3 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
         console.log(chalk.red('there was an error making the web fetch call: '),error.code);
       })
 }
-

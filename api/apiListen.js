@@ -34,8 +34,17 @@ app.listen(listenPort, () => {
         app.get('/txs/:collectionName', cors(), async (req, res) => {
             const db = client.db(dbName);
             const collection = db.collection(("a_"+req.params.collectionName));
-            collection.find().sort({block_timestamp: -1}).limit(50).toArray(function(err, result) {
+            collection.find().sort({block_timestamp: -1}).limit(500).toArray(function(err, result) { 
                 
+                res.send(result)
+            });
+        });
+        app.get('/txs/:collectionName/txDetails/:txDetails', cors(), async (req, res) => {
+            const db = client.db(dbName);
+            const collection = db.collection(("a_"+req.params.collectionName));
+            console.log(req.params.txDetails) 
+            collection.find({"transaction_hash": req.params.txDetails}).sort({block_timestamp: -1}).limit(50).toArray(function(err, result) {
+
                 res.send(result)
             });
         });

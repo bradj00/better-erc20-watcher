@@ -97,12 +97,33 @@ export default function Orders() {
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
 
+  const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
+  const {filteredtxDataOutflow, setfilteredtxDataOutflow} = useContext(GeneralContext);
+
   useEffect(() => {
     setTimeout(()=>{console.log('update');setCurrentTime(new Date().toLocaleString());}, 1000);
   },[currentTime])
 
   useEffect(() => {
     console.log('filteredtxData: ',filteredtxData)
+    
+    if (filteredtxData && filteredtxData.length > 0) {
+      let tempInflow = 0
+      let tempOutflows = 0
+
+      for (let i = 0; i < filteredtxData.length; i++) {
+        if (filteredtxData[i].to_address === clickedDetailsAddress) {
+          tempInflow += ((filteredtxData[i].value) / (10 ** 18))
+        } else {
+          tempOutflows += ((filteredtxData[i].value) / (10 ** 18))
+        }
+      }
+      setfilteredtxDataInflow(tempInflow)
+      setfilteredtxDataOutflow(tempOutflows)
+    }
+    
+      
+
   },[filteredtxData])
 
   useEffect(() => {
@@ -154,6 +175,8 @@ export default function Orders() {
           filteredtxData.map((row, index) => {
             const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
             // console.log(parseInt(rowAge)+' seconds old');
+
+            
             return(
 
               <TableRow className={rowAge > 100? "": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>

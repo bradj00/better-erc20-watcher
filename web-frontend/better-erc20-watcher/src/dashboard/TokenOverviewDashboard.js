@@ -134,6 +134,8 @@ function DashboardContent() {
               color="inherit"
               noWrap
               sx={{ flexGrow: 1 }}
+              onClick={() => {setclickedDetailsAddress(null);}}
+              style={{cursor:'pointer'}}
             >
               {viewingTokenAddress? viewingTokenAddress: <>0x000...</>}&nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SearchIcon />&nbsp;{clickedDetailsAddress? clickedDetailsAddress: <>0x000...</>} 
             </Typography>

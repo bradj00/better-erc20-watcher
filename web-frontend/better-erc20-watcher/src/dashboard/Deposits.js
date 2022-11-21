@@ -1,27 +1,59 @@
-import * as React from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Title from './Title';
+import {GeneralContext} from '../App.js'
+import {commaNumber} from './helpers/h.js';
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+TimeAgo.addDefaultLocale(en)
 
 function preventDefault(event) {
   event.preventDefault();
 }
 
 export default function Deposits() {
+  const {totalVolume, setTotalVolume} = useContext(GeneralContext);
+  const timeAgo = new TimeAgo('en-US'); 
+
+  const {txData, settxData} = useContext(GeneralContext);
+  const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
+  const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
+  const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
+
+  
   return (
-    <div style={{position:'absolute',textAlign:'center', height:'200%', }}>
+    <div style={{position:'absolute',textAlign:'center', height:'100%', border:'0px solid #ff0', width:'100%', userSelect:'none' }}>
     <React.Fragment>
       <Title><span style={{fontSize:'3vh'}}>Token Volume</span></Title>
-      <br></br>
+      
       <Typography component="p" variant="h3" >
-        3,024.00
+        {totalVolume?  commaNumber(parseInt(totalVolume)) : '...'}
       </Typography>
       
       <br></br>
       <br></br>
-      <Typography color="text.secondary" sx={{ flex: 1 }}>
-        past 30 days
-      </Typography>
+      {/* 2 divs here that span 50% each side by side */}
+      <div style={{border:'0px solid #0f0', width:'100%',bottom:'15%', position:'absolute', display:'flex'}}>
+        <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2vh'}}>
+          In-Flow
+          <div>
+            {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+          </div>
+        </div>
+
+        <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',}}>
+          Out-Flow
+          <div>
+            {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+          </div>
+        </div>
+      </div>
+      <div style={{border:'0px solid #0f0',position:'absolute', width:'100%',bottom:'-6%'}}>
+        <Typography color="text.secondary" sx={{ flex: 1 }}  onClick={()=>{console.log(txData)}}>
+          past {txData?txData[0]? txData[0].block_timestamp? (timeAgo.format(  new Date(txData[txData.length-1].block_timestamp), 'mini'  )) : <></>: <></>: <></>}
+        </Typography>
+      </div>
       <div>
         
         {/* <Link color="primary" href="#" variant="body2" onClick={preventDefault}>

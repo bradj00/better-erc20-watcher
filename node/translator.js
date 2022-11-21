@@ -7,6 +7,7 @@
 import axios from 'axios';
 import chalk from 'chalk';
 import * as MongoClientQ from 'mongodb';
+import { getSystemErrorMap } from 'util';
 const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
 const dbNameQueryAddys = 'watchedTokens';
@@ -42,6 +43,7 @@ async function getAddresses() {
 //uncomment when running script directly. comment when running chainData.js since it imports and I cant stop this from auto calling. research?
 getAddresses()
 .then(() => {
+    
     checkAddresses();
 })
 
@@ -55,15 +57,22 @@ async function checkAddresses() {
     var countTrue = 0;
     
     for (const address of uniqueAddys) {
+
         count++;
         countTrue++;
+
+        // console without line breaks
+        // process.stdout.write('\r                    \r'+count+'\r');
+        // setTimeout(async ()=>{
         const collection = await dbFN.collection('lookup').find({address: address}).toArray();
         
-        // console.log('COLLECTION IS: ');
-        // console.log(collection);
+        
+        if (collection.length > 0){
+            console.log('COLLECTION IS: ');
+            console.log(collection);
+        }
 
         if (collection.length === 0) {
-            
             setTimeout( async ()=>{
                 console.log(count+' / '+uniqueAddys.length+'\tOpenSea lookup: ' + address);
                 const data  = await checkAddress(address);
@@ -104,20 +113,25 @@ async function checkAddresses() {
                     await dbFN.collection("lookup").updateOne( { address: address },{$setOnInsert: { address: address, friendlyName: address}},{upsert: false})
                     
                 }
+                console.log('tagged '+count+' of '+uniqueAddys.length+' addresses');
             },1000*count);
         } else {
-            // console.log(chalk.yellow(countTrue+' / '+uniqueAddys.length+`  Already have username for ${address}\t ${collection[0].friendlyName}`));
             count--;
 
+            //we found a friendlyName for this address existing in the database
 
-
-            
-
-            // also list all transactions from all collections in the watchedTokens database that have the address as the from_address or to_address and add the username to the collection
+            // list all transactions from all collections in the watchedTokens database that have the address as the from_address or to_address and add the username to the collection
             const dbWT = client.db(dbNameQueryAddys);
             const collections = await dbWT.listCollections().toArray();
+
+            console.log(chalk.cyan('---------------'))
+            console.log(collection[0]);
+            console.log(chalk.cyan('---------------'))
+            //for each collection in the watchedTokens database
             for (const collection5 of collections) {
                 const addresses = await dbWT.collection(collection5.name).find({ $or: [ { to_address: address }, { from_address: address } ] }, { projection: { to_address: 1, from_address: 1, address: 1 } }).toArray();
+                
+                // find all transactions with this address as the to_address or from_address in the collection
                 for (const address2 of addresses) {
                     if (address2 && address2.to_address === address) {
                         await dbWT.collection(collection5.name).updateOne
@@ -125,7 +139,7 @@ async function checkAddresses() {
                             { to_address: address2.to_address },
                             { $set: { to_address_friendlyName: collection[0].friendlyName } }
                         );
-                        // console.log('updated to_address_friendlyName in collection: '+collection5.name);
+                        console.log('updated to in collection: '+collection5.name+' with '+collection[0].friendlyName);
                     }
                     if (address2 && address2.from_address === address) {
                         await dbWT.collection(collection5.name).updateOne
@@ -133,7 +147,7 @@ async function checkAddresses() {
                             { from_address: address2.to_address },
                             { $set: { from_address_friendlyName: collection[0].friendlyName } }
                         );
-                        // console.log('updated from_address_friendlyName in collection: '+collection5.name);
+                        console.log('updated from in collection: '+collection5.name+' with '+collection[0].friendlyName);
                     }
                 }
             }
@@ -141,6 +155,7 @@ async function checkAddresses() {
 
 
         }
+        // }, 10*count);
     }
     
     
@@ -180,7 +195,7 @@ async function checkAddress(address, resolve) {
     const url = 'https://api.opensea.io/user/' + address + '?format=json';
     try {
         const { data } = await axios.get(url, {})
-        // console.log(data);
+        console.log(data);
         if (data.username == "0x000"){ return(address)}
         return data.username;
     }
