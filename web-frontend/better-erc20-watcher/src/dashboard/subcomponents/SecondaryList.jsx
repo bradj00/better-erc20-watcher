@@ -16,11 +16,21 @@ const SecondaryList = () => {
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext);
     const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext);
-    
+    const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
+    const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
+  
     useEffect(() => {
         console.log('watchedTokenList: ',watchedTokenList);
     }, [watchedTokenList]);
 
+    function updateSelectedToken (token){
+        console.log('clicked: ',token); 
+        setviewingTokenAddress(token.tokenAddress.address); 
+        setclickedDetailsAddress(null);
+
+        setfilteredtxDataInflow(); 
+        setfilteredtxDataOutflow();
+    }
 
     return (
         <React.Fragment>
@@ -30,7 +40,7 @@ const SecondaryList = () => {
             </ListSubheader>
         {watchedTokenList? watchedTokenList.length > 0? watchedTokenList.map((token, index) => (
             token? token.tokenAddress?
-                <ListItemButton  style={{backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(255,255,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} onClick={()=>{console.log('clicked: ',token); setviewingTokenAddress(token.tokenAddress.address); setclickedDetailsAddress(null);}}>
+                <ListItemButton  style={{backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(255,255,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} onClick={()=>{ updateSelectedToken(token) }}>
                 {/* <ListItemIcon>
                     <AssignmentIcon />
                 </ListItemIcon> */}

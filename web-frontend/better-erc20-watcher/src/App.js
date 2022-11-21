@@ -33,7 +33,7 @@ const contextObj = {
   filteredtxData, setfilteredtxData,
   totalVolume, setTotalVolume,
   filteredtxDataInflow,   setfilteredtxDataInflow,
-  filteredtxDataOutflow,   setfilteredtxDataOutflow,
+  filteredtxDataOutflow,  setfilteredtxDataOutflow,
 
 }
 

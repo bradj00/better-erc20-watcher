@@ -40,6 +40,7 @@ function Copyright(props) {
   );
 }
 
+
 const drawerWidth = 240;
 
 const AppBar = styled(MuiAppBar, {
@@ -97,11 +98,24 @@ function DashboardContent() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
-
   const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
   const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+  const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
+  const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
+
+  function updateSelectedToken (){
+    // setviewingTokenAddress(); 
+    setclickedDetailsAddress(null);
   
+    setfilteredtxDataInflow(); 
+    setfilteredtxDataOutflow();
+  }
+  
+
+
+
+
 
   return (
       <div style={{overflow:'hidden'}}>
@@ -125,7 +139,7 @@ function DashboardContent() {
                 marginRight: '36px',
                 ...(open && { display: 'none' }),
               }}
-            >
+            >    
               <MenuIcon />
             </IconButton>
             <Typography
@@ -134,7 +148,7 @@ function DashboardContent() {
               color="inherit"
               noWrap
               sx={{ flexGrow: 1 }}
-              onClick={() => {setclickedDetailsAddress(null);}}
+              onClick={() => {updateSelectedToken(); }}
               style={{cursor:'pointer'}}
             >
               {viewingTokenAddress? viewingTokenAddress: <>0x000...</>}&nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SearchIcon />&nbsp;{clickedDetailsAddress? clickedDetailsAddress: <>0x000...</>} 
