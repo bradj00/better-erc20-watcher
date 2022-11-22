@@ -20,7 +20,7 @@ const dbName = 'watchedTokens';
 const dbNameFriendlyNames = 'friendlyNames';
 
 const apiRateLimitMs = 1000; //delay for Moralis API limit when fetching new pages
-const sleepTimer = 60000;    //delay for Moralis API limit for how often to update token TXs
+const sleepTimer = 15000;    //delay for Moralis API limit for how often to update token TXs
 var latestBlock = 0;
 
 
@@ -155,7 +155,7 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
 
                                     let q = 0;
                                     if (collectionName != "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"){
-                                        q = 15978891;   //super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
+                                        q = 14117606 ;   //super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
                                     }
                                     getTokenTranscationsFromMoralis(0, 100, collectionName, 1, q, coldStart, resolve, tokenTxs); 
                                 }
@@ -291,7 +291,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
             
 
         } 
-        if (offset + limit < data.total){
+        if ((offset) < (data.total)){ //if there are more pages
             setTimeout( ()=>{
                 getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
             }, apiRateLimitMs);
