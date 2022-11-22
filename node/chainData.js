@@ -255,13 +255,14 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
     .then(({data}) => {
         if (data.result.length > 0){
             h.fancylog('[ '+chalk.cyan(data.total+' TXs')+' ]\tfetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) , 'moralis', tokenAddress, spinner) ;
+            console.log('\t'+data.result[0].transaction_hash);
         }
 
         const timeAgo = new TimeAgo('en-US')
 
 
         let delay5 = 0;
-
+        // tokenTxs = [];
         for (let i = 0; i < data.result.length; i++) {
             delay5++;
             let tx = data.result[i];
@@ -291,11 +292,12 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
             setTimeout( ()=>{
                 getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
             }, apiRateLimitMs);
-        } else {
+        } 
+        // else {
 
             var duplicateCount = 0;
 
-
+            setTimeout(()=>{
             if (tokenTxs.length > 0){
                 if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;}
                 
@@ -306,9 +308,11 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
 
                     
                         
-                    collection.insertMany(tokenTxs, function(err, res) {
+                    collection.insertMany(tokenTxs, [{"continueOnError": true}], function(err, res) {
                         if (err) {
-
+                            console.log('\n\n\n\n')
+                            console.log(chalk.magenta('error inserting token TXs into mongo: '), err);
+                            console.log('\n\n\n\n')
                             if (err && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
                                 duplicateCount++;
                                 h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
@@ -337,9 +341,10 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                 else {  }
                 resolve(true);
             } 
+            }, 100);
 
 
-        }
+        // }
 
     })
     .catch(function (error) {

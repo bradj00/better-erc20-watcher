@@ -24,10 +24,10 @@ const SecondaryList = () => {
     }, [watchedTokenList]);
 
     function updateSelectedToken (token){
-        console.log('clicked: ',token); 
+        console.log('clicked: ',token, token); 
         setviewingTokenAddress(token.tokenAddress.address); 
         setclickedDetailsAddress(null);
-
+        document.title = token.tokenAddress.name;
         setfilteredtxDataInflow(); 
         setfilteredtxDataOutflow();
     }

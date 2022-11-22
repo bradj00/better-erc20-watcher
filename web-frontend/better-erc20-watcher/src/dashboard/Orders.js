@@ -6,7 +6,11 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
-import TimeAgo from 'react-timeago'
+// import TimeAgo from 'react-timeago'
+
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+
 import '../App.css';
 import "react-toggle/style.css"
 
@@ -22,7 +26,7 @@ import engStrings from 'react-timeago/lib/language-strings/en'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 
 const formatter = buildFormatter(engStrings)
-
+TimeAgo.addDefaultLocale(en)
 
 
 // Generate Order Data
@@ -95,6 +99,7 @@ export default function Orders() {
   const {txData, settxData} = useContext(GeneralContext);
   const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+  const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
 
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
@@ -147,10 +152,10 @@ export default function Orders() {
       <Title>Transactions</Title>
       <div  style={{overflowY:'scroll', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
         <Table size="small" >
-          <TableHead >
+          <TableHead style={{position:'sticky',top:'0',backgroundColor:'rgba(50,50,60,1)'}}>
             <TableRow>
               <TableCell align="left">amount</TableCell>
-              <TableCell>date</TableCell>
+              <TableCell>age</TableCell>
               <TableCell>from</TableCell>
               <TableCell>to</TableCell>
               <TableCell>tx hash</TableCell>
@@ -160,13 +165,16 @@ export default function Orders() {
             {!filteredtxData? txData? txData.map((row, index) => {
               const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
               // console.log(parseInt(rowAge)+' seconds old');
+              const timeAgo = new TimeAgo('en-US')
+              
               return(
                 
                 <TableRow className={rowAge > 100? "rowHover": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
                   <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
-                  <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell>
-                  <TableCell style={{fontSize:'1vw',color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}  onClick={ ()=>{console.log('clicked:',row.from_address); setclickedDetailsAddress(row.from_address) } }   >{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
-                  <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}      onClick={ ()=>{console.log('clicked:',row.to_address);   setclickedDetailsAddress(row.to_address) } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
+                  {/* <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell> */}
+                  <TableCell style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
+                  <TableCell style={{fontSize:'1vw',color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}  onClick={ ()=>{console.log('clicked:',row.from_address); setclickedDetailsAddress(row.from_address); setclickedDetailsAddressFN(row.from_address_friendlyName) } }   >{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
+                  <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}      onClick={ ()=>{console.log('clicked:',row.to_address);   setclickedDetailsAddress(row.to_address);   setclickedDetailsAddressFN(row.to_address_friendlyName) } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
                   <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
                 </TableRow>
                 
@@ -176,15 +184,16 @@ export default function Orders() {
           filteredtxData.map((row, index) => {
             const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
             // console.log(parseInt(rowAge)+' seconds old');
-
+              const timeAgo = new TimeAgo('en-US')
+              
             
             return(
 
               <TableRow className={rowAge > 100? "": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
                 <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
-                <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell>
-                <TableCell style={{fontSize:'1vw',color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}  onClick={ ()=>{console.log('clicked:',row.from_address); setclickedDetailsAddress(row.from_address) } }   >{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
-                <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}      onClick={ ()=>{console.log('clicked:',row.to_address);   setclickedDetailsAddress(row.to_address) } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
+                <TableCell style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
+                <TableCell style={{fontSize:'1vw',color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}  onClick={ ()=>{console.log('clicked:',row.from_address); setclickedDetailsAddress(row.from_address); setclickedDetailsAddressFN(row.from_address_friendlyName) } }   >{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
+                <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#0a0":"white":"white"}}      onClick={ ()=>{console.log('clicked:',row.to_address);   setclickedDetailsAddress(row.to_address);   setclickedDetailsAddressFN(row.to_address_friendlyName) } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
                 <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
               </TableRow>
             )})

@@ -25,26 +25,26 @@ export default function Deposits() {
   return (
     <div style={{position:'absolute',textAlign:'center', height:'100%', border:'0px solid #ff0', width:'100%', userSelect:'none' }}>
     <React.Fragment>
-      <Title><span style={{fontSize:'3vh'}}>Token Volume</span></Title>
+      <Title><span style={{ fontSize:'3vh'}}>Token Volume</span></Title>
       
-      <Typography component="p" variant="h3" >
+      <Typography component="p" variant="h4" >
         {totalVolume?  commaNumber(parseInt(totalVolume)) : '...'}
       </Typography>
       
       <br></br>
       <br></br>
       {/* 2 divs here that span 50% each side by side */}
-      <div style={{border:'0px solid #0f0', width:'100%',bottom:'15%', position:'absolute', display:'flex'}}>
-        <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2vh'}}>
+      <div style={{border:'0px solid #0f0', width:'100%',bottom:'0.5vh', height:'50%', position:'absolute', display:'flex', justifyContent:'center',alignItems:'center'}}>
+        <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
           In-Flow
-          <div>
+          <div style={{fontSize:'2vh'}}>
             {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
           </div>
         </div>
 
-        <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',}}>
+        <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
           Out-Flow
-          <div>
+          <div style={{fontSize:'2vh'}}>
             {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
           </div>
         </div>

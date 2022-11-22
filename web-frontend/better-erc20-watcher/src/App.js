@@ -14,6 +14,7 @@ const [txData, settxData] = useState(null);
 const [getnewTxData, setgetnewTxData] = useState(null);
 const [audioEnabled, setAudioEnabled] = useState(true)
 const [clickedDetailsAddress, setclickedDetailsAddress] = useState();
+const [clickedDetailsAddressFN, setclickedDetailsAddressFN] = useState();
 const [viewingTokenAddress, setviewingTokenAddress] = useState();
 const [watchedTokenList, setWatchedTokenList] = useState();
 const [filteredtxData, setfilteredtxData] = useState();
@@ -22,12 +23,12 @@ const [totalVolume, setTotalVolume] = useState();
 const [filteredtxDataInflow,   setfilteredtxDataInflow] = useState();
 const [filteredtxDataOutflow,   setfilteredtxDataOutflow] = useState();
 
-
 const contextObj = {
   txData, settxData,
   getnewTxData, setgetnewTxData,
   audioEnabled, setAudioEnabled,
   clickedDetailsAddress, setclickedDetailsAddress,
+  clickedDetailsAddressFN, setclickedDetailsAddressFN,
   viewingTokenAddress, setviewingTokenAddress,
   watchedTokenList, setWatchedTokenList,
   filteredtxData, setfilteredtxData,

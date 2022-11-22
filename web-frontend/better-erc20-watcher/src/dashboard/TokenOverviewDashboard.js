@@ -101,6 +101,8 @@ function DashboardContent() {
   const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
   const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+  const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
+  
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
 
@@ -151,7 +153,7 @@ function DashboardContent() {
               onClick={() => {updateSelectedToken(); }}
               style={{cursor:'pointer'}}
             >
-              {viewingTokenAddress? viewingTokenAddress: <>0x000...</>}&nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SearchIcon />&nbsp;{clickedDetailsAddress? clickedDetailsAddress: <>0x000...</>} 
+              {viewingTokenAddress? viewingTokenAddress: <>0x000...</>}&nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SearchIcon />&nbsp;{clickedDetailsAddressFN? clickedDetailsAddressFN: <>0x000...</>} 
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
