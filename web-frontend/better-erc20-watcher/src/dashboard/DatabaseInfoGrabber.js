@@ -92,7 +92,7 @@ const DatabaseInfoGrabber = () => {
     },[data])
 
     useEffect(() => {
-        console.log('filteredAddyData: ',filteredAddyData);
+        // console.log('filteredAddyData: ',filteredAddyData);
         setfilteredtxData(filteredAddyData)
     },[filteredAddyData])
     

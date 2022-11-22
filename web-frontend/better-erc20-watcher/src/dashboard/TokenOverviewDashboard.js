@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -105,16 +105,29 @@ function DashboardContent() {
   
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
+  const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
+  const [searchInput, setsearchInput] = useState("")
 
   function updateSelectedToken (){
     // setviewingTokenAddress(); 
     setclickedDetailsAddress(null);
+    setclickedDetailsAddressFN(null);
   
     setfilteredtxDataInflow(); 
     setfilteredtxDataOutflow();
   }
   
+  useEffect(()=>{
+    if (searchInput){
+      console.log('search input: ', searchInput)
+    }
+  },[searchInput])
 
+  useEffect(()=>{
+    if (clickedSearchBar){
+      setsearchInput("") // clear the search field when we open the search bar
+    }
+  },[clickedSearchBar])
 
 
 
@@ -150,10 +163,45 @@ function DashboardContent() {
               color="inherit"
               noWrap
               sx={{ flexGrow: 1 }}
-              onClick={() => {updateSelectedToken(); }}
+              // onClick={() => {updateSelectedToken(); }}
               style={{cursor:'pointer'}}
             >
-              {viewingTokenAddress? viewingTokenAddress: <>0x000...</>}&nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SearchIcon />&nbsp;{clickedDetailsAddressFN? clickedDetailsAddressFN: <>0x000...</>} 
+              <div style={{position:'absolute', height:'100%', width:'100%', display:'flex', justifyContent:'left', alignItems:'center', top:'0',  border:'0px solid #0f0'}}>
+              <div style={{zIndex:'9999', }} onClick={()=>{ console.log('clicked to clear filter') }}>
+              {
+                viewingTokenAddress? 
+                  <div style={{zIndex:'1'}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
+                    {viewingTokenAddress}
+                  </div>
+                : 
+                  <>0x0002...</>
+              }
+              </div>
+                &nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div style={{color:'#999'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
+                  <SearchIcon />
+                </div>&nbsp;
+              {
+                clickedDetailsAddressFN || clickedSearchBar?
+                  clickedSearchBar?
+                
+                  <div style={{zIndex:'9999', }} id="searchBox" >
+                    <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
+                      <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'5vh', width:'20vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
+                    </form>
+                  </div>
+                 
+                  :
+                  <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+                  {clickedDetailsAddressFN}
+                  </div>
+                :
+                <div style={{zIndex:'9999', color:'#999' }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+                  (click to search)
+                </div>
+        
+              } 
+              </div>
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">

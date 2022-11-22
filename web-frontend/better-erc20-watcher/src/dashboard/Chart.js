@@ -44,10 +44,10 @@ export default function Chart() {
   useEffect(()=>{
     if (txData) {
       if (filteredtxData){
-        console.log('filteredtxData: ', txData);
+        // console.log('filteredtxData: ', txData);
         formatTheTxData(filteredtxData);
       }else {
-      console.log('txData: ', txData);
+      // console.log('txData: ', txData);
       formatTheTxData(txData);
       }
     }

@@ -110,7 +110,7 @@ export default function Orders() {
   },[currentTime])
 
   useEffect(() => {
-    console.log('filteredtxData: ',filteredtxData)
+    // console.log('filteredtxData: ',filteredtxData)
     
     if (filteredtxData && filteredtxData.length > 0) {
       let tempInflow = 0

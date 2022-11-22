@@ -16,6 +16,7 @@ const SecondaryList = () => {
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext);
     const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext);
+    const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext);
     const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
     const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
   
@@ -27,6 +28,7 @@ const SecondaryList = () => {
         console.log('clicked: ',token, token); 
         setviewingTokenAddress(token.tokenAddress.address); 
         setclickedDetailsAddress(null);
+        setclickedDetailsAddressFN(null);
         document.title = token.tokenAddress.name;
         setfilteredtxDataInflow(); 
         setfilteredtxDataOutflow();
