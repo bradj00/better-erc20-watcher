@@ -7,11 +7,14 @@ import en from 'javascript-time-ago/locale/en'
 import chalk from 'chalk';
 import axios from 'axios';
 import ora from 'ora';
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 // import  lookupSingleAddress from './translator.js';
 
 import * as MongoClientQ from 'mongodb';
-const MongoClient = MongoClientQ.MongoClient;
+const MongoClient = MongoClientQ.MongoClient; 
 const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'watchedTokens';
 const dbNameFriendlyNames = 'friendlyNames';
@@ -22,7 +25,7 @@ var latestBlock = 0;
 
 
 
-const moralisApiKey = "T7pqHUU2RfiIe9i7Ppo0WNC3trCzDRs6bWAMhraTZSJBU1KqiJoLpHKejgUrNQJD";
+const moralisApiKey = process.env.API_KEY;
 import * as h from './helpers/h.cjs';
 TimeAgo.addDefaultLocale(en)
 

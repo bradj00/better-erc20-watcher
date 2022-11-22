@@ -5,7 +5,9 @@ import express from 'express';
 import cors from 'cors';
 import chalk from 'chalk';
 import axios from 'axios';
-
+import dotenv from 'dotenv';
+dotenv.config();
+// console.log('API_KEY: ', process.env.API_KEY);
 
 const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
@@ -13,7 +15,7 @@ const dbName = 'watchedTokens';
 
 const listenPort = 4000;
 
-const moralisApiKey = "T7pqHUU2RfiIe9i7Ppo0WNC3trCzDRs6bWAMhraTZSJBU1KqiJoLpHKejgUrNQJD";
+const moralisApiKey = process.env.API_KEY;
 
 const app = express();
 

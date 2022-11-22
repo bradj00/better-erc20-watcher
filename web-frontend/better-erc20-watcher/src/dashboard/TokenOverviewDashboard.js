@@ -133,7 +133,22 @@ function DashboardContent() {
   },[clickedSearchBar])
 
 
-
+  // clipboard copy method cannot be used without HTTPS and I haven't written my API for https yet. This hack is temp.
+  /////////////////////////////////////////////////
+  const CopyToClipboard = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        document.execCommand('copy')
+    } catch (err) {
+        console.error('Unable to copy to clipboard', err)
+    }
+    document.body.removeChild(textArea)
+};
+  /////////////////////////////////////////////////
 
   return (
       <div style={{overflow:'hidden'}}>
@@ -173,11 +188,11 @@ function DashboardContent() {
               <div style={{zIndex:'9999', }} onClick={()=>{ console.log('clicked to clear filter') }}>
                 {
                   viewingTokenAddress? 
-                    <div>
+                    <div style={{zIndex:'10000'}} onClick={() => { console.log('asldfkjdsflkdsfj'); CopyToClipboard(viewingTokenAddress) }}>
                       <div style={{zIndex:'1',paddingRight:'2vw',marginTop:'-3vh'}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
                       {    clickedTokenSymbol? <>${clickedTokenSymbol}</> : '...'}
                       </div>
-                      <div style={{color:'#999',fontSize:'2vh', bottom:'0.1vh', paddingLeft:'3vw',position:'absolute',}}>
+                      <div style={{color:'#999',fontSize:'2vh', bottom:'0.1vh', position:'absolute',}}  >
                       {getEllipsisTxt(viewingTokenAddress, 6)}
                       </div>
                     </div>

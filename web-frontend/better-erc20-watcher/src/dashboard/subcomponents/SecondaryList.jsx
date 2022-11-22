@@ -31,7 +31,7 @@ const SecondaryList = () => {
         setviewingTokenAddress(token.tokenAddress.address); 
         setclickedDetailsAddress(null);
         setclickedDetailsAddressFN(null);
-        // document.title = token.tokenAddress.name;
+        document.title = token.tokenAddress.name;
         setclickedTokenSymbol(token.tokenAddress.symbol);
         setfilteredtxDataInflow(); 
         setfilteredtxDataOutflow();
