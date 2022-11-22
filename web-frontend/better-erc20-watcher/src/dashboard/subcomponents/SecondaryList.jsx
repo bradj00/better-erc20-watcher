@@ -17,6 +17,7 @@ const SecondaryList = () => {
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext);
     const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext);
     const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext);
+    const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
     const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
     const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
   
@@ -25,11 +26,13 @@ const SecondaryList = () => {
     }, [watchedTokenList]);
 
     function updateSelectedToken (token){
+
         console.log('clicked: ',token, token); 
         setviewingTokenAddress(token.tokenAddress.address); 
         setclickedDetailsAddress(null);
         setclickedDetailsAddressFN(null);
-        document.title = token.tokenAddress.name;
+        // document.title = token.tokenAddress.name;
+        setclickedTokenSymbol(token.tokenAddress.symbol);
         setfilteredtxDataInflow(); 
         setfilteredtxDataOutflow();
     }

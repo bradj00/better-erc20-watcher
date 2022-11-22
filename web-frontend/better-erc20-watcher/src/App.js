@@ -19,6 +19,7 @@ const [viewingTokenAddress, setviewingTokenAddress] = useState();
 const [watchedTokenList, setWatchedTokenList] = useState();
 const [filteredtxData, setfilteredtxData] = useState();
 const [totalVolume, setTotalVolume] = useState();
+const [clickedTokenSymbol, setclickedTokenSymbol] = useState();
 
 const [filteredtxDataInflow,   setfilteredtxDataInflow] = useState();
 const [filteredtxDataOutflow,   setfilteredtxDataOutflow] = useState();
@@ -35,6 +36,7 @@ const contextObj = {
   totalVolume, setTotalVolume,
   filteredtxDataInflow,   setfilteredtxDataInflow,
   filteredtxDataOutflow,  setfilteredtxDataOutflow,
+  clickedTokenSymbol, setclickedTokenSymbol,
 
 }
 

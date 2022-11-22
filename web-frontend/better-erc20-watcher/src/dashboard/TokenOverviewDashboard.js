@@ -26,6 +26,7 @@ import AudioToggle from './subcomponents/AudioToggle';
 import SearchIcon from '@mui/icons-material/Search';
 import SecondaryList from './subcomponents/SecondaryList';
 import MainList from './subcomponents/MainList';
+import {getEllipsisTxt} from './helpers/h.js';
 
 function Copyright(props) {
   return (
@@ -102,7 +103,9 @@ function DashboardContent() {
   const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
-  
+  const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
+
+
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
   const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
@@ -166,41 +169,47 @@ function DashboardContent() {
               // onClick={() => {updateSelectedToken(); }}
               style={{cursor:'pointer'}}
             >
-              <div style={{position:'absolute', height:'100%', width:'100%', display:'flex', justifyContent:'left', alignItems:'center', top:'0',  border:'0px solid #0f0'}}>
+              <div style={{position:'absolute', height:'100%', width:'50%', display:'flex', justifyContent:'left', alignItems:'center', top:'0',  border:'0px solid #0f0'}}>
               <div style={{zIndex:'9999', }} onClick={()=>{ console.log('clicked to clear filter') }}>
-              {
-                viewingTokenAddress? 
-                  <div style={{zIndex:'1'}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
-                    {viewingTokenAddress}
-                  </div>
-                : 
-                  <>0x0002...</>
-              }
+                {
+                  viewingTokenAddress? 
+                    <div>
+                      <div style={{zIndex:'1',paddingRight:'2vw',marginTop:'-3vh'}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
+                      {    clickedTokenSymbol? <>${clickedTokenSymbol}</> : '...'}
+                      </div>
+                      <div style={{color:'#999',fontSize:'2vh', bottom:'0.1vh', paddingLeft:'3vw',position:'absolute',}}>
+                      {getEllipsisTxt(viewingTokenAddress, 6)}
+                      </div>
+                    </div>
+                  : 
+                    <></>
+                }
               </div>
-                &nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <div style={{color:'#999'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
-                  <SearchIcon />
-                </div>&nbsp;
-              {
-                clickedDetailsAddressFN || clickedSearchBar?
-                  clickedSearchBar?
                 
-                  <div style={{zIndex:'9999', }} id="searchBox" >
-                    <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
-                      <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'5vh', width:'20vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
-                    </form>
-                  </div>
-                 
+                <div style={{color:'#999', width:'60%',display:'flex', border:'0px solid #ff0', position:'absolute', right:'0'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
+                {viewingTokenAddress? <SearchIcon />:<></>}
+                
+                {
+                  (clickedDetailsAddressFN || clickedSearchBar)?
+                    clickedSearchBar?
+                  
+                    <div style={{zIndex:'9999', }} id="searchBox" >
+                      <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
+                        <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'5vh', width:'20vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
+                      </form>
+                    </div>
+                  
+                    :
+                    <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+                    {clickedDetailsAddressFN}
+                    </div>
                   :
-                  <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-                  {clickedDetailsAddressFN}
+                  <div style={{zIndex:'9999', color:'#999' }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+                    {viewingTokenAddress? <>(click to search)</>:<></>}
                   </div>
-                :
-                <div style={{zIndex:'9999', color:'#999' }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-                  (click to search)
+          
+                } 
                 </div>
-        
-              } 
               </div>
             </Typography>
             <IconButton color="inherit">
