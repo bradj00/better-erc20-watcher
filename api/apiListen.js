@@ -36,7 +36,7 @@ app.listen(listenPort, () => {
         app.get('/txs/:collectionName', cors(), async (req, res) => {
             const db = client.db(dbName);
             const collection = db.collection(("a_"+req.params.collectionName));
-            collection.find().sort({block_timestamp: -1}).limit(500).toArray(function(err, result) { 
+            collection.find().sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {  //huge limit. We should paginate our own API to stay performant..
                 
                 res.send(result)
             });

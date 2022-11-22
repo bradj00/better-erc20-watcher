@@ -25,7 +25,7 @@ const fancylog = (str, bracketedStr, tokenAddress, spinner) => {
           green = 255;
           blue = 0;
           break;
-        case 'error':
+        case ' error ':
           red = 255;
           green = 0;
           blue = 0;
