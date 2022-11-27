@@ -98,3 +98,15 @@ a:hover {
   transition: visibility 0s 3s, opacity 3s linear;
 }
 
+.showLatestBlock {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 4s linear;
+}
+
+.hideLatestBlock {
+  visibility: hidden;
+  opacity: 0;
+  /* transition: visibility 0s 0s, opacity 0s linear; */
+}
+

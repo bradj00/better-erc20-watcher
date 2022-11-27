@@ -25,6 +25,7 @@ const [filteredtxDataInflow,   setfilteredtxDataInflow] = useState();
 const [filteredtxDataOutflow,   setfilteredtxDataOutflow] = useState();
 const [chainDataHeartbeat, setchainDataHeartbeat] = useState();
 const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = useState();
+const [latestEthBlock, setlatestEthBlock] = useState();
 
 const contextObj = {
   txData, settxData,
@@ -41,7 +42,7 @@ const contextObj = {
   clickedTokenSymbol, setclickedTokenSymbol,
   chainDataHeartbeat, setchainDataHeartbeat,
   chainDataHeartbeatDiff, setchainDataHeartbeatDiff,
-
+  latestEthBlock, setlatestEthBlock,
 }
 
 

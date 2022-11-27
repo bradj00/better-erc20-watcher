@@ -11,6 +11,7 @@ const DatabaseInfoGrabber = () => {
     const {txData, settxData} = useContext(GeneralContext);
     const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
     const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
+    const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
     
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
@@ -66,11 +67,19 @@ const DatabaseInfoGrabber = () => {
             setchainDataHeartbeat(data[0].heartbeat);
             const temp = new Date().getTime()
             const q = (temp - data[0].heartbeat);
-            console.log('ingestion engine heartbeat: ', data[0].heartbeat, 'diff: ', q);
+            // console.log('ingestion engine heartbeat: ', data[0].heartbeat, 'diff: ', q);
             setchainDataHeartbeatDiff(q);
         });
     }
 
+    function fetchLatestBlockFromChain(){
+        const url = "http://10.0.3.2:4000/latestBlock/";
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {setlatestEthBlock(data)})
+        
+
+    }
     function fetchTransactions( viewingTokenAddress ){
         fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress)
         // fetch('http://10.0.3.2:4000/txs/0x0f5d2fb29fb7d3cfee444a200298f468908cc942')
@@ -92,7 +101,7 @@ const DatabaseInfoGrabber = () => {
         // fetchTransactions();
         setInterval(()=>{
             fetchChainDataHeartbeat();
-            // updateHeartBeatDifferenceMarkers();
+            fetchLatestBlockFromChain();
         }, 1000);
     },[])
 

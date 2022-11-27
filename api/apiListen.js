@@ -28,6 +28,23 @@ app.listen(listenPort, () => {
         console.log('MongoDB Connected');
     
 
+        app.get('/latestBlock', cors(),(req, res) => {
+
+            const url = "https://deep-index.moralis.io/api/v2/dateToBlock?chain=eth&date="+(new Date().getTime() );
+            console.log('>>>>>> url: ', url);
+            axios.get(url ,{
+                headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                "X-API-Key" : moralisApiKey
+                },
+            })
+            .then(({data}) => {
+                res.send(data);
+            })
+
+        });
+
         app.get('/', cors(),(req, res) => {
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 if (err) {

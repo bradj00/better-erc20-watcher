@@ -123,13 +123,13 @@ function DashboardContent() {
 
   useEffect(() => {
     const temp = new Date().getTime();
-    console.log("chainData heartbeat: ", (temp - chainDataHeartbeat))
+    // console.log("chainData heartbeat: ", (temp - chainDataHeartbeat))
     setchainDataHeartbeatDiff(temp - chainDataHeartbeat);
   },[chainDataHeartbeat]);
 
 
   useEffect(() => {
-    console.log("CATCH- chainData heartbeat diff from db: ", chainDataHeartbeatDiff);
+    // console.log("CATCH- chainData heartbeat diff from db: ", chainDataHeartbeatDiff);
   },[chainDataHeartbeatDiff]);
 
 
