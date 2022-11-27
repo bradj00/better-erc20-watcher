@@ -25,6 +25,32 @@ var latestBlock = 0;
 
 
 
+
+setInterval(()=>{
+    const timestamp = new Date().getTime();
+    timestamp.toString();
+    MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+        if (err) {
+            h.fancylog(err, 'error');
+            reject(err);
+        }
+        const db = client.db('heartbeats');
+        db.collection("chainData").updateOne({heartbeat: { $lt: timestamp }}, {$set:{heartbeat:timestamp}}, { upsert: true }, function(err, result) {
+            if (err){
+                console.log('error updating heartbeat');
+                client.close();
+            }
+            if (result){
+                // console.log('updated heartbeat: '+timestamp);
+                client.close();
+            }
+        });
+
+
+    });
+}, 1000);
+
+
 const moralisApiKey = process.env.API_KEY;
 import * as h from './helpers/h.cjs';
 TimeAgo.addDefaultLocale(en)
@@ -35,38 +61,44 @@ spinner.color = 'white'
 
 function lookupSingleAddress(address, delay5){
     return new Promise(async (resolve, reject) => {
-    const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
-    const dbFN = client.db(dbNameFriendlyNames);
-    const collection = await dbFN.collection('lookup').find({address: address}).toArray();
+    try {
+        const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
+        const dbFN = client.db(dbNameFriendlyNames);
+        const collection = await dbFN.collection('lookup').find({address: address}).toArray();
+    
 
-    if (collection.length === 0) {
-        // even if it's blank lets move the task of looking up new addresses to translator.js and only use this function for mongo lookups
-        // setTimeout( async ()=>{
-        //     // console.log(count+' / '+uniqueAddys.length+'\tOpenSea lookup: ' + address);
-        //     const data  = await checkAddress(address);
-        //     if (data ) {
-        //         // console.log(chalk.green(`Found username ${data}`));
-        //         resolve(data);
-        //         client.close();
-        //     } 
-        //     else {
-        //         // console.log(chalk.red(`No username found for ${address}`));
-        //         resolve(data);
-        //         client.close();
-        //     }
-        // }, 500 * delay5);
-        resolve(address);
-    } else {
-        resolve(collection[0].friendlyName);
+        if (collection.length === 0) {
+            // even if it's blank lets move the task of looking up new addresses to translator.js and only use this function for mongo lookups
+            // setTimeout( async ()=>{
+            //     // console.log(count+' / '+uniqueAddys.length+'\tOpenSea lookup: ' + address);
+            //     const data  = await checkAddress(address);
+            //     if (data ) {
+            //         // console.log(chalk.green(`Found username ${data}`));
+            //         resolve(data);
+            //         client.close();
+            //     } 
+            //     else {
+            //         // console.log(chalk.red(`No username found for ${address}`));
+            //         resolve(data);
+            //         client.close();
+            //     }
+            // }, 500 * delay5);
+            resolve(address);
+        } else {
+            resolve(collection[0].friendlyName);
+        }
+    
+    } catch (error) {
+        console.error(error);
+        reject(error);
     }
-    
-    
     });
 }
 
 //function that connects to mongodb, uses db "watchedTokens" and for each collection, check if document exists where field "isSyncing" is true. If so console.log('syncing...') and resolve true.
 function checkIfSyncing(tokenName){
     return new Promise((resolve, reject) => {
+        try{
         MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
             if (err) {
                 h.fancylog(err, 'error');
@@ -91,6 +123,10 @@ function checkIfSyncing(tokenName){
             resolve(isSyncing);
             
         });
+    } catch (error) {
+        console.log(error);
+        reject(error);
+    }
     });
 }
 
@@ -127,7 +163,7 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                     if (!isSyncing){
                         // h.fancylog('not in the middle of a sync. Proceeding to gathering updated TXs..', ' mongo ', collectionName);
 
-
+                        try {
                         MongoClient.connect(mongoUrl, function(err, client) {
                             const db = client.db(dbName);        
                             const collection = db.collection(("a_"+collectionName));
@@ -161,6 +197,10 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                 }
                             });
                         });
+                    } catch (error) {
+                        console.log(error);
+                        reject(error);
+                    }
                     } else {
                         h.fancylog('is syncing. Skipping..', ' mongo ', collectionName, spinner);
                         resolve(true);
@@ -189,6 +229,8 @@ function updateAllWatchedTokens(coldStart){
         h.fancylog('cold start...');
     }
     //get all collection names from mongo for database "watchedTokens"
+
+    try {
     MongoClient.connect(mongoUrl, function(err, client) {
         if (err) throw err;
         const db = client.db(dbName);
@@ -216,6 +258,10 @@ function updateAllWatchedTokens(coldStart){
             
         });
     });
+    } catch (error) {
+        console.log(error);
+        reject(error);
+    }
 
 
 }
@@ -304,6 +350,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
             if (tokenTxs.length > 0){
                 if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;}
                 
+                try{
                 MongoClient.connect(mongoUrl, function(err, client) {
                     if (err) throw err;
                     const db = client.db(dbName);
@@ -332,6 +379,11 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                         // client.close();
                     });
                 });
+                } catch (error) {
+                    console.log(error);
+                    reject(error);
+                }
+
             }  
             else {
                 if (!coldStart){

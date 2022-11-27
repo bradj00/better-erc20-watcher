@@ -29,8 +29,24 @@ app.listen(listenPort, () => {
     
 
         app.get('/', cors(),(req, res) => {
-            const timestamp = new Date().getTime();
-            res.send(timestamp.toString()) // used for heartbeat
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                    reject(err);
+                }
+                const db = client.db('heartbeats');
+                db.collection("chainData").find({"heartbeat": {$exists: true}}).sort({block_timestamp: -1}).limit(1).toArray(function(err, result) {
+                    if (err) { 
+                        // h.fancylog(err, 'error');
+                        reject(err);
+                    }
+
+                    res.send(result);
+                    client.close();
+                });
+            });
+            // const timestamp = new Date().getTime();
+            // res.send(timestamp.toString()) // used for heartbeat
             
         }) 
         app.get('/txs/:collectionName', cors(), async (req, res) => {

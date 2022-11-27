@@ -15,6 +15,9 @@ const DatabaseInfoGrabber = () => {
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext); 
+    const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
+    const {chainDataHeartbeatDiff, setchainDataHeartbeatDiff} = useContext(GeneralContext);
+
 
     function fetchWatchedTokenList() {
         fetch('http://10.0.3.2:4000/watchedTokenList')
@@ -56,6 +59,18 @@ const DatabaseInfoGrabber = () => {
         })
     }
 
+    function fetchChainDataHeartbeat(){
+        fetch('http://10.0.3.2:4000/')
+        .then(response => response.json())
+        .then(data => {
+            setchainDataHeartbeat(data[0].heartbeat);
+            const temp = new Date().getTime()
+            const q = (temp - data[0].heartbeat);
+            console.log('ingestion engine heartbeat: ', data[0].heartbeat, 'diff: ', q);
+            setchainDataHeartbeatDiff(q);
+        });
+    }
+
     function fetchTransactions( viewingTokenAddress ){
         fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress)
         // fetch('http://10.0.3.2:4000/txs/0x0f5d2fb29fb7d3cfee444a200298f468908cc942')
@@ -63,12 +78,22 @@ const DatabaseInfoGrabber = () => {
         .then(data => setData(data))
 
     }
+    // function updateHeartBeatDifferenceMarkers(){
+    //     // console.log('chainDataHeartbeat: ',chainDataHeartbeat);
+    //     if (chainDataHeartbeat){
+    //         // console.log('checking..')
+    //         const temp = new Date().getTime()
+    //         setchainDataHeartbeatDiff(temp - chainDataHeartbeat);
+    //     }
+    // }
+
     useEffect(() => {
         fetchWatchedTokenList();
         // fetchTransactions();
-        // setInterval(()=>{
-        //     fetchTransactions()
-        // }, 5000);
+        setInterval(()=>{
+            fetchChainDataHeartbeat();
+            // updateHeartBeatDifferenceMarkers();
+        }, 1000);
     },[])
 
 

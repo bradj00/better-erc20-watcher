@@ -1,7 +1,7 @@
 import TokenOverviewDashboard from './dashboard/TokenOverviewDashboard.js';
 import DatabaseInfoGrabber from './dashboard/DatabaseInfoGrabber.js';
 import React, {useContext, useEffect, useState} from 'react';
-
+import ConnectionStatusBanner from './dashboard/ConnectionStatusBanner.jsx';
 
 
 
@@ -23,6 +23,8 @@ const [clickedTokenSymbol, setclickedTokenSymbol] = useState();
 
 const [filteredtxDataInflow,   setfilteredtxDataInflow] = useState();
 const [filteredtxDataOutflow,   setfilteredtxDataOutflow] = useState();
+const [chainDataHeartbeat, setchainDataHeartbeat] = useState();
+const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = useState();
 
 const contextObj = {
   txData, settxData,
@@ -37,13 +39,21 @@ const contextObj = {
   filteredtxDataInflow,   setfilteredtxDataInflow,
   filteredtxDataOutflow,  setfilteredtxDataOutflow,
   clickedTokenSymbol, setclickedTokenSymbol,
+  chainDataHeartbeat, setchainDataHeartbeat,
+  chainDataHeartbeatDiff, setchainDataHeartbeatDiff,
 
 }
+
+
+useEffect(() => {
+  // console.log("CATCH- chainData heartbeat diff from db: ", chainDataHeartbeatDiff);
+},[chainDataHeartbeatDiff]);
 
 return (
   <>
     <GeneralContext.Provider value={contextObj} >
       <div style={{overflow:'hidden', border:'0px solid #0f0'}}>
+          <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
           <TokenOverviewDashboard />
       </div>
     <DatabaseInfoGrabber />

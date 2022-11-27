@@ -84,3 +84,17 @@ a:hover {
 ::-webkit-scrollbar-thumb {
   background-color: #000;
 }
+
+
+.deadHeartbeat {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.3s linear;
+}
+
+.goodHeartbeat {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 3s, opacity 3s linear;
+}
+

@@ -27,6 +27,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import SecondaryList from './subcomponents/SecondaryList';
 import MainList from './subcomponents/MainList';
 import {getEllipsisTxt} from './helpers/h.js';
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en';
+TimeAgo.addDefaultLocale(en);
+
 
 function Copyright(props) {
   return (
@@ -104,12 +108,35 @@ function DashboardContent() {
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
-
+  
+  const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
+  const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
 
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
   const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
   const [searchInput, setsearchInput] = useState("")
+  
+  const timeAgo = new TimeAgo('en-US'); 
+
+
+
+  useEffect(() => {
+    const temp = new Date().getTime();
+    console.log("chainData heartbeat: ", (temp - chainDataHeartbeat))
+    setchainDataHeartbeatDiff(temp - chainDataHeartbeat);
+  },[chainDataHeartbeat]);
+
+
+  useEffect(() => {
+    console.log("CATCH- chainData heartbeat diff from db: ", chainDataHeartbeatDiff);
+  },[chainDataHeartbeatDiff]);
+
+
+
+
+
+
 
   function updateSelectedToken (){
     // setviewingTokenAddress(); 
@@ -163,7 +190,7 @@ function DashboardContent() {
             }}
           >
             
-            <IconButton
+            {/* <IconButton
               edge="start"
               color="inherit"
               aria-label="open drawer"
@@ -174,7 +201,7 @@ function DashboardContent() {
               }}
             >    
               <MenuIcon />
-            </IconButton>
+            </IconButton> */}
             <Typography
               component="h1"
               variant="h6"
@@ -228,12 +255,12 @@ function DashboardContent() {
               </div>
             </Typography>
             <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-                <div style={{position:'absolute', left: '-8vw', top:'0vh',zIndex:'9999',}}>
+                <div style={{position:'absolute', left: '-4vw', top:'0vh',zIndex:'9999',}}>
                   <AudioToggle />
                 </div>
-              </Badge>
+              {/* <Badge badgeContent={4} color="secondary"> */}
+                {/* <NotificationsIcon /> */}
+              {/* </Badge> */}
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -246,10 +273,12 @@ function DashboardContent() {
               px: [1],
             }}
           >
-            <IconButton onClick={toggleDrawer}>
+            {/* <IconButton onClick={toggleDrawer}>
               <ChevronLeftIcon />
-            </IconButton>
+            </IconButton> */}
           </Toolbar>
+
+
           <Divider />
           <List component="nav">
             {/* {mainListItems} */}
