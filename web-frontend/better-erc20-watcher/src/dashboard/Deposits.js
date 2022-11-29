@@ -20,12 +20,12 @@ export default function Deposits() {
   const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
-
+  const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext);
   
   return (
     <div style={{position:'absolute',textAlign:'center', height:'100%', border:'0px solid #ff0', width:'100%', userSelect:'none' }}>
     <React.Fragment>
-      <Title><span style={{ fontSize:'3vh'}}>Token Volume</span></Title>
+      <Title><span style={{ fontSize:'3vh'}}>{clickedDetailsAddressFN? clickedDetailsAddressFN == 'Uniswap v3 Pool'? <>DEX Volume</> : <>Token Volume</>: <>Token Volume</>}</span></Title>
       
       <Typography component="p" variant="h4" >
         {totalVolume?  commaNumber(parseInt(totalVolume)) : '...'}
@@ -35,19 +35,57 @@ export default function Deposits() {
       <br></br>
       {/* 2 divs here that span 50% each side by side */}
       <div style={{border:'0px solid #0f0', width:'100%',bottom:'0.5vh', height:'50%', position:'absolute', display:'flex', justifyContent:'center',alignItems:'center'}}>
-        <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
-          In-Flow
-          <div style={{fontSize:'2vh'}}>
-            {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
-          </div>
-        </div>
+        
+      {clickedDetailsAddressFN? clickedDetailsAddressFN == 'Uniswap v3 Pool'?
+        <>
 
-        <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
-          Out-Flow
+        <div style={{border:'0px solid #0f0', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
+          Buys
           <div style={{fontSize:'2vh'}}>
             {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
           </div>
         </div>
+        <div style={{border:'0px solid #f00', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
+          Sells
+          <div style={{fontSize:'2vh'}}>
+            {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+          </div>
+        </div>
+        </>
+      :
+      <>
+      <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
+        In-Flow
+        <div style={{fontSize:'2vh'}}>
+          {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+        </div>
+      </div>
+
+      <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
+        Out-Flow
+        <div style={{fontSize:'2vh'}}>
+          {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+        </div>
+      </div>
+      </>
+      :
+      <>
+      <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
+        In-Flow
+        <div style={{fontSize:'2vh'}}>
+          {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+        </div>
+      </div>
+
+      <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
+        Out-Flow
+        <div style={{fontSize:'2vh'}}>
+          {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+        </div>
+      </div>
+      </>
+      }
+
       </div>
       <div style={{border:'0px solid #0f0',position:'absolute', width:'100%',bottom:'-6%'}}>
         <Typography color="text.secondary" sx={{ flex: 1 }}  onClick={()=>{console.log(txData)}}>

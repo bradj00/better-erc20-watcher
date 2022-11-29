@@ -11,8 +11,7 @@ const ConnectionStatusBanner = (props) => {
 
 
     useEffect(() => {
-        console.log('latestEthBlock: ', latestEthBlock);
-
+        // console.log('latestEthBlock: ', latestEthBlock);
     },[latestEthBlock]);
 
     useEffect(() => {
@@ -26,7 +25,7 @@ const ConnectionStatusBanner = (props) => {
             {/* {props.diff? props.diff:<></>} */}
 
         </div>
-        <div className={props.diff? props.diff < 1000? "showLatestBlock":"hideLatestBlock":""} style={{textAlign:'center', fontSize:'2.3vh', zIndex:'9999',width:'13vw', height:'6.25vh',  top:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center',  color:'#888', position:'fixed'}}>
+        <div className={props.diff? props.diff < 1000? "showLatestBlock":"hideLatestBlock":""} style={{textAlign:'center', fontSize:'1.8vh', zIndex:'9999',width:'13vw', height:'6.25vh',  top:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center',  color:'#888', position:'fixed'}}>
             {/* {latestEthBlock? <>latest block: {JSON.stringify(latestEthBlock.block)}</>:<></>} */}
             {latestEthBlock? <>latest block:<br></br> {timeAgo.format(new Date(latestEthBlock.block_timestamp).getTime(),'mini')} ago</>:<></>}
         </div>

@@ -76,10 +76,10 @@ const DatabaseInfoGrabber = () => {
         const url = "http://10.0.3.2:4000/latestBlock/";
         fetch(url)
         .then(response => response.json())
-        .then(data => {setlatestEthBlock(data)})
-        
-
+        .then(data => {setlatestEthBlock(data)} )
     }
+
+
     function fetchTransactions( viewingTokenAddress ){
         fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress)
         // fetch('http://10.0.3.2:4000/txs/0x0f5d2fb29fb7d3cfee444a200298f468908cc942')
@@ -98,11 +98,14 @@ const DatabaseInfoGrabber = () => {
 
     useEffect(() => {
         fetchWatchedTokenList();
+        fetchLatestBlockFromChain();
+        fetchChainDataHeartbeat();
         // fetchTransactions();
+
         setInterval(()=>{
             fetchChainDataHeartbeat();
             fetchLatestBlockFromChain();
-        }, 1000);
+        }, 10000);
     },[])
 
 
@@ -116,7 +119,7 @@ const DatabaseInfoGrabber = () => {
             //create a setInterval that we can clear later
             setintervalQ( setInterval(() => {
                 fetchTransactions( viewingTokenAddress )
-            }, 5000));
+            }, 10000));
 
         }
     },[viewingTokenAddress])

@@ -29,7 +29,13 @@ import MainList from './subcomponents/MainList';
 import {getEllipsisTxt} from './helpers/h.js';
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en';
+
+
+
+
+
 TimeAgo.addDefaultLocale(en);
+
 
 
 function Copyright(props) {
@@ -177,6 +183,8 @@ function DashboardContent() {
 };
   /////////////////////////////////////////////////
 
+
+
   return (
       <div style={{overflow:'hidden'}}>
     <ThemeProvider theme={mdTheme}>
@@ -314,6 +322,12 @@ function DashboardContent() {
                   }}
                 >
                   <Chart />
+                  {/* <div style={{border:'1px solid #0f0', height:'100%',width:'100%', display:'flex', justifyContent:'center', alignItems:'center'}}>
+                    Chart goes here
+                    
+                    
+
+                  </div> */}
                 </Paper>
               </Grid>
               {/* Recent Deposits */}
