@@ -43,7 +43,7 @@ const SecondaryList = () => {
             <ListSubheader component="div" style={{fontSize:'1.5vw'}}>
             
             </ListSubheader>
-        {watchedTokenList? watchedTokenList.length > 0? watchedTokenList.map((token, index) => (
+        {watchedTokenList? watchedTokenList.length > 0? <>{watchedTokenList.map((token, index) => (
             token? token.tokenAddress?
                 <ListItemButton  style={{backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(255,255,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} onClick={()=>{ updateSelectedToken(token) }}>
                 {/* <ListItemIcon>
@@ -54,7 +54,12 @@ const SecondaryList = () => {
                 </ListItemButton>
             : <div key={index}></div> : <div key={index}></div>
             
-        )): <></>: <></>
+        ))}
+        <div style={{width:'100%',textAlign:'center', display:'flex', justifyContent:'center',alignItems:'center', border:'1px solid rgba(100,100,120,1)', borderRight:'0px solid #fff',borderLeft:'0px solid #fff', borderRadius:'5px', backgroundColor:'rgba(100,100,120,0.4)', position:'absolute',top:'150%',height:'100%',}}>
+            Options Panel here<br></br>
+            updates on token selection
+        </div>
+        </>: <></>: <></>
 
         }
 

@@ -77,7 +77,7 @@ a:hover {
 }
 
 ::-webkit-scrollbar {
-  width: 2px;
+  width: 15px;
   background-color: #888;
 }
 

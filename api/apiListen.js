@@ -12,8 +12,11 @@ dotenv.config();
 const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'watchedTokens';
-
 const listenPort = 4000;
+
+
+const IgnoredAddresses = ["0x333e3763085fc14854978f89261890339cb2f6a9", "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"]
+
 
 const moralisApiKey = process.env.API_KEY;
 
@@ -29,7 +32,7 @@ app.listen(listenPort, () => {
     
 
         app.get('/latestBlock', cors(),(req, res) => {
-
+            try{
             const url = "https://deep-index.moralis.io/api/v2/dateToBlock?chain=eth&date="+(new Date().getTime() );
             console.log('>>>>>> url: ', url);
             axios.get(url ,{
@@ -42,6 +45,9 @@ app.listen(listenPort, () => {
             .then(({data}) => {
                 res.send(data);
             })
+            }catch(e){
+                console.log('error: ', e);
+            }
 
         });
 
@@ -69,7 +75,9 @@ app.listen(listenPort, () => {
         app.get('/txs/:collectionName', cors(), async (req, res) => {
             const db = client.db(dbName);
             const collection = db.collection(("a_"+req.params.collectionName));
-            collection.find().sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {  //huge limit. We should paginate our own API to stay performant..
+
+
+            collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {  //huge limit. We should paginate our own API to stay performant..
                 
                 res.send(result)
             });
