@@ -1,6 +1,8 @@
 # better-erc20-watcher
 Watch ERC20 transactions live. Categorize on-chain actions and give friendly labels to addresses
 
+**Coming soon:** Install instructions and pre-requisites to use this tool.
+
 
 using:
 
