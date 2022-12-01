@@ -1,3 +1,7 @@
+body {
+  user-select: none;
+}
+
 .App {
   text-align: center;
 }
@@ -110,3 +114,60 @@ a:hover {
   /* transition: visibility 0s 0s, opacity 0s linear; */
 }
 
+
+.hoverAddNewToken {
+  color: rgba(255,255,255,0.4);
+  cursor:pointer;
+  user-select: none;
+}
+.hoverAddNewToken:hover {
+  color: rgba(255,255,255,1);
+  cursor:pointer;
+  user-select: none;
+}
+
+
+.timeFilter-slider{
+  -webkit-appearance: none;
+  width: 92%;
+  margin-left:3.75vw;
+  height: 1.5vh;
+  border-radius: 5px;
+  background: rgba(50,100,150, 1);
+  outline: none;
+  opacity: 1;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.timeFilter-thumb{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 3vw;
+  height: 1.5vw;
+  border-radius: 0.5vh;
+  background: rgba(100,200,250, 1);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+
+}
+/* .timeFilter-track{
+  
+
+} */
+
+.hoverResetTimeFilter{
+  background-color: rgba(100,200,250, 0.4);
+  cursor:pointer;
+  user-select: none;
+}
+.hoverResetTimeFilter:hover {
+  background-color: rgba(100,200,250, 1);
+  cursor:pointer;
+  user-select: none;
+}
