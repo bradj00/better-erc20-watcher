@@ -49,8 +49,11 @@ export default function Chart() {
       let formattedTx = createData(tx.block_timestamp.substr(5,5), (tx.value / (10**18)) );
       formattedTxData.push(formattedTx);
     });
-
-    setformattedTxData(filterFromIndex(formattedTxData.reverse(), timeFilter) )
+    if (timeFilter != 0){
+      setformattedTxData(filterFromIndex(formattedTxData, timeFilter) )
+    }else {
+      setformattedTxData(filterFromIndex(formattedTxData.reverse(), timeFilter) )
+    }
     setTotalVolume(totalVolume);
   }
 
@@ -82,7 +85,11 @@ export default function Chart() {
           
       });
 
-        setfilteredtxDataDual( filterFromIndex(filteredTxDataTemp.reverse(), timeFilter) );
+        if (timeFilter != 0){
+          setfilteredtxDataDual( filterFromIndex(filteredTxDataTemp, timeFilter) );
+        }else {
+          setfilteredtxDataDual( filterFromIndex(filteredTxDataTemp.reverse(), timeFilter) );
+        }
       
         
     }
@@ -194,9 +201,17 @@ useEffect(()=>{
             onAfterChange={(value) => { 
               console.log('final:' ,value);
               if (clickedDetailsAddress){
+                if (timeFilter != 0){
+                  setfilteredtxDataDual( filterFromIndex(formattedTxData, value)) //if we're filtering dont reverse it. we already have it reversed
+                }else {
                 setfilteredtxDataDual( filterFromIndex(formattedTxData.reverse(), value))
+                }
               }else {
-                setformattedTxData( filterFromIndex(formattedTxData.reverse(), value))
+                if (timeFilter != 0){
+                  setformattedTxData( filterFromIndex(formattedTxData, value)) //if we're filtering dont reverse it. we already have it reversed
+                }else {
+                  setformattedTxData( filterFromIndex(formattedTxData.reverse(), value))
+                }
               }
                 
               // settimeFilter( filterFromIndex(formattedTxData.reverse(), value) ); 
