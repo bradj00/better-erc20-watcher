@@ -32,20 +32,19 @@ setInterval(()=>{
     MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
         if (err) {
             h.fancylog(err, 'error');
-            reject(err);
+        }else {
+            const db = client.db('heartbeats');
+            db.collection("chainData").updateOne({heartbeat: { $lt: timestamp }}, {$set:{heartbeat:timestamp}}, { upsert: true }, function(err, result) {
+                if (err){
+                    console.log('error updating heartbeat');
+                    client.close();
+                }
+                if (result){
+                    // console.log('updated heartbeat: '+timestamp);
+                    client.close();
+                }
+            });
         }
-        const db = client.db('heartbeats');
-        db.collection("chainData").updateOne({heartbeat: { $lt: timestamp }}, {$set:{heartbeat:timestamp}}, { upsert: true }, function(err, result) {
-            if (err){
-                console.log('error updating heartbeat');
-                client.close();
-            }
-            if (result){
-                // console.log('updated heartbeat: '+timestamp);
-                client.close();
-            }
-        });
-
 
     });
 }, 1000);
@@ -168,10 +167,10 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                             const db = client.db(dbName);        
                             const collection = db.collection(("a_"+collectionName));
                             collection.find().sort({block_timestamp: -1}).limit(1).toArray(function(err, result) {
-                                if (err) throw err; 
+                                if (err) console.log(err); 
                                 if (result.length > 0){
                                     const timeAgo = new TimeAgo('en-US')
-                                    if (!coldStart){h.fancylog('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName,spinner);}
+                                    if (!coldStart && result[0]&& result[0].blockTimestamp){h.fancylog('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName,spinner);}
                                     // if (!coldStart){h.fancylog('most recent cached tx was [  ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName);}
 
                                     result[0].value = parseFloat(result[0].value/(10**18).toFixed(4));
@@ -191,8 +190,8 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
 
                                     let q = 0;
                                     if (collectionName != "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"){
-                                        q = 14117606 ;   //super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
-                                    }
+                                        q = 16017606 ;   //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
+                                    }       
                                     getTokenTranscationsFromMoralis(0, 100, collectionName, 1, q, coldStart, resolve, tokenTxs); 
                                 }
                             });
@@ -287,8 +286,8 @@ function getLatestBlockFromMoralis(){
 }
 
 function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
-    if ((fromBlock == undefined)){
-        fromBlock = 0;
+    if ((fromBlock == undefined) || (!fromBlock)){
+        fromBlock = 16017606; //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
     }
     
     //1 block past the last block we have in our db
@@ -401,6 +400,6 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
 
     })
     .catch(function (error) {
-        console.log(chalk.red('there was an error making the web fetch call: '),error.code);
+        console.log(chalk.red('there was an error making the web fetch call: '),error);
       })
 }

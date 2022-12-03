@@ -27,6 +27,12 @@ const [chainDataHeartbeat, setchainDataHeartbeat] = useState();
 const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = useState();
 const [latestEthBlock, setlatestEthBlock] = useState();
 
+
+const [MinAmountFilterValue, setMinAmountFilterValue] = useState();
+const [MaxAmountFilterValue, setMaxAmountFilterValue] = useState();
+const [DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue] = useState();
+const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState();
+
 const contextObj = {
   txData, settxData,
   getnewTxData, setgetnewTxData,
@@ -43,6 +49,11 @@ const contextObj = {
   chainDataHeartbeat, setchainDataHeartbeat,
   chainDataHeartbeatDiff, setchainDataHeartbeatDiff,
   latestEthBlock, setlatestEthBlock,
+
+  MinAmountFilterValue, setMinAmountFilterValue,
+  MaxAmountFilterValue, setMaxAmountFilterValue,
+  DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue,
+  DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue,
 }
 
 

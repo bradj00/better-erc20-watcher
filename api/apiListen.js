@@ -32,9 +32,9 @@ app.listen(listenPort, () => {
     
 
         app.get('/latestBlock', cors(),(req, res) => {
-            try{
+            
             const url = "https://deep-index.moralis.io/api/v2/dateToBlock?chain=eth&date="+(new Date().getTime() );
-            console.log('>>>>>> url: ', url);
+            // console.log('>>>>>> url: ', url);
             axios.get(url ,{
                 headers: {
                 Accept: "application/json",
@@ -45,9 +45,9 @@ app.listen(listenPort, () => {
             .then(({data}) => {
                 res.send(data);
             })
-            }catch(e){
-                console.log('error: ', e);
-            }
+            .catch((err) => {
+                console.log('error: ', err);
+            });
 
         });
 
@@ -55,13 +55,13 @@ app.listen(listenPort, () => {
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 if (err) {
                     h.fancylog(err, 'error');
-                    reject(err);
+                    resolve('------error: ',err);
                 }
                 const db = client.db('heartbeats');
                 db.collection("chainData").find({"heartbeat": {$exists: true}}).sort({block_timestamp: -1}).limit(1).toArray(function(err, result) {
                     if (err) { 
                         // h.fancylog(err, 'error');
-                        reject(err);
+                        resolve('------error: ',err);
                     }
 
                     res.send(result);
@@ -94,7 +94,7 @@ app.listen(listenPort, () => {
         app.get('/tokenInfo/:tokenAddress', cors(), async (req, res) => {
             
             const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+req.params.tokenAddress;
-            console.log('>>>>>> url: ', url);
+            // console.log('>>>>>> url: ', url);
             axios.get(url ,{
                 headers: {
                 Accept: "application/json",

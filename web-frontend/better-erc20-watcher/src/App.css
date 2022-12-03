@@ -171,3 +171,14 @@ a:hover {
   cursor:pointer;
   user-select: none;
 }
+
+.filterResetHover {
+  color: rgba(255,255,255,0.4);
+  cursor:pointer;
+  user-select: none;
+}
+.filterResetHover:hover {
+  color: rgba(255,0,0,1);
+  cursor:pointer;
+  user-select: none;
+}

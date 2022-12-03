@@ -117,11 +117,16 @@ function DashboardContent() {
   
   const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
   const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
+  
+  const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
+  const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
 
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
   const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
   const [searchInput, setsearchInput] = useState("")
+  const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
+  const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
   
   const timeAgo = new TimeAgo('en-US'); 
 
@@ -183,10 +188,12 @@ function DashboardContent() {
 };
   /////////////////////////////////////////////////
 
-
+function function66(e){
+  console.log("function66:", e)
+}
 
   return (
-      <div style={{overflow:'hidden'}}>
+    <div style={{overflow:'hidden'}}>
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
@@ -197,7 +204,27 @@ function DashboardContent() {
               pr: '24px', // keep right padding when drawer closed
             }}
           >
-            
+          <div style={{fontSize:'1.5vh', position:'absolute', right:'15vw', top:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', backgroundColor:'rgba(0,0,0,0.4)',width:'13vw', height:'6.5vh'}}>
+            <div style={{}}>
+              <div  style={{position:'absolute', left:'0', top:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
+                Filter Amount
+              </div>
+
+              <div style={{ bottom:'0',}}>
+                
+                <input type="number" value={DisplayMinAmountFilterValue} onChange={(e) => setDisplayMinAmountFilterValue(e.target.value)} style={{width:'5vw',marginRight:'1vw', height:'2.5vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="Min" />
+                <input type="number" value={DisplayMaxAmountFilterValue} onChange={(e) => setDisplayMaxAmountFilterValue(e.target.value)} style={{width:'5vw', height:'2.5vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="Max" />
+
+                
+              </div>
+
+              <div className="filterResetHover" onClick={() =>{setMaxAmountFilterValue(); setMinAmountFilterValue(); }} style={{position:'absolute', left:'0', bottom:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
+                Reset
+              </div>
+            </div>
+          </div>
+
+
             {/* <IconButton
               edge="start"
               color="inherit"

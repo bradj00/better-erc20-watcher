@@ -18,7 +18,11 @@ const DatabaseInfoGrabber = () => {
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext); 
     const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
     const {chainDataHeartbeatDiff, setchainDataHeartbeatDiff} = useContext(GeneralContext);
-
+    
+    const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
+    const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
+    const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
+    const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
 
     function fetchWatchedTokenList() {
         fetch('http://10.0.3.2:4000/watchedTokenList')
@@ -125,8 +129,36 @@ const DatabaseInfoGrabber = () => {
     },[viewingTokenAddress])
 
     useEffect(() => {
-        settxData(data)
-    },[data])
+        const timeOutId = setTimeout(() => setMinAmountFilterValue(DisplayMinAmountFilterValue), 2500);
+        return () => clearTimeout(timeOutId);
+      }, [DisplayMinAmountFilterValue ]);
+
+    useEffect(() => {
+        const timeOutId = setTimeout(() => setMaxAmountFilterValue(DisplayMaxAmountFilterValue), 2500);
+        return () => clearTimeout(timeOutId);
+      }, [DisplayMaxAmountFilterValue ]);
+
+
+
+    useEffect(() => {
+        console.log('data: ', data);
+        // if (MinAmountFilterValue || MaxAmountFilterValue) is defined then filter data only showing transactions that are between the two values
+        let checkedMinValue = 0;
+        let checkedMaxValue = 0;
+        if (MinAmountFilterValue || MaxAmountFilterValue){
+            console.log('MinAmountFilterValue: ', MinAmountFilterValue, ' MaxAmountFilterValue: ', MaxAmountFilterValue);
+            if (!MinAmountFilterValue){ checkedMaxValue = 999999999 } else { checkedMinValue = MinAmountFilterValue } 
+            if (!MaxAmountFilterValue){ checkedMaxValue = 999999999 } else { checkedMaxValue = MaxAmountFilterValue } 
+            const temp = data.filter((item) => {
+                if ((parseInt(item.value) / 10 ** 18) >= checkedMinValue && (parseInt(item.value) / 10 ** 18) <= checkedMaxValue){
+                    return item;
+                }
+            })
+            settxData(temp);
+        }else {
+            settxData(data)
+        }
+    },[data, MinAmountFilterValue, MaxAmountFilterValue])
 
     useEffect(() => {
         // console.log('filteredAddyData: ',filteredAddyData);
