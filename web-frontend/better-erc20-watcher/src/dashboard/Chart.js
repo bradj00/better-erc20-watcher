@@ -178,6 +178,7 @@ useEffect(()=>{
             >
               Amount
             </Label>
+            
           </YAxis>
         </BarChart>
         

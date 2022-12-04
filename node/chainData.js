@@ -231,10 +231,10 @@ function updateAllWatchedTokens(coldStart){
 
     try {
     MongoClient.connect(mongoUrl, function(err, client) {
-        if (err) throw err;
+        if (err) console.log('THERE WAS AN ERROR: ',err);
         const db = client.db(dbName);
         db.listCollections().toArray(function(err, collections) {
-            if (err) throw err;
+            if (err) console.log('THERE WAS AN ERROR: ',err);
             
 
             // h.fancylog(collections);
@@ -352,7 +352,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                 
                 try{
                 MongoClient.connect(mongoUrl, function(err, client) {
-                    if (err) throw err;
+                    if (err) console.log('THERE WAS AN ERROR: ',err);
                     const db = client.db(dbName);
                     const collection = db.collection("a_"+tokenAddress);
 
