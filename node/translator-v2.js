@@ -1,6 +1,10 @@
+//the structural question from here is whether to make this a daemon and run with cron periodically, dynamically called by chainData.js, or a setInterval and sleep like 
+//how chainData.js works right now.
+
 import axios from 'axios';
 import chalk from 'chalk';
 import * as MongoClientQ from 'mongodb';
+import { resolve } from 'path';
 import { getSystemErrorMap } from 'util';
 const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
@@ -28,21 +32,27 @@ getAddresses()
     // console.log('uniqueAddys.length from getAddresses(): ', uniqueAddys.length);
     checkIfAddressesExistInFriendlyNames( uniqueAddys )
     .then((thisObj) => {
-        console.log('thisObj: ', Object.keys(thisObj));
         let toLookup = thisObj.toLookup;
         let existsInCache = thisObj.existsInCache;
-        console.log('toLookup.length: ', toLookup.length);
-        console.log('existsInCache.length: ', existsInCache.length);
+        console.log('addresses to lookup friendlyName:\t', toLookup.length);
+        console.log('cached friendlyName addresses:\t\t', existsInCache.length);
 
-        console.log(chalk.cyan('simultaneously kicking off jobs: ')+chalk.yellow('UpdateTxsFromEachCollection()')+' and '+chalk.yellow('LookupAddressesFromApi()'));
+        console.log(chalk.cyan('\nstarting job: ')+chalk.yellow('LookupAddressesFromApi()'));
         
         LookupAddressesFromApi(toLookup)
         // let existsInCacheFirstFive = existsInCache.slice(0, 5);
         // LookupAddressesFromApi(existsInCacheFirstFive)
         .then((data) => {
-            console.log(chalk.cyan('Updating TXs with the friendlyNames we had to fetch: '), data);
-            UpdateTxsFromEachCollection(data, 'loud') // console.log any tx updates that happen
+            if (data) {
+                console.log(chalk.cyan('Updating TXs with the friendlyNames we had to fetch: '), data);
+                UpdateTxsFromEachCollection(data, 'loud') // console.log any tx updates that happen
+            } else {
+                console.log(chalk.yellow('LookupAddressesFromApi()')+'\tfinished. No new addresses to update.');
+            }
         });
+
+
+        console.log(chalk.cyan('starting job: ')+chalk.yellow('UpdateTxsFromEachCollection()'));
         UpdateTxsFromEachCollection(existsInCache, 'silent'); // silence logging tx updates since there will be a lot from the cached addresses
 
     })
@@ -58,8 +68,8 @@ getAddresses()
         console.log('thisObj: ', Object.keys(thisObj));
         let toLookup = thisObj.toLookup;
         let existsInCache = thisObj.existsInCache;
-        console.log('toLookup.length: ', toLookup.length);
-        console.log('existsInCache.length: ', existsInCache.length);
+        console.log('addresses to lookup friendlyName:\t', toLookup.length);
+        console.log('cached friendlyName addresses:\t\t', existsInCache.length);
 
         console.log(chalk.cyan('simultaneously kicking off jobs: ')+chalk.yellow('UpdateTxsFromEachCollection()')+' and '+chalk.yellow('LookupAddressesFromApi()'));
         
@@ -125,8 +135,8 @@ function checkIfAddressesExistInFriendlyNames(){
                 uniqueAddysToLookup.push(address);
             }
         }
-        console.log('uniqueAddysCachedPresent.length: ', uniqueAddysCachedPresent.length);
-        console.log('uniqueAddysToLookup.length: ', uniqueAddysToLookup.length);
+        // console.log('uniqueAddysCachedPresent.length: ', uniqueAddysCachedPresent.length);
+        // console.log('uniqueAddysToLookup.length: ', uniqueAddysToLookup.length);
         client.close();
         resolve({toLookup: uniqueAddysToLookup, existsInCache: uniqueAddysCachedPresent});
     });
@@ -136,6 +146,9 @@ function checkIfAddressesExistInFriendlyNames(){
 async function UpdateTxsFromEachCollection(addresses, silentSwitch){
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
     const dbFN = client.db(dbNameFriendlyNames);
+    const db = client.db(dbNameQueryAddys);
+
+
 
     for (let i = 0; i < addresses.length; i++) {
         // setTimeout(() => {
@@ -146,8 +159,12 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
                 if (silentSwitch == 'loud'){
                     console.log('updating all collections matching address: ', chalk.magenta(addresses[i]),' with friendlyName: ', chalk.magenta(friendlyName[0].friendlyName));
                 }
-                // db.collection.updateMany({from_address: addresses[i]}, {$set: {from_address_friendlyName: friendlyName}})
-                // db.collection.updateMany(  {to_address: addresses[i]}, {$set: {to_address_friendlyName: friendlyName}})
+
+                const collections = await db.listCollections().toArray();
+                for (let j = 0; j < collections.length; j++) {
+                    db.collection(collections[j].name).updateMany({from_address: addresses[i]}, {$set: {from_address_friendlyName: friendlyName[0].friendlyName}})
+                    db.collection(collections[j].name).updateMany(  {to_address: addresses[i]}, {$set: {to_address_friendlyName: friendlyName[0].friendlyName}})
+                }
             }
             else { 
                 if (silentSwitch == 'loud'){
@@ -156,7 +173,7 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
             }
         // }, 200 * i);
         if (i == addresses.length - 1) {
-            console.log('done updating all collections, count: ', i);
+            console.log(chalk.yellow('UpdateTxsFromEachCollection()')+'\tfinished. Records updated for: '+chalk.yellow(i)+' addresses');
             console.log('--------------------------------------------');
             client.close();
         }
@@ -168,6 +185,9 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
 const LookupAddressesFromApi = (ListOfAddresses) => {
     // console.log('list of addresses: ', ListOfAddresses);
     return new Promise( (resolve, reject) => {
+        if (ListOfAddresses.length == 0) {
+            resolve();
+        }
         let newlyFetchedAddresses = [];
         ListOfAddresses.reduce((promiseChain, item, index) => {
             console.log('index: ', index);
