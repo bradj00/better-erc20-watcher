@@ -129,13 +129,13 @@ const DatabaseInfoGrabber = () => {
     },[viewingTokenAddress])
 
     useEffect(() => {
-        const timeOutId = setTimeout(() => setMinAmountFilterValue(DisplayMinAmountFilterValue), 2500);
-        return () => clearTimeout(timeOutId);
+        const timeOutId = setTimeout(() => setMinAmountFilterValue(DisplayMinAmountFilterValue), 500);
+        // return () => clearTimeout(timeOutId);
       }, [DisplayMinAmountFilterValue ]);
 
     useEffect(() => {
-        const timeOutId = setTimeout(() => setMaxAmountFilterValue(DisplayMaxAmountFilterValue), 2500);
-        return () => clearTimeout(timeOutId);
+        const timeOutId = setTimeout(() => setMaxAmountFilterValue(DisplayMaxAmountFilterValue), 500);
+        // return () => clearTimeout(timeOutId);
       }, [DisplayMaxAmountFilterValue ]);
 
 
@@ -147,7 +147,7 @@ const DatabaseInfoGrabber = () => {
         let checkedMaxValue = 0;
         if (MinAmountFilterValue || MaxAmountFilterValue){
             console.log('MinAmountFilterValue: ', MinAmountFilterValue, ' MaxAmountFilterValue: ', MaxAmountFilterValue);
-            if (!MinAmountFilterValue){ checkedMaxValue = 999999999 } else { checkedMinValue = MinAmountFilterValue } 
+            if (!MinAmountFilterValue){ checkedMinValue = 0 } else { checkedMinValue = MinAmountFilterValue } 
             if (!MaxAmountFilterValue){ checkedMaxValue = 999999999 } else { checkedMaxValue = MaxAmountFilterValue } 
             const temp = data.filter((item) => {
                 if ((parseInt(item.value) / 10 ** 18) >= checkedMinValue && (parseInt(item.value) / 10 ** 18) <= checkedMaxValue){

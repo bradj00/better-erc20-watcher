@@ -130,6 +130,12 @@ function DashboardContent() {
   
   const timeAgo = new TimeAgo('en-US'); 
 
+  useEffect(() => {
+
+  },[DisplayMinAmountFilterValue]);
+  useEffect(() => {
+
+  },[DisplayMaxAmountFilterValue]);
 
 
   useEffect(() => {
@@ -211,14 +217,11 @@ function function66(e){
               </div>
 
               <div style={{ bottom:'0',}}>
-                
                 <input type="number" value={DisplayMinAmountFilterValue} onChange={(e) => setDisplayMinAmountFilterValue(e.target.value)} style={{width:'5vw',marginRight:'1vw', height:'2.5vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="Min" />
                 <input type="number" value={DisplayMaxAmountFilterValue} onChange={(e) => setDisplayMaxAmountFilterValue(e.target.value)} style={{width:'5vw', height:'2.5vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="Max" />
-
-                
               </div>
 
-              <div className="filterResetHover" onClick={() =>{setMaxAmountFilterValue(); setMinAmountFilterValue(); }} style={{position:'absolute', left:'0', bottom:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
+              <div className="filterResetHover" onClick={() =>{setMaxAmountFilterValue(); setMinAmountFilterValue();setDisplayMaxAmountFilterValue(0); setDisplayMinAmountFilterValue(0) }} style={{position:'absolute', left:'0', bottom:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
                 Reset
               </div>
             </div>

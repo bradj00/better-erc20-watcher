@@ -287,7 +287,8 @@ function getLatestBlockFromMoralis(){
 
 function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
     if ((fromBlock == undefined) || (!fromBlock)){
-        fromBlock = 16017606; //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
+        // fromBlock = 16017606; //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
+        fromBlock = 0; //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
     }
     
     //1 block past the last block we have in our db

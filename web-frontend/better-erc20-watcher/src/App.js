@@ -52,7 +52,7 @@ const contextObj = {
 
   MinAmountFilterValue, setMinAmountFilterValue,
   MaxAmountFilterValue, setMaxAmountFilterValue,
-  DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue,
+  DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue,
   DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue,
 }
 
