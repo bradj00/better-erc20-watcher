@@ -6,7 +6,11 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
-// import TimeAgo from 'react-timeago'
+
+
+import FilterListIcon from '@mui/icons-material/FilterList';
+import EditIcon from '@mui/icons-material/Edit';
+import PersonIcon from '@mui/icons-material/Person';
 
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
@@ -101,6 +105,8 @@ export default function Orders() {
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
+  
+  const {rowClickMode, setrowClickMode} = useContext(GeneralContext);
 
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow, setfilteredtxDataOutflow} = useContext(GeneralContext);
@@ -149,10 +155,38 @@ export default function Orders() {
     }
   },[txData])
 
+  function processTableClicked(row, fromOrTo){
+    if (rowClickMode == 'manager'){
+
+    }
+    else if (rowClickMode == 'filter'){
+      if (fromOrTo == 'from'){
+        setclickedDetailsAddress(row.from_address)
+        setclickedDetailsAddressFN(row.from_address_fn)
+      }
+      else if (fromOrTo == 'to'){
+        setclickedDetailsAddress(row.to_address)
+        setclickedDetailsAddressFN(row.to_address_fn)
+      }
+    }
+
+
+  }
+
+
 
   return (
     <React.Fragment>
       <Title>Transactions</Title>
+      <div className="txClickModeHover" style={{position:'absolute', top:'39vh', zIndex:'9999', left:'27%',   padding:'1vh'}}> 
+        <FilterListIcon style={{fontSize:'1.5vw',}}/>
+      </div>
+      <div className="txClickModeHover" style={{position:'absolute', top:'39vh', zIndex:'9999', left:'29%', padding:'1vh'}}> 
+        <EditIcon style={{fontSize:'1.5vw',}}/>
+      </div>
+      <div className="txClickModeHover" style={{position:'absolute', top:'39vh', zIndex:'9999', left:'31%', padding:'1vh'}}> 
+        <PersonIcon style={{fontSize:'1.5vw',}}/>
+      </div>
       <div  style={{overflowY:'scroll', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
         <Table size="small" >
           <TableHead style={{position:'sticky',top:'0',backgroundColor:'rgba(50,50,60,1)'}}>
@@ -176,8 +210,9 @@ export default function Orders() {
                   <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
                   {/* <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell> */}
                   <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
-                  <TableCell style={{fontSize:'1vw',color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#ccc":"#aaa":"#aaa"}}  onClick={ ()=>{console.log('clicked:',row.from_address); setclickedDetailsAddress(row.from_address); setclickedDetailsAddressFN(row.from_address_friendlyName) } }   >{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
-                  <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#ccc":"#aaa":"#aaa"}}      onClick={ ()=>{console.log('clicked:',row.to_address);   setclickedDetailsAddress(row.to_address);   setclickedDetailsAddressFN(row.to_address_friendlyName) } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell>
+                  <TableCell style={{fontSize:'1vw',color: row.from_address_friendlyName? !row.from_address_friendlyName.match(/0x000/)?"#ccc":"#aaa":"#aaa"}}  onClick={ ()=>{processTableClicked(row, 'from')} }   >{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): row.from_address_friendlyName}</TableCell>
+                  {/* <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#ccc":"#aaa":"#aaa"}}      onClick={ ()=>{console.log('clicked:',row.to_address);   setclickedDetailsAddress(row.to_address);   setclickedDetailsAddressFN(row.to_address_friendlyName) } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName}</TableCell> */}
+                  <TableCell style={{fontSize:'1vw',color: row.to_address_friendlyName? !row.to_address_friendlyName.match(/0x000/)?"#ccc":"#aaa":"#aaa"}}      onClick={ ()=>{processTableClicked(row, 'to') } }> {((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): row.to_address_friendlyName} </TableCell>
                   <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
                 </TableRow>
                 

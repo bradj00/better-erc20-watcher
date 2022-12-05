@@ -1,4 +1,5 @@
 console.clear(); 
+console.log(chalk.cyan.underline.inverse('apiListen.js')+'\n');
 
 import * as MongoClientQ from 'mongodb';
 import express from 'express';
@@ -12,6 +13,7 @@ dotenv.config();
 const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'watchedTokens';
+const dbNameFN = 'friendlyNames';
 const listenPort = 4000;
 
 
@@ -55,13 +57,12 @@ app.listen(listenPort, () => {
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 if (err) {
                     h.fancylog(err, 'error');
-                    resolve('------error: ',err);
+                    
                 }
                 const db = client.db('heartbeats');
                 db.collection("chainData").find({"heartbeat": {$exists: true}}).sort({block_timestamp: -1}).limit(1).toArray(function(err, result) {
                     if (err) { 
-                        // h.fancylog(err, 'error');
-                        resolve('------error: ',err);
+                        h.fancylog(err, 'error');
                     }
 
                     res.send(result);
@@ -119,6 +120,22 @@ app.listen(listenPort, () => {
             });
         });    
 
+        app.get('/friendlyName/:theAddress', cors(), async (req, res) => {
+            const db = client.db(dbNameFN);
+
+            console.log('looking up: ', req.params.theAddress);
+            const collection = db.collection('lookup'); 
+     
+            //we have to use a more expensive regex here because sometimes the address comes in not checksummed from Moralis. I could cast them all to lowercase but this seems better.
+            const regex = new RegExp(`^${req.params.theAddress}$`, `i`);
+            collection.find({address: regex }).toArray(function(err, result) {
+                if (err) {
+                    console.log('error: ', err);
+                }
+                console.log('result: ', result);
+                res.send(result)
+            });
+        });
 
         app.get('/watchedTokenList', cors(), async (req, res) => {
             const db = client.db(dbName);

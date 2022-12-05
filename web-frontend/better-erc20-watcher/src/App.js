@@ -33,6 +33,8 @@ const [MaxAmountFilterValue, setMaxAmountFilterValue] = useState();
 const [DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue] = useState();
 const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState();
 
+const [rowClickMode, setrowClickMode] = useState();
+
 const contextObj = {
   txData, settxData,
   getnewTxData, setgetnewTxData,
@@ -54,6 +56,8 @@ const contextObj = {
   MaxAmountFilterValue, setMaxAmountFilterValue,
   DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue,
   DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue,
+  rowClickMode, setrowClickMode,
+
 }
 
 

@@ -8,6 +8,8 @@ import chalk from 'chalk';
 import axios from 'axios';
 import ora from 'ora';
 import dotenv from 'dotenv';
+import * as h from './helpers/h.cjs';
+
 dotenv.config();
 
 
@@ -23,6 +25,8 @@ const apiRateLimitMs = 1000; //delay for Moralis API limit when fetching new pag
 const sleepTimer = 15000;    //delay for Moralis API limit for how often to update token TXs
 var latestBlock = 0;
 
+const moralisApiKey = process.env.API_KEY;
+TimeAgo.addDefaultLocale(en)
 
 
 
@@ -50,9 +54,6 @@ setInterval(()=>{
 }, 1000);
 
 
-const moralisApiKey = process.env.API_KEY;
-import * as h from './helpers/h.cjs';
-TimeAgo.addDefaultLocale(en)
 
 var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
 // const spinner = ora(`[`+Date().substr(15,9)+` ] `+'Begin checking '+chalk.magenta('Moralis')+' every '+chalk.magenta(sleepTimer/1000+'s')+' for new TXs...');
@@ -168,7 +169,7 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                             const collection = db.collection(("a_"+collectionName));
                             collection.find().sort({block_timestamp: -1}).limit(1).toArray(function(err, result) {
                                 if (err) console.log(err); 
-                                if (result.length > 0){
+                                if (result && result.length > 0){
                                     const timeAgo = new TimeAgo('en-US')
                                     if (!coldStart && result[0]&& result[0].blockTimestamp){h.fancylog('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName,spinner);}
                                     // if (!coldStart){h.fancylog('most recent cached tx was [  ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName);}

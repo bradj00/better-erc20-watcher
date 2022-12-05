@@ -182,3 +182,14 @@ a:hover {
   cursor:pointer;
   user-select: none;
 }
+
+.txClickModeHover{
+  color: rgba(255,255,255,0.4);
+  cursor:pointer;
+  user-select: none;
+}
+.txClickModeHover:hover {
+  color: rgba(255,255,255,1);
+  cursor:pointer;
+  user-select: none;
+}
