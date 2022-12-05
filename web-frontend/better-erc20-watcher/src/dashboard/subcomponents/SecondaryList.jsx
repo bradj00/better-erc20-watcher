@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -12,6 +12,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import {GeneralContext} from '../../App.js';
 import tokenImage from '../images/token_image.png';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import { getEllipsisTxt } from '../helpers/h.js';
 const SecondaryList = () => {
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext);
@@ -20,7 +21,12 @@ const SecondaryList = () => {
     const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
     const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
     const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
-  
+    const {RequestFriendlyLookup, setRequestFriendlyLookup} = useContext(GeneralContext);
+    const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
+    const {updateFriendlyName, setupdateFriendlyName} = useContext(GeneralContext);
+
+    const [DesiredFriendlyNameUpdate, setDesiredFriendlyNameUpdate] = useState();
+
     useEffect(() => {
         console.log('watchedTokenList: ',watchedTokenList);
     }, [watchedTokenList]);
@@ -35,6 +41,11 @@ const SecondaryList = () => {
         setclickedTokenSymbol(token.tokenAddress.symbol);
         setfilteredtxDataInflow(); 
         setfilteredtxDataOutflow(); 
+    }
+
+    function finalizeFriendlyNameUpdate(){
+        console.log('finalizeFriendlyNameUpdate: ',DesiredFriendlyNameUpdate);
+        setupdateFriendlyName(DesiredFriendlyNameUpdate);
     }
 
     return (
@@ -71,8 +82,24 @@ const SecondaryList = () => {
 
 
                 <div style={{width:'90%',textAlign:'center', display:'flex', justifyContent:'center',alignItems:'center', border:'1px solid rgba(100,100,120,1)', borderRight:'0px solid #fff',borderLeft:'0px solid #fff', borderRadius:'5px', backgroundColor:'rgba(100,100,120,0.4)', position:'absolute',top:'110%',height:'100%',}}>
-                    Options Panel here<br></br>
-                    updates on token selection
+                    {friendlyLookupResponse? friendlyLookupResponse.length > 0?
+                        <>
+                            <div style={{position:'absolute',top:'1%',fontSize:'1vw'}}>
+                                {getEllipsisTxt(RequestFriendlyLookup, 6)}
+                            </div>
+                            <div style={{position:'absolute',top:'13%',left:'1%'}}>
+                                {/* {friendlyLookupResponse} */}
+                                FN:<input  value={DesiredFriendlyNameUpdate} onChange={(e) => setDesiredFriendlyNameUpdate(e.target.value)} style={{width:'94%', padding:'2%', backgroundColor:'rgba(0,0,0,0.4)', color:'#999', border:'none', textAlign:'center'}} placeholder={friendlyLookupResponse} />
+                            </div>
+
+                            <div onClick={()=>{finalizeFriendlyNameUpdate()}} style={{position:'absolute',top:'25%', width:'50%', height: '10%', backgroundColor:'rgba(0,0,0,0.4)', display:'flex', justifyContent:'center', alignItems:'center'}}>
+                                update
+                            </div>
+                        </>
+                    : 
+                        <>...</> : <>+++</>
+                        
+                    }
                 </div>
             </div>
             

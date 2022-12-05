@@ -121,6 +121,7 @@ app.listen(listenPort, () => {
         });    
 
         app.get('/friendlyName/:theAddress', cors(), async (req, res) => {
+            
             const db = client.db(dbNameFN);
 
             console.log('looking up: ', req.params.theAddress);
@@ -136,6 +137,38 @@ app.listen(listenPort, () => {
                 res.send(result)
             });
         });
+
+
+
+
+        app.get('/updateFN/:address/:friendlyName',  cors(), async (req, res) => {
+            console.log('got FN update request: ',);
+
+            const db = client.db(dbNameFN);
+            const collection = db.collection('lookup');
+            const address = req.params.address;
+            const friendlyName = req.params.friendlyName;
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                    
+                }
+                const db = client.db('friendlyNames');
+                //update or insert the friendlyName into the collection where address matches the address in the request
+                db.collection("lookup").updateOne({address: address}, {$set: {friendlyName: friendlyName}}, {upsert: true}, function(err, result) {
+                    if (err) { 
+                        h.fancylog(err, 'error');
+                    }
+                    console.log('updated friendlyName result: ', result);
+                    res.send(result);
+                    client.close();
+                });
+            });
+            
+        });
+
+
+
 
         app.get('/watchedTokenList', cors(), async (req, res) => {
             const db = client.db(dbName);

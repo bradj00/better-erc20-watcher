@@ -97,11 +97,11 @@ export default function Chart() {
 
 
 useEffect(()=>{
-  console.log('------------------');
-  console.log('filteredtxDataDual:' ,filteredtxDataDual.length);
-  console.log('formattedTxData:' ,formattedTxData.length);
-  console.log('timeFilter:' ,timeFilter);
-  console.log('------------------');
+  // console.log('------------------');
+  // console.log('filteredtxDataDual:' ,filteredtxDataDual.length);
+  // console.log('formattedTxData:' ,formattedTxData.length);
+  // console.log('timeFilter:' ,timeFilter);
+  // console.log('------------------');
 },[filteredtxDataDual, timeFilter, formattedTxData])  
 
   function filterFromIndex(array,index) {

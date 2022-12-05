@@ -23,6 +23,10 @@ const DatabaseInfoGrabber = () => {
     const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
     const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
     const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
+    
+    const {RequestFriendlyLookup, setRequestFriendlyLookup} = useContext(GeneralContext);
+    const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
+    const {updateFriendlyName, setupdateFriendlyName} = useContext(GeneralContext);
 
     function fetchWatchedTokenList() {
         fetch('http://10.0.3.2:4000/watchedTokenList')
@@ -45,6 +49,13 @@ const DatabaseInfoGrabber = () => {
 
 
     useEffect(() => {
+        if (updateFriendlyName){
+            console.log('updating address '+RequestFriendlyLookup+' with manually defined Friendly Name: ', updateFriendlyName);
+            updateAFriendlyName(RequestFriendlyLookup,updateFriendlyName);
+        }
+    },[updateFriendlyName]);
+
+    useEffect(() => {
         if (clickedDetailsAddress){
             console.log('clickedDetailsAddress: ', clickedDetailsAddress);
             fetchAddressFilteredTransactions(viewingTokenAddress, clickedDetailsAddress);
@@ -53,6 +64,28 @@ const DatabaseInfoGrabber = () => {
         }
     },[clickedDetailsAddress]);
     
+    useEffect(()=>{
+        if (RequestFriendlyLookup){
+            console.log('RequestFriendlyLookup: ', RequestFriendlyLookup);
+            fetchFriendlyNameLookup(RequestFriendlyLookup);
+        }
+    },[RequestFriendlyLookup])
+
+    function updateAFriendlyName(address, friendlyName){
+        
+        console.log('updating address '+address+' with manually defined Friendly Name: ', friendlyName)
+        
+
+        fetch('http://10.0.3.2:4000/updateFN/'+address+'/'+friendlyName) //hacky way to do this. should be a post request but I ran into CORS issues and this was the quickest way to get it working
+        .then(response => response.json())
+        .then(data => {
+            console.log('ok: ', data);
+        });
+
+
+    }
+
+
 
     //fetch result from the following URL http://10.0.3.2:4000/txs/0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e
     function fetchAddressFilteredTransactions( viewingTokenAddress, clickedDetailsAddress ){
@@ -63,6 +96,21 @@ const DatabaseInfoGrabber = () => {
             setFilteredAddyData(data)
         })
     }
+    
+    function fetchFriendlyNameLookup( address ){
+        fetch('http://10.0.3.2:4000/friendlyName/' + address)
+        .then(response => response.json())
+        .then(data => {
+            console.log('looked up friendly name for address: ', address, 'result: ', data)
+            if (data && data[0] && data[0].friendlyName){
+                setFriendlyLookupResponse(data[0].friendlyName)
+            }else {
+                setFriendlyLookupResponse('no friendly name found')
+            }
+        })
+    }
+
+
 
     function fetchChainDataHeartbeat(){
         fetch('http://10.0.3.2:4000/')
@@ -141,7 +189,7 @@ const DatabaseInfoGrabber = () => {
 
 
     useEffect(() => {
-        console.log('data: ', data);
+        // console.log('data: ', data);
         // if (MinAmountFilterValue || MaxAmountFilterValue) is defined then filter data only showing transactions that are between the two values
         let checkedMinValue = 0;
         let checkedMaxValue = 0;
