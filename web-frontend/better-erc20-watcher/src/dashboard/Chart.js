@@ -42,19 +42,25 @@ export default function Chart() {
 
 
   function formatTheTxData(txData){
-    let formattedTxData = [];
-    let totalVolume  = 0;
-    txData.forEach((tx) => {
-      totalVolume += (tx.value / (10**18));
-      let formattedTx = createData(tx.block_timestamp.substr(5,5), (tx.value / (10**18)) );
-      formattedTxData.push(formattedTx);
-    });
-    if (timeFilter != 0){
-      setformattedTxData(filterFromIndex(formattedTxData, timeFilter) )
-    }else {
-      setformattedTxData(filterFromIndex(formattedTxData.reverse(), timeFilter) )
+    if (txData == undefined || txData.length == 0) {return}
+    else {
+      console.log('formatting txData: ', txData.length)
+      console.log(txData);
+      console.log(typeof txData)
+      let formattedTxData = [];
+      let totalVolume  = 0;
+      txData.forEach((tx) => {
+        totalVolume += (tx.value / (10**18));
+        let formattedTx = createData(tx.block_timestamp.substr(5,5), (tx.value / (10**18)) );
+        formattedTxData.push(formattedTx);
+      });
+      if (timeFilter != 0){
+        setformattedTxData(filterFromIndex(formattedTxData, timeFilter) )
+      }else {
+        setformattedTxData(filterFromIndex(formattedTxData.reverse(), timeFilter) )
+      }
+      setTotalVolume(totalVolume);
     }
-    setTotalVolume(totalVolume);
   }
 
 
@@ -65,26 +71,29 @@ export default function Chart() {
   
   useEffect(()=>{
     if (filteredtxData){ //if we have clicked an address and therefore filtering in-flow out-flow...
-      console.log('filteredtxData:' ,filteredtxData);
+      console.log('qqq filteredtxData:' ,filteredtxData);
 
       let  filteredTxDataTemp = [];
 
-      filteredtxData.forEach((tx) => {
-        // console.log('tx: ',tx);
-        if ((tx.to_address === clickedDetailsAddress) || (tx.to_address_friendlyName === clickedDetailsAddressFN)){
-          tx.inflow = (tx.value) / (10 ** 18);
-          tx.block_timestamp_cut = tx.block_timestamp.substr(5,5);
-          filteredTxDataTemp.push(tx);
-        } 
-        
-        if ((tx.from_address === clickedDetailsAddress) || (tx.from_address_friendlyName === clickedDetailsAddressFN)){
-          tx.outflow = (tx.value) / (10 ** 18);
-          tx.block_timestamp_cut = tx.block_timestamp.substr(5,5);
-          filteredTxDataTemp.push(tx);
-        }
+      // if (filteredtxDataDual.length > 0){
+        filteredtxData.forEach((tx) => {
+          // console.log('tx: ',tx);
+          if ((tx.to_address === clickedDetailsAddress) || (tx.to_address_friendlyName === clickedDetailsAddressFN)){
+            tx.inflow = (tx.value) / (10 ** 18);
+            tx.block_timestamp_cut = tx.block_timestamp.substr(5,5);
+            filteredTxDataTemp.push(tx);
+          } 
           
-      });
+          if ((tx.from_address === clickedDetailsAddress) || (tx.from_address_friendlyName === clickedDetailsAddressFN)){
+            tx.outflow = (tx.value) / (10 ** 18);
+            tx.block_timestamp_cut = tx.block_timestamp.substr(5,5);
+            filteredTxDataTemp.push(tx);
+          }
+            
+        });
+      // }
 
+        console.log('filteredTxDataTemp: ', filteredTxDataTemp);
         if (timeFilter != 0){
           setfilteredtxDataDual( filterFromIndex(filteredTxDataTemp, timeFilter) );
         }else {
@@ -109,6 +118,7 @@ useEffect(()=>{
     for (let i = index; i < array.length; i++) {
       filteredArray.push(array[i]);
     }
+    console.log('filtered array: ', filteredArray);
     return filteredArray;
   }
 
@@ -205,7 +215,7 @@ useEffect(()=>{
                 if (timeFilter != 0){
                   setfilteredtxDataDual( filterFromIndex(formattedTxData, value)) //if we're filtering dont reverse it. we already have it reversed
                 }else {
-                setfilteredtxDataDual( filterFromIndex(formattedTxData.reverse(), value))
+                  setfilteredtxDataDual( filterFromIndex(formattedTxData.reverse(), value))
                 }
               }else {
                 if (timeFilter != 0){

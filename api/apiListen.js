@@ -1,5 +1,3 @@
-console.clear(); 
-console.log(chalk.cyan.underline.inverse('apiListen.js')+'\n');
 
 import * as MongoClientQ from 'mongodb';
 import express from 'express';
@@ -7,12 +5,13 @@ import cors from 'cors';
 import chalk from 'chalk';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import * as h from './helpers/h.cjs'; 
 dotenv.config();
 // console.log('API_KEY: ', process.env.API_KEY);
 
 const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
-const dbName = 'watchedTokens';
+const dbName = 'watchedTokens'; 
 const dbNameFN = 'friendlyNames';
 const listenPort = 4000;
 
@@ -23,6 +22,13 @@ const IgnoredAddresses = ["0x333e3763085fc14854978f89261890339cb2f6a9", "0x1892f
 const moralisApiKey = process.env.API_KEY;
 
 const app = express();
+
+
+
+console.clear(); 
+console.log(chalk.cyan.underline.inverse('apiListen.js')+'\n');
+
+
 
 app.use(express.json());
 
@@ -73,22 +79,47 @@ app.listen(listenPort, () => {
             // res.send(timestamp.toString()) // used for heartbeat
             
         }) 
+        // app.get('/txs/:collectionName', cors(), async (req, res) => {
+        //     const db = client.db(dbName);
+        //     const collection = db.collection(("a_"+req.params.collectionName));
+
+
+               
+        //         res.send(result)
+        //     });
+        // });
+
+        // app.get('/txs/:collectionName/:pageNumber', cors(), async (req, res) => {
         app.get('/txs/:collectionName', cors(), async (req, res) => {
+            console.log('query: ', req.params.collectionName, req.query);
+            const pageNumber = req.query.pageNumber;
             const db = client.db(dbName);
             const collection = db.collection(("a_"+req.params.collectionName));
-
-
-            collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {  //huge limit. We should paginate our own API to stay performant..
-                
-                res.send(result)
-            });
+            
+            
+            if (pageNumber == 'chart') {
+                collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {  
+                    res.send({totalPages: 1, result: result}) // still 1000 limit. Used for chart and we should normalize our charts to only load 100 elements or less with pivot tables
+                });
+            } else {
+                const pageLimit = 10;
+                collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).skip(pageNumber * pageLimit).limit(pageLimit).toArray(function(err, result) {  
+                    
+                    collection.count({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }, function(err, count) {
+                    const totalPages = Math.ceil(count/pageLimit);
+                    res.send({totalPages: totalPages-1, result: result});
+                    });
+                });
+            }
         });
+
+
         app.get('/txs/:collectionName/txDetails/:txDetails', cors(), async (req, res) => {
+            const pageNumber = req.query.pageNumber;
             const db = client.db(dbName);
             const collection = db.collection(("a_"+req.params.collectionName));
             console.log(req.params.txDetails) 
             collection.find({"transaction_hash": req.params.txDetails}).sort({block_timestamp: -1}).limit(50).toArray(function(err, result) {
-
                 res.send(result)
             });
         });
@@ -110,8 +141,10 @@ app.listen(listenPort, () => {
 
         //get transactions for a token by a holder address
         app.get('/txs/:collectionName/:filterAddress', cors(), async (req, res) => {
+            console.log('filtered by address query: ', req.query);
             const db = client.db(dbName);
             console.log('req.params.filterAddress: ', req.params.filterAddress);
+            console.log('req.params.collectionName: ', req.params.collectionName);
             const collection = db.collection(("a_"+req.params.collectionName));
 
             collection.find({ $or: [ {to_address: {$regex: req.params.filterAddress, $options: 'i'}} ,  {from_address: {$regex: req.params.filterAddress, $options: 'i'}} ]}).sort({block_timestamp: -1}).limit(50000).toArray(function(err, result) {

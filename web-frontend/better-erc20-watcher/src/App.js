@@ -36,6 +36,7 @@ const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState()
 const [RequestFriendlyLookup, setRequestFriendlyLookup] = useState();
 const [friendlyLookupResponse, setFriendlyLookupResponse] = useState();
 const [updateFriendlyName, setupdateFriendlyName] = useState();
+const [pageNumber, setpageNumber] = useState(1);
 
 const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
 
@@ -65,6 +66,8 @@ const contextObj = {
   RequestFriendlyLookup, setRequestFriendlyLookup,
   friendlyLookupResponse, setFriendlyLookupResponse,
   updateFriendlyName, setupdateFriendlyName,
+  pageNumber, setpageNumber,
+
 }
 
 

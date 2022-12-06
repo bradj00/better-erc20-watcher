@@ -60,6 +60,7 @@ const DatabaseInfoGrabber = () => {
             console.log('clickedDetailsAddress: ', clickedDetailsAddress);
             fetchAddressFilteredTransactions(viewingTokenAddress, clickedDetailsAddress);
         }else {
+            console.log('clearing filtered txs')
             setFilteredAddyData();
         }
     },[clickedDetailsAddress]);
@@ -87,12 +88,11 @@ const DatabaseInfoGrabber = () => {
 
 
 
-    //fetch result from the following URL http://10.0.3.2:4000/txs/0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e
     function fetchAddressFilteredTransactions( viewingTokenAddress, clickedDetailsAddress ){
         fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress+'/'+clickedDetailsAddress)
         .then(response => response.json())
         .then(data => {
-
+            console.log('filtered txs: ', data);
             setFilteredAddyData(data)
         })
     }
@@ -133,8 +133,11 @@ const DatabaseInfoGrabber = () => {
 
 
     function fetchTransactions( viewingTokenAddress ){
-        fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress)
-        // fetch('http://10.0.3.2:4000/txs/0x0f5d2fb29fb7d3cfee444a200298f468908cc942')
+        if (!viewingTokenAddress){
+            return;
+        }
+        console.log('viewingTokenAddress: ', viewingTokenAddress)
+        fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress + '?pageNumber=chart')
         .then(response => response.json())
         .then(data => setData(data))
 
@@ -189,27 +192,31 @@ const DatabaseInfoGrabber = () => {
 
 
     useEffect(() => {
-        // console.log('data: ', data);
+        // console.log('data.result: ', data.result);
         // if (MinAmountFilterValue || MaxAmountFilterValue) is defined then filter data only showing transactions that are between the two values
         let checkedMinValue = 0;
         let checkedMaxValue = 0;
-        if (MinAmountFilterValue || MaxAmountFilterValue){
-            console.log('MinAmountFilterValue: ', MinAmountFilterValue, ' MaxAmountFilterValue: ', MaxAmountFilterValue);
-            if (!MinAmountFilterValue){ checkedMinValue = 0 } else { checkedMinValue = MinAmountFilterValue } 
-            if (!MaxAmountFilterValue){ checkedMaxValue = 999999999 } else { checkedMaxValue = MaxAmountFilterValue } 
-            const temp = data.filter((item) => {
-                if ((parseInt(item.value) / 10 ** 18) >= checkedMinValue && (parseInt(item.value) / 10 ** 18) <= checkedMaxValue){
-                    return item;
-                }
-            })
-            settxData(temp);
-        }else {
-            settxData(data)
+        if (data && data.result){
+            if (MinAmountFilterValue || MaxAmountFilterValue){
+                console.log('MinAmountFilterValue: ', MinAmountFilterValue, ' MaxAmountFilterValue: ', MaxAmountFilterValue);
+                if (!MinAmountFilterValue){ checkedMinValue = 0 } else { checkedMinValue = MinAmountFilterValue } 
+                if (!MaxAmountFilterValue){ checkedMaxValue = 999999999 } else { checkedMaxValue = MaxAmountFilterValue } 
+                const temp = data.result.filter((item) => {
+                    if ((parseInt(item.value) / 10 ** 18) >= checkedMinValue && (parseInt(item.value) / 10 ** 18) <= checkedMaxValue){
+                        return item;
+                    }
+                })
+                console.log('SETTING FINAL TEMP: ', temp)
+                settxData(temp);
+            }else {
+                console.log('SETTING FINAL UNFILTERED TEMP: ', data.result)
+                settxData(data.result)
+            }
         }
     },[data, MinAmountFilterValue, MaxAmountFilterValue])
 
     useEffect(() => {
-        // console.log('filteredAddyData: ',filteredAddyData);
+        console.log('filteredAddyData: ',filteredAddyData);
         setfilteredtxData(filteredAddyData)
     },[filteredAddyData])
     

@@ -236,7 +236,7 @@ export default function Orders() {
               )})
             : <></>
           :
-          filteredtxData.map((row, index) => {
+          filteredtxData && filteredtxData.length > 0? filteredtxData.map((row, index) => {
             const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
             // console.log(parseInt(rowAge)+' seconds old');
               const timeAgo = new TimeAgo('en-US')
@@ -252,6 +252,7 @@ export default function Orders() {
                 <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
               </TableRow>
             )})
+            : <></>
           }
           </TableBody>
         </Table>

@@ -9,13 +9,13 @@ import axios from 'axios';
 import ora from 'ora';
 import dotenv from 'dotenv';
 import * as h from './helpers/h.cjs';
+import * as MongoClientQ from 'mongodb';
 
 dotenv.config();
 
 
 // import  lookupSingleAddress from './translator.js';
 
-import * as MongoClientQ from 'mongodb';
 const MongoClient = MongoClientQ.MongoClient; 
 const mongoUrl = 'mongodb://localhost:27017';
 const dbName = 'watchedTokens';

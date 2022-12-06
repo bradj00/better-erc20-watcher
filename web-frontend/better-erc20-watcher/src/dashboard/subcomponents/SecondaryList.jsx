@@ -21,6 +21,7 @@ const SecondaryList = () => {
     const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
     const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
     const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
+    
     const {RequestFriendlyLookup, setRequestFriendlyLookup} = useContext(GeneralContext);
     const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
     const {updateFriendlyName, setupdateFriendlyName} = useContext(GeneralContext);
@@ -47,6 +48,20 @@ const SecondaryList = () => {
         console.log('finalizeFriendlyNameUpdate: ',DesiredFriendlyNameUpdate);
         setupdateFriendlyName(DesiredFriendlyNameUpdate);
     }
+
+    const CopyToClipboard = (text) => {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy')
+        } catch (err) {
+            console.error('Unable to copy to clipboard', err)
+        }
+        document.body.removeChild(textArea)
+    };
 
     return (
         <React.Fragment>
@@ -84,7 +99,7 @@ const SecondaryList = () => {
                 <div style={{width:'90%',textAlign:'center', display:'flex', justifyContent:'center',alignItems:'center', border:'1px solid rgba(100,100,120,1)', borderRight:'0px solid #fff',borderLeft:'0px solid #fff', borderRadius:'5px', backgroundColor:'rgba(100,100,120,0.4)', position:'absolute',top:'110%',height:'100%',}}>
                     {friendlyLookupResponse? friendlyLookupResponse.length > 0?
                         <>
-                            <div style={{position:'absolute',top:'1%',fontSize:'1vw'}}>
+                            <div onClick={()=>{CopyToClipboard(RequestFriendlyLookup)}} style={{cursor:'pointer', position:'absolute',top:'1%',fontSize:'1vw'}}>
                                 {getEllipsisTxt(RequestFriendlyLookup, 6)}
                             </div>
                             <div style={{position:'absolute',top:'13%',left:'1%'}}>

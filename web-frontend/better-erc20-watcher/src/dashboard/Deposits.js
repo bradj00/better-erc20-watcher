@@ -30,28 +30,43 @@ export default function Deposits() {
       <Typography component="p" variant="h4" >
         {totalVolume?  commaNumber(parseInt(totalVolume)) : '...'}
       </Typography>
-      
+{/*       
       <br></br>
-      <br></br>
+      <br></br> */}
       {/* 2 divs here that span 50% each side by side */}
-      <div style={{border:'0px solid #0f0', width:'100%',bottom:'0.5vh', height:'50%', position:'absolute', display:'flex', justifyContent:'center',alignItems:'center'}}>
+      <div style={{border:'0px solid #0f0', width:'100%',bottom:'3.5vh', height:'50%', position:'absolute', display:'flex', justifyContent:'center',alignItems:'center'}}>
         
       {clickedDetailsAddressFN? clickedDetailsAddressFN == 'Uniswap v3 Pool'?
-        <>
-
-        <div style={{border:'0px solid #0f0', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
-          Buys
-          <div style={{fontSize:'2vh'}}>
-            {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+      <>
+        <div style={{width:'100%', marginTop:'6vh',}}>
+          <div style={{border:'0px solid #0f0', width:'50%',color:'#0f0',fontSize:'1.5vh'}}>
+            Buys
+            <div style={{fontSize:'2vh'}}>
+              {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+            </div>
+          </div>
+          <div style={{border:'0px solid #f00', width:'50%',color:'#f00',fontSize:'1.5vh'}}>
+            Sells
+            <div style={{fontSize:'2vh'}}>
+              {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+            </div>
           </div>
         </div>
-        <div style={{border:'0px solid #f00', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
-          Sells
-          <div style={{fontSize:'2vh'}}>
-            {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+        <div style={{marginTop:'6vh',}}>
+          <div style={{border:'0px solid #0f0', width:'100%',color:'#0ff',fontSize:'1.5vh'}}>
+            +Liquidity
+            <div style={{fontSize:'2vh'}}>
+              {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+            </div>
+          </div>
+          <div style={{border:'0px solid #f00', width:'100%',color:'#f80',fontSize:'1.5vh'}}>
+            -Liquidity
+            <div style={{fontSize:'2vh'}}>
+              {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+            </div>
           </div>
         </div>
-        </>
+      </>
       :
       <>
       <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
