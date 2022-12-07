@@ -11,6 +11,7 @@ export const GeneralContext   = React.createContext({});
 function App() {
 //create context for the app
 const [txData, settxData] = useState(null);
+const [txDataChart, settxDataChart] = useState(null);
 const [getnewTxData, setgetnewTxData] = useState(null);
 const [audioEnabled, setAudioEnabled] = useState(true)
 const [clickedDetailsAddress, setclickedDetailsAddress] = useState();
@@ -28,8 +29,8 @@ const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = useState();
 const [latestEthBlock, setlatestEthBlock] = useState();
 
 
-const [MinAmountFilterValue, setMinAmountFilterValue] = useState();
-const [MaxAmountFilterValue, setMaxAmountFilterValue] = useState();
+const [MinAmountFilterValue, setMinAmountFilterValue] = useState(1);
+const [MaxAmountFilterValue, setMaxAmountFilterValue] = useState(1);
 const [DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue] = useState();
 const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState();
 
@@ -67,6 +68,7 @@ const contextObj = {
   friendlyLookupResponse, setFriendlyLookupResponse,
   updateFriendlyName, setupdateFriendlyName,
   pageNumber, setpageNumber,
+  txDataChart, settxDataChart,
 
 }
 

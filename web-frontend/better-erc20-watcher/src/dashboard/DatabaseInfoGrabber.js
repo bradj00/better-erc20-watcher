@@ -6,9 +6,11 @@ import {GeneralContext} from '../App.js'
 const DatabaseInfoGrabber = () => {
     // fetch data from api and store it in state
     const [data, setData] = useState(null)
+    const [dataChart, setDataChart] = useState(null)
     const [filteredAddyData, setFilteredAddyData] = useState(null)
     const [intervalQ, setintervalQ] = useState(null)
     const {txData, settxData} = useContext(GeneralContext);
+    const {txDataChart, settxDataChart} = useContext(GeneralContext); 
     const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
     const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
     const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
@@ -28,6 +30,13 @@ const DatabaseInfoGrabber = () => {
     const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
     const {updateFriendlyName, setupdateFriendlyName} = useContext(GeneralContext);
 
+    useEffect(() => {
+        console.log('MinAmountFilterValue,MaxAmountFilterValue: ', MinAmountFilterValue,MaxAmountFilterValue)
+        if (MinAmountFilterValue !=1 && MaxAmountFilterValue != 1){
+            fetchTransactions( viewingTokenAddress , MinAmountFilterValue, MaxAmountFilterValue)
+        }
+    },[MinAmountFilterValue,MaxAmountFilterValue]);
+
     function fetchWatchedTokenList() {
         fetch('http://10.0.3.2:4000/watchedTokenList')
         .then(response => response.json())
@@ -43,7 +52,7 @@ const DatabaseInfoGrabber = () => {
     useEffect(() => {
         if (watchedTokenList){
             console.log('watched token list: ', watchedTokenList);
-            fetchTransactions(watchedTokenList[1].address);
+            fetchTransactions(watchedTokenList[1].address, MinAmountFilterValue, MaxAmountFilterValue);
         }
     },[watchedTokenList]);
 
@@ -132,15 +141,21 @@ const DatabaseInfoGrabber = () => {
     }
 
 
-    function fetchTransactions( viewingTokenAddress ){
+    function fetchTransactions( viewingTokenAddress , MinAmountFilterValue, MaxAmountFilterValue){ 
         if (!viewingTokenAddress){
             return;
         }
         console.log('viewingTokenAddress: ', viewingTokenAddress)
-        fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress + '?pageNumber=chart')
+        
+        let url = 'http://10.0.3.2:4000/txs/' + viewingTokenAddress + '?pageNumber=allData&filterMin='+MinAmountFilterValue+'&filterMax='+MaxAmountFilterValue;
+        fetch(url)
         .then(response => response.json())
         .then(data => setData(data))
-
+        
+        let url2 = 'http://10.0.3.2:4000/txs/' + viewingTokenAddress + '?pageNumber=chart&filterMin='+MinAmountFilterValue+'&filterMax='+MaxAmountFilterValue;
+        fetch(url2)
+        .then(response => response.json())
+        .then(data => setDataChart(data))
     }
     // function updateHeartBeatDifferenceMarkers(){
     //     // console.log('chainDataHeartbeat: ',chainDataHeartbeat);
@@ -155,7 +170,7 @@ const DatabaseInfoGrabber = () => {
         fetchWatchedTokenList();
         fetchLatestBlockFromChain();
         fetchChainDataHeartbeat();
-        // fetchTransactions();
+        
 
         setInterval(()=>{
             fetchChainDataHeartbeat();
@@ -170,25 +185,33 @@ const DatabaseInfoGrabber = () => {
             //clear thisInterval
             clearInterval(intervalQ);
 
-            fetchTransactions( viewingTokenAddress )
+            fetchTransactions( viewingTokenAddress , MinAmountFilterValue, MaxAmountFilterValue);
             //create a setInterval that we can clear later
             setintervalQ( setInterval(() => {
-                fetchTransactions( viewingTokenAddress )
+                fetchTransactions( viewingTokenAddress , MinAmountFilterValue, MaxAmountFilterValue);
             }, 10000));
 
         }
     },[viewingTokenAddress])
 
-    useEffect(() => {
-        const timeOutId = setTimeout(() => setMinAmountFilterValue(DisplayMinAmountFilterValue), 500);
-        // return () => clearTimeout(timeOutId);
-      }, [DisplayMinAmountFilterValue ]);
+    // useEffect(() => {
+    //     setMinAmountFilterValue(DisplayMinAmountFilterValue)
+    //   }, [DisplayMinAmountFilterValue ]);
+
+    // useEffect(() => {
+    //     setMaxAmountFilterValue(DisplayMaxAmountFilterValue)
+    //     // return () => clearTimeout(timeOutId);
+    //   }, [DisplayMaxAmountFilterValue ]);
+
+
 
     useEffect(() => {
-        const timeOutId = setTimeout(() => setMaxAmountFilterValue(DisplayMaxAmountFilterValue), 500);
-        // return () => clearTimeout(timeOutId);
-      }, [DisplayMaxAmountFilterValue ]);
-
+        let checkedMinValue = 0;
+        let checkedMaxValue = 0;
+        if (dataChart && dataChart.result){
+            settxDataChart(dataChart.result);
+        }
+    },[dataChart])
 
 
     useEffect(() => {
@@ -213,7 +236,7 @@ const DatabaseInfoGrabber = () => {
                 settxData(data.result)
             }
         }
-    },[data, MinAmountFilterValue, MaxAmountFilterValue])
+    },[data])
 
     useEffect(() => {
         console.log('filteredAddyData: ',filteredAddyData);

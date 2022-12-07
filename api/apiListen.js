@@ -91,17 +91,27 @@ app.listen(listenPort, () => {
 
         // app.get('/txs/:collectionName/:pageNumber', cors(), async (req, res) => {
         app.get('/txs/:collectionName', cors(), async (req, res) => {
-            console.log('query: ', req.params.collectionName, req.query);
+            // console.log('query: ', req.params.collectionName, req.query);
             const pageNumber = req.query.pageNumber;
+            const filterMin = req.query.filterMin;
+            const filterMax = req.query.filterMax;
+
             const db = client.db(dbName);
             const collection = db.collection(("a_"+req.params.collectionName));
             
             
-            if (pageNumber == 'chart') {
+            if (pageNumber == 'allData') { //bad. temporary to display all data while I mock up the summarized chart loading. This will be replaced by paginated data + infinite scrolling
                 collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {  
-                    res.send({totalPages: 1, result: result}) // still 1000 limit. Used for chart and we should normalize our charts to only load 100 elements or less with pivot tables
+                    res.send({totalPages: 1, result: result})
                 });
-            } else {
+            }
+            else if (pageNumber == 'chart') {
+                collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {    
+                    res.send({totalPages: 1, result: condenseArray(result, filterMin, filterMax)})                    
+                    // res.send({totalPages: 1, result: result}) // still 1000 limit. Used for chart and we should normalize our charts to only load 100 elements or less with pivot tables
+                });
+            }
+            else {
                 const pageLimit = 10;
                 collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).skip(pageNumber * pageLimit).limit(pageLimit).toArray(function(err, result) {  
                     
@@ -261,3 +271,47 @@ app.listen(listenPort, () => {
     }); 
 
 });
+
+
+
+function condenseArray(tempArray, filterMin, filterMax) {
+    console.log('filterMin: ', filterMin), console.log('filterMax: ', filterMax);
+
+    let tempArray2 = [];
+    let tempObj = {};
+    for (let i = 0; i < tempArray.length; i++) {
+      let currElement = tempArray[i];
+      let day = currElement.block_timestamp.split('T')[0];
+      let value = parseInt(currElement.value);
+      
+      if (tempObj[day]) {
+        if (filterMin > 1 && filterMax > 1) {               //if filterMin and filterMax are set, only add to the total if the value is within the range
+            if (value >= filterMin && value <= filterMax){
+                tempObj[day].value += value;
+            }
+        } else {                                            //if filterMin and filterMax are not set, add all values to the total
+            tempObj[day].value += value;
+        }
+      } else {
+        if (filterMin > 1 && filterMax > 1) {               //if filterMin and filterMax are set, only add to the array if the value is within the range   
+            if (value >= filterMin && value <= filterMax){
+                tempObj[day] = {
+                    block_timestamp: currElement.block_timestamp,
+                    value: value
+                };
+            }
+        } else {                                            //if filterMin and filterMax are not set, add all values to the array
+            tempObj[day] = {
+                block_timestamp: currElement.block_timestamp,
+                value: value
+            };
+        }
+      }
+    }
+  
+    for (let key in tempObj) {
+      tempArray2.push(tempObj[key]);
+    }
+    console.log('condensed array: ', tempArray2.length)
+    return tempArray2;
+  }

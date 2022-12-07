@@ -29,18 +29,47 @@ export default function Chart() {
   const {totalVolume, setTotalVolume} = useContext(GeneralContext);
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext);
   const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext);
+  const {txDataChart, settxDataChart} = useContext(GeneralContext);
   const [timeFilter,settimeFilter] = useState(0);
   const [timeFilterDisplay,settimeFilterDisplay] = useState(0);
+
+
+  const [filteredtxDataChart, setfilteredtxDataChart] = useState();
   
   
   const [filteredtxDataDual, setfilteredtxDataDual] = React.useState([]);
 
 
+  const [formattedTxDataChart, setformattedTxDataChart] = React.useState([]);
   const [formattedTxData, setformattedTxData] = React.useState([]);
   const [filteredTxDataInflow,   setfilteredTxDataInflow] = React.useState([]);
   const [filteredTxDataOutflow, setfilteredTxDataOutflow] = React.useState([]);
 
+    useEffect(()=>{
+      console.log('txDataChart: ', txDataChart);
+      formatTheTxDataChart(txDataChart);
+    },[txDataChart])
 
+  function formatTheTxDataChart(txData){
+    if (txData == undefined || txData.length == 0) {return}
+    else {
+      console.log('formatting txData: ', txData.length)
+      console.log(txData);
+      console.log(typeof txData)
+      let formattedTxData = [];
+      let totalVolume  = 0;
+      txData.forEach((tx) => {
+        totalVolume += (tx.value / (10**18));
+        let formattedTx = createData(tx.block_timestamp.substr(5,5), (tx.value / (10**18)) );
+        formattedTxData.push(formattedTx);
+      });
+      if (timeFilter != 0){
+        setformattedTxDataChart(filterFromIndex(formattedTxData, timeFilter) )
+      }else {
+        setformattedTxDataChart(filterFromIndex(formattedTxData.reverse(), timeFilter) )
+      }
+    }
+  }
   function formatTheTxData(txData){
     if (txData == undefined || txData.length == 0) {return}
     else {
@@ -76,7 +105,7 @@ export default function Chart() {
       let  filteredTxDataTemp = [];
 
       // if (filteredtxDataDual.length > 0){
-        filteredtxData.forEach((tx) => {
+        filteredtxData.forEach((tx, index) => {
           // console.log('tx: ',tx);
           if ((tx.to_address === clickedDetailsAddress) || (tx.to_address_friendlyName === clickedDetailsAddressFN)){
             tx.inflow = (tx.value) / (10 ** 18);
@@ -89,7 +118,28 @@ export default function Chart() {
             tx.block_timestamp_cut = tx.block_timestamp.substr(5,5);
             filteredTxDataTemp.push(tx);
           }
+          if (index == filteredtxData.length - 1){
             
+            //summarize filteredtxDataDual entries, combine all inflow and outflow of matching block_timestamp_cut into one entry, and add to temp array. Only carry over the block_timestamp_cut and the inflow and outflow values to the new array.
+            let temp = [];
+            let temp2 = [];
+            filteredtxDataDual.forEach((tx) => {
+                if (temp2[tx.block_timestamp_cut]){
+                temp2[tx.block_timestamp_cut].inflow += tx.inflow;
+                temp2[tx.block_timestamp_cut].outflow += tx.outflow;
+                }else {
+                temp2[tx.block_timestamp_cut] = {block_timestamp_cut: tx.block_timestamp_cut, inflow: tx.inflow, outflow: tx.outflow};
+                }
+            }
+            );
+            for (let key in temp2){
+                temp.push(temp2[key]);
+            }
+            console.log('AAA temp: ', temp);
+            setfilteredtxDataChart(temp);
+
+
+          }
         });
       // }
 
@@ -123,6 +173,11 @@ useEffect(()=>{
   }
 
 
+  // useEffect(()=>{
+
+    
+  // },[filteredtxDataDual, formattedTxData]);
+
   useEffect(()=>{
     if (txData) {
       if (filteredtxData){
@@ -155,7 +210,8 @@ useEffect(()=>{
         <BarChart 
           width={150} 
           height={40} 
-          data={clickedDetailsAddress? filteredtxDataDual : formattedTxData}
+          data={clickedDetailsAddress? filteredtxDataDual : formattedTxDataChart}
+          // data={filteredtxDataChart? filteredtxDataChart : <></>}
           margin={{
             top: 10,
             right: 10,

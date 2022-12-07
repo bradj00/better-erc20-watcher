@@ -165,6 +165,11 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
 
                         try {
                         MongoClient.connect(mongoUrl, function(err, client) {
+                            if (err) {
+                                h.fancylog(err, 'error');
+                                resolve(err);
+                                return;
+                            }else {
                             const db = client.db(dbName);        
                             const collection = db.collection(("a_"+collectionName));
                             collection.find().sort({block_timestamp: -1}).limit(1).toArray(function(err, result) {
@@ -196,10 +201,11 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                     getTokenTranscationsFromMoralis(0, 100, collectionName, 1, q, coldStart, resolve, tokenTxs); 
                                 }
                             });
+                            }
                         });
                     } catch (error) {
                         console.log(error);
-                        reject(error);
+                        resolve(error);
                     }
                     } else {
                         h.fancylog('is syncing. Skipping..', ' mongo ', collectionName, spinner);
