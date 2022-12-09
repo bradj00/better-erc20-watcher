@@ -30,7 +30,7 @@ const [latestEthBlock, setlatestEthBlock] = useState();
 
 
 const [MinAmountFilterValue, setMinAmountFilterValue] = useState(1);
-const [MaxAmountFilterValue, setMaxAmountFilterValue] = useState(1);
+const [MaxAmountFilterValue, setMaxAmountFilterValue] = useState(999999999999999999);
 const [DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue] = useState();
 const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState();
 

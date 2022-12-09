@@ -17,6 +17,7 @@ const listenPort = 4000;
 
 
 const IgnoredAddresses = ["0x333e3763085fc14854978f89261890339cb2f6a9", "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"]
+// const IgnoredAddresses = []
 
 
 const moralisApiKey = process.env.API_KEY;
@@ -108,7 +109,7 @@ app.listen(listenPort, () => {
             else if (pageNumber == 'chart') {
                 collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {    
                     res.send({totalPages: 1, result: condenseArray(result, filterMin, filterMax)})                    
-                    // res.send({totalPages: 1, result: result}) // still 1000 limit. Used for chart and we should normalize our charts to only load 100 elements or less with pivot tables
+                    // res.send({totalPages: 1, result: result}) 
                 });
             }
             else {
