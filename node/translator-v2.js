@@ -161,7 +161,7 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
     const dbFN = client.db(dbNameFriendlyNames);
     const db = client.db(dbNameQueryAddys);
-
+    
 
 
     for (let i = 0; i < addresses.length; i++) {
@@ -192,7 +192,7 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
             h.fancylog(chalk.yellow('UpdateTxsFromEachCollection()')+'\tfinished. Updated TXs for: '+chalk.yellow(i)+ ' addresses',' mongo ')
             // console.log('--------------------------------------------');
             h.fancylog(`all token TXs are up to date for all watched tokens. sleeping ${chalk.cyan(sleepSeconds)} seconds..`, 'system ')
-            // client.close();
+            client.close();
         }
     }
 

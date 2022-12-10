@@ -33,24 +33,30 @@ TimeAgo.addDefaultLocale(en)
 setInterval(()=>{
     const timestamp = new Date().getTime();
     timestamp.toString();
-    MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
-        if (err) {
-            h.fancylog(err, 'error');
-        }else {
-            const db = client.db('heartbeats');
-            db.collection("chainData").updateOne({heartbeat: { $lt: timestamp }}, {$set:{heartbeat:timestamp}}, { upsert: true }, function(err, result) {
-                if (err){
-                    console.log('error updating heartbeat');
-                    client.close();
-                }
-                if (result){
-                    // console.log('updated heartbeat: '+timestamp);
-                    client.close();
-                }
-            });
-        }
+    try{
+        // console.log('1\t');
+        MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+            if (err) {
+                h.fancylog('1'+err, 'error');
+                client.close();
+            }else {
+                const db = client.db('heartbeats');
+                db.collection("chainData").updateOne({heartbeat: { $lt: timestamp }}, {$set:{heartbeat:timestamp}}, { upsert: true }, function(err, result) {
+                    if (err){
+                        console.log('error updating heartbeat');
+                        client.close();
+                    }
+                    if (result){
+                        // console.log('updated heartbeat: '+timestamp);
+                        client.close();
+                    }
+                });
+            }
 
-    });
+        });
+    }catch(err){
+        h.fancylog('2'+err, 'error');
+    }
 }, 1000);
 
 
@@ -62,6 +68,7 @@ spinner.color = 'white'
 function lookupSingleAddress(address, delay5){
     return new Promise(async (resolve, reject) => {
     try {
+        console.log('2\t');
         const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
         const dbFN = client.db(dbNameFriendlyNames);
         const collection = await dbFN.collection('lookup').find({address: address}).toArray();
@@ -83,50 +90,59 @@ function lookupSingleAddress(address, delay5){
             //         client.close();
             //     }
             // }, 500 * delay5);
+            client.close();
             resolve(address);
         } else {
+            client.close();
             resolve(collection[0].friendlyName);
         }
     
     } catch (error) {
         console.error(error);
-        reject(error);
+        resolve(error);
     }
     });
 }
 
 //function that connects to mongodb, uses db "watchedTokens" and for each collection, check if document exists where field "isSyncing" is true. If so console.log('syncing...') and resolve true.
 function checkIfSyncing(tokenName){
+    
+    // console.log('checking if [', chalk.yellow(tokenName), '] is in the middle of fetching/caching...');
     return new Promise((resolve, reject) => {
-        try{
-        MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
-            if (err) {
-                h.fancylog(err, 'error');
-                reject(err);
-            }
-            const db = client.db(dbName);
-            let isSyncing = false;
+    //     try{
+    //     // console.log('333\t');
+    //     MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+    //         if (err) {
+    //             h.fancylog('3'+err, 'error');
+    //             client.close();
+    //             resolve(err);
+    //         }else {
+    //         const db = client.db(dbName);
+    //         let isSyncing = false;
             
-            let t = "a_"+tokenName;
-            db.collection("isSyncing").findOne({t: true}, function(err, result) {
-                if (err) {
-                    h.fancylog(err, 'error');
-                    reject(err);
-                }
-                if (result){
-                    isSyncing = true;
-                    resolve(true);
-                }
-            });
+    //         let t = "a_"+tokenName;
+    //         db.collection("isSyncing").findOne({t: true}, function(err, result) {
+    //             if (err) {
+    //                 h.fancylog('4'+err, 'error');
+    //                 client.close();
+    //                 resolve(err);
+    //             }
+    //             if (result){
+    //                 // isSyncing = true;
+    //                 client.close();
+    //                 resolve(true);
+    //             }
+    //         });
             
-            // client.close();
-            resolve(isSyncing);
-            
-        });
-    } catch (error) {
-        console.log(error);
-        reject(error);
-    }
+    //         client.close();
+    //         // resolve(isSyncing);
+    //         }
+    //     });
+    // } catch (error) {
+    //     console.log(error);
+    //     resolve(error);
+    // }
+        resolve();
     });
 }
 
@@ -164,9 +180,11 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                         // h.fancylog('not in the middle of a sync. Proceeding to gathering updated TXs..', ' mongo ', collectionName);
 
                         try {
+                        // console.log('4\t');
                         MongoClient.connect(mongoUrl, function(err, client) {
                             if (err) {
-                                h.fancylog(err, 'error');
+                                h.fancylog('5'+err, 'error');
+                                client.close();
                                 resolve(err);
                                 return;
                             }else {
@@ -185,6 +203,7 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                         // // console.log(result[0]);
                                         // console.log('\n');
                                     }
+                                    client.close();
                                     getTokenTranscationsFromMoralis(0, 100, collectionName, 1, parseInt(result[0].block_number), coldStart, resolve, tokenTxs);
                                     // client.close();
                                     // if (!spinner.isSpinning){spinner.start();}
@@ -198,6 +217,7 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                     if (collectionName != "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"){
                                         q = 16017606 ;   //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
                                     }       
+                                    client.close();
                                     getTokenTranscationsFromMoralis(0, 100, collectionName, 1, q, coldStart, resolve, tokenTxs); 
                                 }
                             });
@@ -208,7 +228,7 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                         resolve(error);
                     }
                     } else {
-                        h.fancylog('is syncing. Skipping..', ' mongo ', collectionName, spinner);
+                        // h.fancylog('is syncing. Skipping..', ' mongo ', collectionName, spinner);
                         resolve(true);
                     }
                     
@@ -237,17 +257,29 @@ function updateAllWatchedTokens(coldStart){
     //get all collection names from mongo for database "watchedTokens"
 
     try {
+    // console.log('5\t');
     MongoClient.connect(mongoUrl, function(err, client) {
         if (err) console.log('THERE WAS AN ERROR: ',err);
+        if (!client ){ h.fancylog('mongo client not connected. exiting..', 'error'); client.close(); return;}
+
         const db = client.db(dbName);
         db.listCollections().toArray(function(err, collections) {
-            if (err) console.log('THERE WAS AN ERROR: ',err);
+            if (err) {
+                console.log('THERE WAS AN ERROR: ',err);
+                client.close();
+                return;
+            }
             
 
             // h.fancylog(collections);
             let watchedTokenContracts = [];
-            collections.forEach(collection => {
+            collections.forEach((collection, index) => {
                 watchedTokenContracts.push(collection.name);
+
+                //if last collection then update all token lists
+                if (index == collections.length-1){
+                    client.close();
+                }
             });
             // h.fancylog(watchedTokenContracts,'watched tokens');
             
@@ -256,17 +288,19 @@ function updateAllWatchedTokens(coldStart){
             updateSingleTokenList(watchedTokenContracts, coldStart).then((q) =>{
                 // h.fancylog(`all token TXs are up to date for all watched tokens. sleeping..`, 'system ')
                 if (!spinner.isSpinning){spinner.start();}
+                client.close();
             });
 
-            watchedTokenContracts.map((collectionName, index) => {
+            // watchedTokenContracts.map((collectionName, index) => {
 
-            });
+            // });
             
         });
     });
     } catch (error) {
         console.log(error);
-        reject(error);
+        // client.close();
+        resolve(error);
     }
 
 
@@ -358,7 +392,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                 if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;}
                 
                 try{
-                MongoClient.connect(mongoUrl, function(err, client) {
+                console.log('6\t');MongoClient.connect(mongoUrl, function(err, client) {
                     if (err) console.log('THERE WAS AN ERROR: ',err);
                     const db = client.db(dbName);
                     const collection = db.collection("a_"+tokenAddress);
@@ -376,19 +410,21 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                             } else {
                                 h.fancylog(chalk.red('mongo err: '), err, ' error ', spinner) ;
                             }
+                            client.close();
                             resolve(true);
                         } else {
                             //there's no error and insertion was successful. 
                             h.fancylog('caching ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
+                            client.close();
                             resolve(true);
-                            // client.close();
                         }
                         // client.close();
                     });
                 });
                 } catch (error) {
                     console.log(error);
-                    reject(error);
+                    client.close();
+                    resolve(error);
                 }
 
             }  
