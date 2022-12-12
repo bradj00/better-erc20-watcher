@@ -29,8 +29,8 @@ import MainList from './subcomponents/MainList';
 import {getEllipsisTxt} from './helpers/h.js';
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en';
-
-
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import {commaNumber} from './helpers/h.js';
 
 
 
@@ -52,7 +52,8 @@ function Copyright(props) {
 }
 
 
-const drawerWidth = 240;
+// const drawerWidth = 240;
+const drawerWidth = 320;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -120,14 +121,14 @@ function DashboardContent() {
   
   const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
   const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
-
+  const {systemStatuses, setSystemStatuses} = useContext(GeneralContext);
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
   const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
   const [searchInput, setsearchInput] = useState("")
   const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
   const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
-  
+  const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
   const timeAgo = new TimeAgo('en-US'); 
 
   useEffect(() => {
@@ -169,6 +170,12 @@ function DashboardContent() {
       console.log('search input: ', searchInput)
     }
   },[searchInput])
+
+  useEffect(()=>{
+    if (latestEthBlock){
+      console.log('latestEthBlock: ', latestEthBlock)
+    }
+  },[latestEthBlock]);
 
   useEffect(()=>{
     if (clickedSearchBar){
@@ -318,13 +325,59 @@ function function66(e){
 
 
           <Divider />
-          <List component="nav">
+          <List style={{overflow:'hidden'}} component="nav">
             {/* {mainListItems} */}
             <MainList />
-            <Divider sx={{ my: 1 }} />
+            {/* <Divider sx={{ my: 1 }} /> */}
             {/* {secondaryListItems} */}
             <SecondaryList />
+
+
+
           </List>
+          <div style={{border:'0px solid #0aa', color:'#999', position:'absolute',bottom:'0%', width:'100%', height:'20vh', display:'flex', justifyContent:'center', alignItems:'center'}}>
+                  <div style={{position:'absolute', top:'2%',  }}>
+                    Services Health:
+                  </div>
+                  <div style={{width:'95%', textAlign:'left', }}>
+                    <div style={{position:'relative', left:'2%'}}>
+                      Latest Block: 
+                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
+                        {latestEthBlock? commaNumber(latestEthBlock.block):<>...</>}
+                      </div>
+                    </div>
+
+                    <div style={{position:'relative', left:'2%'}}>
+                      TX Ingestion: 
+                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}>
+                         <CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
+                      </div>
+                    </div>
+
+                    <div style={{position:'relative', left:'2%'}}>
+                      Address Translator: 
+                        <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
+                          
+                          
+                          { // find the 'translator' service in the array of services
+                            systemStatuses? 
+                            // if it's found, display "lookupIndex" / "lookupIndexMax"
+                            <> {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndex)} / {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax)} </>
+                          
+                            :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
+                          }
+                        </div>
+                    </div>
+
+                    <div style={{position:'relative', left:'2%'}}>
+                      API: 
+                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
+                        <CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
+                      </div>
+                    </div>
+                  </div>
+          </div>
+
         </Drawer>
         <Box
           component="main"

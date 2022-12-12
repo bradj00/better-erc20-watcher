@@ -56,6 +56,11 @@ const fancylog = (str, bracketedStr, tokenAddress, spinner) => {
   return "";
 };
 
+const updateSystemStatus = (collectionObj, newStatus) => {
+  // update the object status in mongo database
+  // return result of the db operation
+}
+
 exports.fancylog = fancylog;
 exports.getEllipsisTxt = getEllipsisTxt;
 

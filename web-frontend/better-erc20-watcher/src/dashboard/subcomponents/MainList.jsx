@@ -18,12 +18,12 @@ const MainList = () => {
             </ListSubheader>
 
             {/* <ListItemButton> */}
-            <div style={{width:'100%',border:'0px solid #0f0',display:'flex',alignItems:'center',}}>
-            <ListItemIcon>
+            {/* <div style={{width:'100%',border:'0px solid #0f0',display:'flex',alignItems:'center',}}> */}
+            {/* <ListItemIcon>
                 <DashboardIcon />
             </ListItemIcon>
-            <ListItemText primary="Watched Tokens" />
-            </div>
+            <ListItemText primary="Watched Tokens" /> */}
+            {/* </div> */}
             {/* </ListItemButton> */}
 
         </React.Fragment>

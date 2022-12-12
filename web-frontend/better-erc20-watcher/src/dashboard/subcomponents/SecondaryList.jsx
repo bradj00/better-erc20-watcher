@@ -12,6 +12,11 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import {GeneralContext} from '../../App.js';
 import tokenImage from '../images/token_image.png';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+
+
 import { getEllipsisTxt } from '../helpers/h.js';
 const SecondaryList = () => {
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
@@ -27,6 +32,7 @@ const SecondaryList = () => {
     const {updateFriendlyName, setupdateFriendlyName} = useContext(GeneralContext);
 
     const [DesiredFriendlyNameUpdate, setDesiredFriendlyNameUpdate] = useState();
+    const [editingTokens, setEditingTokens] = useState(false);
 
     useEffect(() => {
         console.log('watchedTokenList: ',watchedTokenList);
@@ -71,32 +77,51 @@ const SecondaryList = () => {
             </ListSubheader>
         {watchedTokenList? watchedTokenList.length > 0? 
         <div style={{display:'flex',}}>
-            <div style={{marginBottom:'3vh',width:'90%', marginLeft:'0.5vw',}}>
+            <div style={{marginBottom:'3vh',width:'100%', }}>
                 {watchedTokenList.map((token, index) => (
                     token? token.tokenAddress?
-                        <ListItemButton  style={{marginBottom:'0.1vh',backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(255,255,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} onClick={()=>{ updateSelectedToken(token) }}>
-                        {/* <ListItemIcon>
-                            <AssignmentIcon />
-                        </ListItemIcon> */}
-                        <img src={token.tokenAddress.logo? token.tokenAddress.logo : tokenImage } style={{marginLeft:token.tokenAddress.logo?'0':'-0.5vh', height:token.tokenAddress.logo?'3vh':'4vh'}} />{token.tokenAddress.logo?<>&nbsp;&nbsp;</>: <>&nbsp;</>}
-                        <ListItemText primary={token.tokenAddress.symbol} />
-                        </ListItemButton> 
+                        <div style={{position:'relative',}}>
+                            <ListItemButton  style={{marginBottom:'0.1vh',backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(255,255,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} onClick={()=>{ updateSelectedToken(token) }}>
+                            {/* <ListItemIcon>
+                                <AssignmentIcon />
+                            </ListItemIcon> */}
+                            <img src={token.tokenAddress.logo? token.tokenAddress.logo : tokenImage } style={{marginLeft:token.tokenAddress.logo?'0':'-0.5vh', height:token.tokenAddress.logo?'3vh':'4vh'}} />{token.tokenAddress.logo?<>&nbsp;&nbsp;</>: <>&nbsp;</>}
+                            <ListItemText primary={token.tokenAddress.symbol} />
+                            </ListItemButton>
+                            <div style={{border:'0px solid #0f0', textAlign:'left', fontSize:'1.3vh', left:'3vw', bottom:'-2%', position:'absolute',color:'#999',fontStyle:'italic', width:'100%',}}>
+                                re-indexing database in progress
+                            </div>
+                            <div title="Stop watching this token" className="hoverRemoveToken" style={{position:'absolute', right:'3%', bottom:'0%',}}>
+                                { editingTokens? <RemoveCircleIcon /> : <></> }
+                            </div>
+                        </div> 
                     : <div style={{marginBottom:'1vh'}} key={index}></div> : <div key={index}></div>
                     
                 ))}
-                <div className="hoverAddNewToken" style={{marginLeft:'1vh', marginTop:'5vh', position:'relative', border:'0px solid #0f0', display:'flex', justifyContent:'center',alignItems:'center',}}>
+
+                {editingTokens?
+                <div onClick={()=>{  }}  style={{ marginTop:'5vh', position:'relative', border:'0px solid #0f0', display:'flex', justifyContent:'center',alignItems:'center',}}>
+                    <div title="Add token to watch" className="hoverAddNewToken" style={{marginRight:'1vw' }}>
+                        <AddCircleOutlineIcon style={{fontSize:'4vh',}}/> 
+                    </div>
+                    <div title="Close editing window" className="hoverCloseEditTokenWindow" onClick={()=>{ setEditingTokens(false) }} style={{marginLeft:'1vw'}}>
+                        <CheckCircleIcon style={{fontSize:'4vh',}}/> 
+                    </div>
+                </div> 
+                :
+                <div onClick={()=>{ setEditingTokens(true) }} className="hoverAddNewToken" style={{left:'25%', marginTop:'5vh', position:'relative', border:'0px solid #0f0', display:'flex', justifyContent:'center',alignItems:'center',}}>
                     
                         <div style={{position:'absolute', left:'0', float:'left', }}>
-                            <AddCircleOutlineIcon style={{fontSize:'4vh',}}/> 
+                            <ModeEditIcon style={{fontSize:'3vh',}}/>
                         </div>
-                        <div style={{float:'right', position:'absolute', width:'100%', textAlign:'center',display:'flex', justifyContent:'center',alignItems:'center',}}> 
-                            add token
+                        <div style={{ position:'absolute', left:'15%',  textAlign:'center',display:'flex', justifyContent:'center',alignItems:'center',}}> 
+                            edit tokens
                         </div>
                     
                 </div>
+                }
 
-
-                <div style={{width:'90%',textAlign:'center', display:'flex', justifyContent:'center',alignItems:'center', border:'1px solid rgba(100,100,120,1)', borderRight:'0px solid #fff',borderLeft:'0px solid #fff', borderRadius:'5px', backgroundColor:'rgba(100,100,120,0.4)', position:'absolute',top:'110%',height:'100%',}}>
+                <div style={{width:'92%',textAlign:'center', display:'flex', justifyContent:'center',alignItems:'center', border:'1px solid rgba(0,0,20,0.4)', borderRight:'0px solid #fff',borderLeft:'0px solid #fff', borderRadius:'5px', backgroundColor:'rgba(100,100,120,0.25)', position:'absolute',top:'110%',height:'100%',}}>
                     {friendlyLookupResponse? friendlyLookupResponse.length > 0?
                         <>
                             <div onClick={()=>{CopyToClipboard(RequestFriendlyLookup)}} style={{cursor:'pointer', position:'absolute',top:'1%',fontSize:'1vw'}}>
@@ -117,7 +142,6 @@ const SecondaryList = () => {
                     }
                 </div>
             </div>
-            
         </div>: <></>: <></>
 
         }

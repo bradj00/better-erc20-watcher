@@ -15,9 +15,11 @@ const dbNameFriendlyNames = 'friendlyNames';
 var uniqueAddys = [];
 var uniqueAddysCachedPresent = [];
 var uniqueAddysToLookup = [];
+var lookingUpFromApi = false;
 
 
 var sleepSeconds = 300; // 5 minutes between each run
+// var sleepSeconds = 5;
 
 
 console.clear();
@@ -44,7 +46,12 @@ getAddresses()
         console.log('cached friendlyName addresses:\t\t', existsInCache.length);
 
         h.fancylog('starting jobs: '+chalk.yellow('LookupAddressesFromApi()')+' '+chalk.yellow('UpdateTxsFromEachCollection()'), 'system ');
+        
 
+        if (toLookup.length > 0) {
+            lookingUpFromApi = true;
+        }
+        
         LookupAddressesFromApi(toLookup)
         // let existsInCacheFirstFive = existsInCache.slice(0, 5);
         // LookupAddressesFromApi(existsInCacheFirstFive)
@@ -57,7 +64,7 @@ getAddresses()
             }
         });
         UpdateTxsFromEachCollection(existsInCache, 'silent'); // silence logging tx updates since there will be a lot from the cached addresses
-
+        
     })
 })
 
@@ -66,6 +73,10 @@ setInterval(() => {
     uniqueAddys = [];
     uniqueAddysToLookup = [];
     uniqueAddysCachedPresent = [];
+    if (lookingUpFromApi == true){
+        h.fancylog('still looking up addresses from api. skipping this run.','system ');
+        return;
+    }
 
     getAddresses()
     .then((uniqueAddys) => {
@@ -77,6 +88,9 @@ setInterval(() => {
             let existsInCache = thisObj.existsInCache;
             // // console.log('addresses to lookup friendlyName:\t', toLookup.length);
             // // console.log('cached friendlyName addresses:\t\t', existsInCache.length);
+            if (toLookup.length > 0) {
+                lookingUpFromApi = true;
+            }
             h.fancylog('addresses to lookup friendlyName:\t'+ toLookup.length,'system ');
             h.fancylog('cached friendlyName addresses:\t\t'+ existsInCache.length,'system ');
 
@@ -132,7 +146,9 @@ async function getAddresses() {
     });
 }
 
-function checkIfAddressesExistInFriendlyNames(){
+function checkIfAddressesExistInFriendlyNames( uniqueAddys ){
+    //console log length of uniqueAddys
+    console.log('uniqueAddys.length: ', uniqueAddys.length);
     //return new promise
     return new Promise(async (resolve, reject) => {
         const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
@@ -140,10 +156,12 @@ function checkIfAddressesExistInFriendlyNames(){
         var count = 0;
         var countTrue = 0;
         for (const address of uniqueAddys) {
+            // console.log('count is: ', count, 'countTrue is: ', countTrue, 'address is: ', address, '')
             count++;
             countTrue++;
             var collectionExists = await dbFN.collection('lookup').find({address: address}).toArray();
-            if (collectionExists) {
+            // console.log('collectionExists: ', collectionExists, 'address: ', address, 'count: ', count, 'countTrue: ', countTrue, )
+            if (collectionExists && typeof collectionExists[0] == 'object' && collectionExists[0].friendlyName) {
                 uniqueAddysCachedPresent.push(address);
             } else {
                 uniqueAddysToLookup.push(address);
@@ -192,7 +210,7 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
             h.fancylog(chalk.yellow('UpdateTxsFromEachCollection()')+'\tfinished. Updated TXs for: '+chalk.yellow(i)+ ' addresses',' mongo ')
             // console.log('--------------------------------------------');
             h.fancylog(`all token TXs are up to date for all watched tokens. sleeping ${chalk.cyan(sleepSeconds)} seconds..`, 'system ')
-            client.close();
+            // client.close();
         }
     }
 
@@ -207,25 +225,53 @@ const LookupAddressesFromApi = (ListOfAddresses) => {
         }
         let newlyFetchedAddresses = [];
         ListOfAddresses.reduce((promiseChain, item, index) => {
-            console.log('index: ', index);
+            // console.log('index: ', index);
             return promiseChain.then(() => {
+                console.log('looking up address: ', item, 'index: ', index, 'total: ', ListOfAddresses.length);
                 newlyFetchedAddresses.push(item);
                 if (index == ListOfAddresses.length - 1) {
                     console.log(chalk.red('done fetching all addresses, count: '), index);
+                    lookingUpFromApi = false;
+
+                    MongoClient.connect(mongoUrl, function(err, client) {
+                        if (err) console.log('Mongo ERR: ',err);
+                        const db = client.db('systemStats');
+                        db.collection("systemStatuses").updateOne({name:"translator"}, {$set:{name:"translator", lookupIndex: 0, lookupIndexMax: 0}},{upsert: true},  function(err, result) {
+                            
+                            if (err) console.log('Mongo ERR: ',err);
+                            // console.log('OK UPDATED: ',result)
+                            client.close();
+                        });
+                    });
+
                     resolve(newlyFetchedAddresses);
-                }
-                return LookupSingleAddress(item);
+                }else {
+                MongoClient.connect(mongoUrl, function(err, client) {
+                    if (err) console.log('Mongo ERR: ',err);
+                    const db = client.db('systemStats');
+                    db.collection("systemStatuses").updateOne({name:"translator"}, {$set:{name:"translator", lookupIndex: index+1, lookupIndexMax: ListOfAddresses.length}},{upsert: true},  function(err, result) {
+                        
+                        if (err) console.log('Mongo ERR: ',err);
+                        // console.log('OK UPDATED: ',result)
+                        client.close();
+                    });
+                });
+            }
+
+
+                return LookupSingleAddress(item, index+1, ListOfAddresses.length);
             });
         }, Promise.resolve())
     });
 }
 
-const LookupSingleAddress =  (singleAddress) => {
+const LookupSingleAddress =  (singleAddress, count, totalCount) => {
     return new Promise( (resolve, reject) => {
         setTimeout(async() => {
             const url = 'https://api.opensea.io/user/' + singleAddress + '?format=json';
             // console.log('OpenSea looking up: ', url);
-            h.fancylog('OpenSea looking up: '+url, 'system ')
+            // h.fancylog('OpenSea looking up: '+url, 'system ')
+            h.fancylog('[ '+chalk.yellow(count)+'/'+chalk.yellow(totalCount)+' ]\tlooking up: '+chalk.magenta(singleAddress)+'\t'+url, 'system');
             
             try {
                 const { data } = await axios.get(url, {})

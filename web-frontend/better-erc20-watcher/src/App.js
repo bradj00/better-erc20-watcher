@@ -34,6 +34,8 @@ const [MaxAmountFilterValue, setMaxAmountFilterValue] = useState(999999999999999
 const [DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue] = useState();
 const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState();
 
+const [systemStatuses, setSystemStatuses] = useState();
+
 const [RequestFriendlyLookup, setRequestFriendlyLookup] = useState();
 const [friendlyLookupResponse, setFriendlyLookupResponse] = useState();
 const [updateFriendlyName, setupdateFriendlyName] = useState();
@@ -69,6 +71,8 @@ const contextObj = {
   updateFriendlyName, setupdateFriendlyName,
   pageNumber, setpageNumber,
   txDataChart, settxDataChart,
+  systemStatuses, setSystemStatuses,
+  
 
 }
 

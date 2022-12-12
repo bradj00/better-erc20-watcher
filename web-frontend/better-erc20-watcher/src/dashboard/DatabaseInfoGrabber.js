@@ -29,6 +29,7 @@ const DatabaseInfoGrabber = () => {
     const {RequestFriendlyLookup, setRequestFriendlyLookup} = useContext(GeneralContext);
     const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
     const {updateFriendlyName, setupdateFriendlyName} = useContext(GeneralContext);
+    const {systemStatuses, setSystemStatuses} = useContext(GeneralContext);
 
     useEffect(() => {
         console.log('MinAmountFilterValue,MaxAmountFilterValue: ', MinAmountFilterValue,MaxAmountFilterValue)
@@ -36,6 +37,15 @@ const DatabaseInfoGrabber = () => {
             fetchTransactions( viewingTokenAddress , MinAmountFilterValue, MaxAmountFilterValue)
         }
     },[MinAmountFilterValue,MaxAmountFilterValue]);
+
+    function fetchAllSystemStatuses() {
+        fetch('http://10.0.3.2:4000/system/systemStatus')
+        .then(response => response.json())
+        .then(data => {
+            console.log('system status: ', data);
+            setSystemStatuses(data);
+        })
+    }
 
     function fetchWatchedTokenList() {
         fetch('http://10.0.3.2:4000/watchedTokenList')
@@ -168,9 +178,14 @@ const DatabaseInfoGrabber = () => {
 
     useEffect(() => {
         fetchWatchedTokenList();
+        fetchAllSystemStatuses();
         fetchLatestBlockFromChain();
         fetchChainDataHeartbeat();
         
+
+        setInterval(()=>{
+            fetchAllSystemStatuses();
+        }, 1000);
 
         setInterval(()=>{
             fetchChainDataHeartbeat();

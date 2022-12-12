@@ -193,3 +193,23 @@ a:hover {
   cursor:pointer;
   user-select: none;
 }
+.hoverRemoveToken {
+  color: rgba(130,50,50,0.8);
+  cursor:pointer;
+  user-select: none;
+}
+.hoverRemoveToken:hover {
+  color: rgba(255,0,0,1);
+  cursor:pointer;
+  user-select: none;
+}
+.hoverCloseEditTokenWindow {
+  color: rgba(255,255,255,0.4);
+  cursor:pointer;
+  user-select: none;
+}
+.hoverCloseEditTokenWindow:hover {
+  color: rgba(0,255,0,1);
+  cursor:pointer;
+  user-select: none;
+}

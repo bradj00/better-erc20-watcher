@@ -68,7 +68,7 @@ spinner.color = 'white'
 function lookupSingleAddress(address, delay5){
     return new Promise(async (resolve, reject) => {
     try {
-        console.log('2\t');
+        // console.log('2\t');
         const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
         const dbFN = client.db(dbNameFriendlyNames);
         const collection = await dbFN.collection('lookup').find({address: address}).toArray();
@@ -392,7 +392,8 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                 if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;}
                 
                 try{
-                console.log('6\t');MongoClient.connect(mongoUrl, function(err, client) {
+                // console.log('6\t');
+                MongoClient.connect(mongoUrl, function(err, client) {
                     if (err) console.log('THERE WAS AN ERROR: ',err);
                     const db = client.db(dbName);
                     const collection = db.collection("a_"+tokenAddress);

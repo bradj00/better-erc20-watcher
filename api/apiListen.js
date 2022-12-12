@@ -83,12 +83,40 @@ app.listen(listenPort, () => {
             // res.send(timestamp.toString()) // used for heartbeat
             
         }) 
+        
+        //get system status object, which contains any activity properties the frontend needs to know about.
+        app.get('/system/systemStatus', cors(), async (req, res) => {
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                }
+                const db = client.db('systemStats');
+                const collection = db.collection('systemStatuses');
+                
+                // find all documents in the collection and return them as an an object together
+                const systemStatus = await collection.find({}).toArray();
+                //convert the array of objects into a single object.
+                // const systemStatusObj = systemStatus.reduce((acc, cur) => {
+                //     return {...acc, ...cur};
+                // }, {});
 
+
+
+
+                // const systemStatus = await collection.find({}).toArray();
+                // console.log('systemStatus: ', systemStatus);
+                //send the array to the frontend.
+                client.close();
+                res.send(systemStatus);
+                // res.send(systemStatus);
+            });
+        });
 
         //request to set up new watched token
         app.get('/system/watchNewToken/:tokenAddress', cors(), async (req, res) => {
             const tokenAddress = req.params.tokenAddress;
-            console.log('4\t');MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+            // console.log('4\t');
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 const db = client.db('watchedTokens');
                 const collectionlist = await db.listCollections().toArray();
                 //from collectionList, get all collections that start with 'a_' and remove the 'a_' prefix. push them into an array.
@@ -137,7 +165,8 @@ app.listen(listenPort, () => {
             const pageNumber = req.query.pageNumber;
             const filterMin = req.query.filterMin;
             const filterMax = req.query.filterMax;
-            console.log('3\t');MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+            // console.log('3\t');
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 const db = client.db(dbName);
                 const collection = db.collection(("a_"+req.params.collectionName));
                 
@@ -172,10 +201,11 @@ app.listen(listenPort, () => {
 
         app.get('/txs/:collectionName/txDetails/:txDetails', cors(), async (req, res) => {
             const pageNumber = req.query.pageNumber;
-            console.log('2\t');MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+            // console.log('2\t');
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 const db = client.db(dbName);
                 const collection = db.collection(("a_"+req.params.collectionName));
-                console.log(req.params.txDetails) 
+                // console.log(req.params.txDetails) 
                 collection.find({"transaction_hash": req.params.txDetails}).sort({block_timestamp: -1}).limit(50).toArray(function(err, result) {
                     res.send(result)
                 });
@@ -199,12 +229,13 @@ app.listen(listenPort, () => {
 
         //get transactions for a token by a holder address
         app.get('/txs/:collectionName/:filterAddress', cors(), async (req, res) => {
-            console.log('filtered by address query: ', req.query);
+            // console.log('filtered by address query: ', req.query);
             
-            console.log('1\t');MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+            // console.log('1\t');
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 const db = client.db(dbName);
-                console.log('req.params.filterAddress: ', req.params.filterAddress);
-                console.log('req.params.collectionName: ', req.params.collectionName);
+                // console.log('req.params.filterAddress: ', req.params.filterAddress);
+                // console.log('req.params.collectionName: ', req.params.collectionName);
                 const collection = db.collection(("a_"+req.params.collectionName));
 
                 collection.find({ $or: [ {to_address: {$regex: req.params.filterAddress, $options: 'i'}} ,  {from_address: {$regex: req.params.filterAddress, $options: 'i'}} ]}).sort({block_timestamp: -1}).limit(50000).toArray(function(err, result) {
@@ -215,7 +246,8 @@ app.listen(listenPort, () => {
         });    
 
         app.get('/friendlyName/:theAddress', cors(), async (req, res) => {
-            console.log('q\t');MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+            // console.log('q\t');
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 const db = client.db(dbNameFN);
 
                 console.log('looking up: ', req.params.theAddress);
@@ -227,7 +259,8 @@ app.listen(listenPort, () => {
                     if (err) {
                         console.log('error: ', err);
                     }
-                    console.log('result: ', result);
+                    // console.log('result: ', result);
+                    client.close();
                     res.send(result)
                 });
             });
@@ -239,7 +272,8 @@ app.listen(listenPort, () => {
         app.get('/updateFN/:address/:friendlyName',  cors(), async (req, res) => {
             console.log('got FN update request: ',);
 
-            console.log('q\t');MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 const db1 = client.db(dbNameFN);
                 const collection = db1.collection('lookup');
                 const address = req.params.address;
@@ -255,8 +289,8 @@ app.listen(listenPort, () => {
                             h.fancylog(err, 'error');
                         }
                         console.log('updated friendlyName result: ', result);
-                        res.send(result);
                         client.close();
+                        res.send(result);
                     });
                 
             });
@@ -267,7 +301,8 @@ app.listen(listenPort, () => {
 
 
         app.get('/watchedTokenList', cors(), async (req, res) => {
-            console.log('6\t');MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+            // console.log('6\t');
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 const db = client.db(dbName);
                 const collectionlist = await db.listCollections().toArray();
                 //remove isSyncing from list
@@ -312,6 +347,7 @@ app.listen(listenPort, () => {
                     for(let i = 0; i < values.length; i++) {
                         temp.push({tokenAddress :  values[i].data[0] });
                     }
+                    client.close();
                     res.send(temp);
                 })
                 
