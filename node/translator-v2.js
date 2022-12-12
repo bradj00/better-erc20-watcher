@@ -187,13 +187,15 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
             // console.log('hello ', addresses[i]);
             // find all documents in all collections that have the address in the from_address or to_address field. Update the to_address_friendlyName or from_address_friendlyName depending on which field it is.
             let friendlyName = await dbFN.collection('lookup').find({address: addresses[i]}).limit(1).toArray()
+            const collections = await db.listCollections().toArray();
+
             if(friendlyName[0]){
                 if (silentSwitch == 'loud'){
                     // console.log('updating all collections matching address: ', chalk.magenta(addresses[i]),' with friendlyName: ', chalk.magenta(friendlyName[0].friendlyName));
                     h.fancylog('updating all collections matching address: '+ chalk.magenta(addresses[i])+' with friendlyName: '+chalk.magenta(friendlyName[0].friendlyName), ' mongo ')
                 }
 
-                const collections = await db.listCollections().toArray();
+                
                 for (let j = 0; j < collections.length; j++) {
                     db.collection(collections[j].name).updateMany({from_address: addresses[i]}, {$set: {from_address_friendlyName: friendlyName[0].friendlyName}})
                     db.collection(collections[j].name).updateMany(  {to_address: addresses[i]}, {$set: {to_address_friendlyName: friendlyName[0].friendlyName}})
@@ -202,7 +204,12 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
             else { 
                 if (silentSwitch == 'loud'){
                     // console.log('\tskip because no friendlyName found for address: ', addresses[i]);
-                    h.fancylog('skip because no friendlyName found for address: '+addresses[i], ' mongo ')
+                    // h.fancylog('no friendlyName found for address: '+addresses[i], ' mongo ')
+                }
+
+                for (let j = 0; j < collections.length; j++) {
+                    db.collection(collections[j].name).updateMany({from_address: addresses[i]}, {$set: {from_address_friendlyName: addresses[i] }})
+                    db.collection(collections[j].name).updateMany(  {to_address: addresses[i]}, {$set: {to_address_friendlyName: addresses[i] }})
                 }
             }
         // }, 200 * i);
@@ -273,17 +280,38 @@ const LookupSingleAddress =  (singleAddress, count, totalCount) => {
             // h.fancylog('OpenSea looking up: '+url, 'system ')
             h.fancylog('[ '+chalk.yellow(count)+'/'+chalk.yellow(totalCount)+' ]\tlooking up: '+chalk.magenta(singleAddress)+'\t'+url, 'system');
             
+
+            MongoClient.connect(mongoUrl, async function(err, client) {
+            if (err) console.log('Mongo ERR: ',err);
+            const db = client.db(dbNameFriendlyNames);
+
             try {
                 const { data } = await axios.get(url, {})
                 console.log('got: ', data.username);
-                resolve(data.username);
+                if (data.username == null) { data.username = singleAddress }
+                db.collection("lookup").updateOne({address: singleAddress }, {$set:{ 'friendlyName': data.username }},{upsert: true},  function(err, result) {
+                    if (err) console.log('Mongo ERR: ',err);
+                    client.close();
+                    resolve(data.username);
+                });
+                
+
+
             }
             catch(error){
                 console.log('------------------------------------');
                 console.log(error.code); // usually means the name is not found on OpenSea if 404 ERR_BAD_REQUEST
                 console.log('------------------------------------');
-                resolve(singleAddress);
+
+                db.collection("lookup").updateOne({address: singleAddress }, {$set:{ 'friendlyName': singleAddress }},{upsert: true},  function(err, result) {
+                    if (err) console.log('Mongo ERR: ',err);
+                    client.close();
+                    resolve(singleAddress);
+                });
+
             }
+
+            });
         }, 1000);
     });
   }

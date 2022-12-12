@@ -183,13 +183,14 @@ const DatabaseInfoGrabber = () => {
         fetchChainDataHeartbeat();
         
 
-        setInterval(()=>{
-            fetchAllSystemStatuses();
-        }, 1000);
+        // setInterval(()=>{
+        //     fetchAllSystemStatuses();
+        // }, 1000);
 
         setInterval(()=>{
             fetchChainDataHeartbeat();
             fetchLatestBlockFromChain();
+            fetchAllSystemStatuses();
         }, 10000);
     },[])
 
