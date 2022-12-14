@@ -76,7 +76,7 @@ const SecondaryList = () => {
             
             </ListSubheader>
         {watchedTokenList? watchedTokenList.length > 0? 
-        <div style={{display:'flex',}}>
+        <div style={{display:'flex', height:'70vh',border:'0px solid #f0f'}}>
             <div style={{marginBottom:'3vh',width:'100%', }}>
                 {watchedTokenList.map((token, index) => (
                     token? token.tokenAddress?
@@ -121,15 +121,16 @@ const SecondaryList = () => {
                 </div>
                 }
 
-                <div style={{width:'92%',textAlign:'center', display:'flex', justifyContent:'center',alignItems:'center', border:'1px solid rgba(0,0,20,0.4)', borderRight:'0px solid #fff',borderLeft:'0px solid #fff', borderRadius:'5px', backgroundColor:'rgba(100,100,120,0.25)', position:'absolute',top:'110%',height:'100%',}}>
+                <div style={{zIndex:'10000', textAlign:'center', display:'flex', justifyContent:'center',alignItems:'center', border:'1px solid rgba(0,0,20,0.4)', borderRight:'0px solid #fff',borderLeft:'0px solid #fff', backgroundColor:'rgba(100,100,120,0.1)', position:'absolute',bottom:'0%',width:'100%',height:'40%',}}>
                     {friendlyLookupResponse? friendlyLookupResponse.length > 0?
                         <>
                             <div onClick={()=>{CopyToClipboard(RequestFriendlyLookup)}} style={{cursor:'pointer', position:'absolute',top:'1%',fontSize:'1vw'}}>
                                 {getEllipsisTxt(RequestFriendlyLookup, 6)}
                             </div>
-                            <div style={{position:'absolute',top:'13%',left:'1%'}}>
+
+                            <div style={{position:'absolute',top:'13%',left:'0%',width:'100%'}}>
                                 {/* {friendlyLookupResponse} */}
-                                FN:<input  value={DesiredFriendlyNameUpdate} onChange={(e) => setDesiredFriendlyNameUpdate(e.target.value)} style={{width:'94%', padding:'2%', backgroundColor:'rgba(0,0,0,0.4)', color:'#999', border:'none', textAlign:'center'}} placeholder={friendlyLookupResponse} />
+                                FN:<input  value={DesiredFriendlyNameUpdate} onChange={(e) => setDesiredFriendlyNameUpdate(e.target.value)} style={{width:'82%', padding:'2%', backgroundColor:'rgba(0,0,0,0.4)', color:'#999', border:'none', textAlign:'center'}} placeholder={friendlyLookupResponse} />
                             </div>
 
                             <div onClick={()=>{finalizeFriendlyNameUpdate()}} style={{position:'absolute',top:'25%', width:'50%', height: '10%', backgroundColor:'rgba(0,0,0,0.4)', display:'flex', justifyContent:'center', alignItems:'center'}}>

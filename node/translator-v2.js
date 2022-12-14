@@ -119,6 +119,7 @@ setInterval(() => {
 async function getAddresses() {
     //return new promise
     return new Promise(async (resolve, reject) => {
+    // console.log('666\t')
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
     const db = client.db(dbNameQueryAddys);
     const collections = await db.listCollections().toArray();
@@ -151,6 +152,7 @@ function checkIfAddressesExistInFriendlyNames( uniqueAddys ){
     console.log('uniqueAddys.length: ', uniqueAddys.length);
     //return new promise
     return new Promise(async (resolve, reject) => {
+        // console.log('555\t')
         const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
         const dbFN = client.db(dbNameFriendlyNames);
         var count = 0;
@@ -176,6 +178,7 @@ function checkIfAddressesExistInFriendlyNames( uniqueAddys ){
 
  
 async function UpdateTxsFromEachCollection(addresses, silentSwitch){
+    // console.log('444\t')
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
     const dbFN = client.db(dbNameFriendlyNames);
     const db = client.db(dbNameQueryAddys);
@@ -218,6 +221,9 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
             // console.log('--------------------------------------------');
             h.fancylog(`all token TXs are up to date for all watched tokens. sleeping ${chalk.cyan(sleepSeconds)} seconds..`, 'system ')
             // client.close();
+            setTimeout(()=>{        //this should be event driven, not a timeout but it's a blocker for now
+                client.close();
+            },5000);
         }
     }
 
@@ -239,7 +245,7 @@ const LookupAddressesFromApi = (ListOfAddresses) => {
                 if (index == ListOfAddresses.length - 1) {
                     console.log(chalk.red('done fetching all addresses, count: '), index);
                     lookingUpFromApi = false;
-
+                    // console.log('333\t')
                     MongoClient.connect(mongoUrl, function(err, client) {
                         if (err) console.log('Mongo ERR: ',err);
                         const db = client.db('systemStats');
@@ -253,6 +259,7 @@ const LookupAddressesFromApi = (ListOfAddresses) => {
 
                     resolve(newlyFetchedAddresses);
                 }else {
+                    // console.log('111\t')
                 MongoClient.connect(mongoUrl, function(err, client) {
                     if (err) console.log('Mongo ERR: ',err);
                     const db = client.db('systemStats');
@@ -281,6 +288,7 @@ const LookupSingleAddress =  (singleAddress, count, totalCount) => {
             h.fancylog('[ '+chalk.yellow(count)+'/'+chalk.yellow(totalCount)+' ]\tlooking up: '+chalk.magenta(singleAddress)+'\t'+url, 'system');
             
 
+            // console.log('222\t')
             MongoClient.connect(mongoUrl, async function(err, client) {
             if (err) console.log('Mongo ERR: ',err);
             const db = client.db(dbNameFriendlyNames);

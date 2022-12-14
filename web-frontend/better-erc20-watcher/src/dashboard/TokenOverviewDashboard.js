@@ -343,7 +343,7 @@ function function66(e){
                     <div style={{position:'relative', left:'2%'}}>
                       Latest Block: 
                       <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
-                        {latestEthBlock? commaNumber(latestEthBlock.block):<>...</>}
+                        {latestEthBlock? <a target="blank_" href={("https://etherscan.io/block/"+latestEthBlock.block)}> {commaNumber(latestEthBlock.block)} </a>:<>...</>}
                       </div>
                     </div>
 
@@ -356,14 +356,16 @@ function function66(e){
 
                     <div style={{position:'relative', left:'2%'}}>
                       Address Translator: 
-                        <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
+                        <div style={{float:'right', position:'absolute', top:'0', right:'5%', color:'#aa0'}}> 
                           
                           
                           { // find the 'translator' service in the array of services
                             systemStatuses? 
+                            commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax) > 0? 
                             // if it's found, display "lookupIndex" / "lookupIndexMax"
                             <> {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndex)} / {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax)} </>
                           
+                            :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
                             :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
                           }
                         </div>

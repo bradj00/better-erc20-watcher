@@ -14,6 +14,10 @@ const fancylog = (str, bracketedStr, tokenAddress, spinner) => {
 
   if (str) {
     if (bracketedStr) {
+      if (bracketedStr == 'system'){ bracketedStr = 'system ';}
+      if (bracketedStr == 'mongo'){ bracketedStr = ' mongo ';}
+      if (bracketedStr == 'error'){ bracketedStr = ' error ';}
+      
       switch (bracketedStr){
         case 'moralis':
           red = 0;

@@ -191,7 +191,7 @@ const DatabaseInfoGrabber = () => {
             fetchChainDataHeartbeat();
             fetchLatestBlockFromChain();
             fetchAllSystemStatuses();
-        }, 10000);
+        }, 30000);
     },[])
 
 
