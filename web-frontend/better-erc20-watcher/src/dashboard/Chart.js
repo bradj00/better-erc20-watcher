@@ -46,16 +46,16 @@ export default function Chart() {
   const [filteredTxDataOutflow, setfilteredTxDataOutflow] = React.useState([]);
 
     useEffect(()=>{
-      console.log('txDataChart: ', txDataChart);
+      // console.log('txDataChart: ', txDataChart);
       formatTheTxDataChart(txDataChart);
     },[txDataChart])
 
   function formatTheTxDataChart(txData){
     if (txData == undefined || txData.length == 0) {return}
     else {
-      console.log('formatting txData: ', txData.length)
-      console.log(txData);
-      console.log(typeof txData)
+      // console.log('formatting txData: ', txData.length)
+      // console.log(txData);
+      // console.log(typeof txData)
       let formattedTxData = [];
       let totalVolume  = 0;
       txData.forEach((tx) => {
@@ -73,9 +73,9 @@ export default function Chart() {
   function formatTheTxData(txData){
     if (txData == undefined || txData.length == 0) {return}
     else {
-      console.log('formatting txData: ', txData.length)
-      console.log(txData);
-      console.log(typeof txData)
+      // console.log('formatting txData: ', txData.length)
+      // console.log(txData);
+      // console.log(typeof txData)
       let formattedTxData = [];
       let totalVolume  = 0;
       txData.forEach((tx) => {
@@ -168,7 +168,7 @@ useEffect(()=>{
     for (let i = index; i < array.length; i++) {
       filteredArray.push(array[i]);
     }
-    console.log('filtered array: ', filteredArray);
+    // console.log('filtered array: ', filteredArray);
     return filteredArray;
   }
 

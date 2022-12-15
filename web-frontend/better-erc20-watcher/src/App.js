@@ -1,4 +1,5 @@
 import TokenOverviewDashboard from './dashboard/TokenOverviewDashboard.js';
+import AddressSummaryDashboard from './dashboard/AddressSummaryDashboard.js';
 import DatabaseInfoGrabber from './dashboard/DatabaseInfoGrabber.js';
 import React, {useContext, useEffect, useState} from 'react';
 import ConnectionStatusBanner from './dashboard/ConnectionStatusBanner.jsx';
@@ -40,6 +41,7 @@ const [RequestFriendlyLookup, setRequestFriendlyLookup] = useState();
 const [friendlyLookupResponse, setFriendlyLookupResponse] = useState();
 const [updateFriendlyName, setupdateFriendlyName] = useState();
 const [pageNumber, setpageNumber] = useState(1);
+const [displayPanel, setdisplayPanel] = useState('watchingTokens');
 
 const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
 
@@ -72,6 +74,7 @@ const contextObj = {
   pageNumber, setpageNumber,
   txDataChart, settxDataChart,
   systemStatuses, setSystemStatuses,
+  displayPanel, setdisplayPanel,
   
 
 }
@@ -86,7 +89,9 @@ return (
     <GeneralContext.Provider value={contextObj} >
       <div style={{overflow:'hidden', border:'0px solid #0f0'}}>
           <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
-          <TokenOverviewDashboard />
+          {displayPanel == 'watchingTokens'? <TokenOverviewDashboard />: <></>}
+          {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
+          
       </div>
     <DatabaseInfoGrabber />
     </GeneralContext.Provider>

@@ -245,17 +245,17 @@ const DatabaseInfoGrabber = () => {
                         return item;
                     }
                 })
-                console.log('SETTING FINAL TEMP: ', temp)
+                // console.log('SETTING FINAL TEMP: ', temp)
                 settxData(temp);
             }else {
-                console.log('SETTING FINAL UNFILTERED TEMP: ', data.result)
+                // console.log('SETTING FINAL UNFILTERED TEMP: ', data.result)
                 settxData(data.result)
             }
         }
     },[data])
 
     useEffect(() => {
-        console.log('filteredAddyData: ',filteredAddyData);
+        // console.log('filteredAddyData: ',filteredAddyData);
         setfilteredtxData(filteredAddyData)
     },[filteredAddyData])
     
