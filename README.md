@@ -27,7 +27,7 @@ using:
 <sub>( Address Summary stats, includes held tokens common to the existing database of watched addresses )</sub>
 
 <sub>( This will be good for stepping into a community and quickly seeing commonly held ERC20 tokens and patterns)</sub>
-![image](https://user-images.githubusercontent.com/99688245/208028929-ed45110e-3a76-4acd-8277-064d8c441af3.png)
+![image](https://user-images.githubusercontent.com/99688245/208042807-64ab72b7-8f97-4f2f-80c5-a777854f6789.png)
 
 <sub>( OneNote User Guide detailing mechanical operation and use )</sub>
 ![image](https://user-images.githubusercontent.com/99688245/201840676-3fedcf9d-adc2-4f10-8afb-2a1b1bba0dce.png)
