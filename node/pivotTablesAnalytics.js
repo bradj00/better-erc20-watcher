@@ -78,7 +78,7 @@ async function getHeldTokensForAllAddresses() {
             //for each token held, add a new field to the document where address == address.address in the collection 'filteredAddresses' with the token address as the field name and the balance as the value
             for (const token of balances) {
                 // console.log('token: ', token)
-                let update = await db.collection('allAddresses').updateOne({ address: address.address }, { $set: { [token.token_address]: token.balance } });
+                let update = await db.collection('allAddresses').updateOne({ address: address.address }, { $set: { [token.token_address]: {metadata: token} } });
                 // console.log('update: ', update)
             }
         }

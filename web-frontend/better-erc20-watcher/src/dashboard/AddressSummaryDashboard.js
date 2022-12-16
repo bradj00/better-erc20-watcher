@@ -131,7 +131,16 @@ function DashboardContent() {
   const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
   const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
   const timeAgo = new TimeAgo('en-US'); 
+  const {selectedAddressListOfTokens, setselectedAddressListOfTokens} = useContext(GeneralContext);
+  const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
+  const {heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN} = useContext(GeneralContext);
 
+  useEffect(() => {
+    // if (selectedAddressListOfTokens){
+      console.log("-----selectedAddressListOfTokens: ", selectedAddressListOfTokens);
+    // }
+  },[selectedAddressListOfTokens]);
+  
   useEffect(() => {
 
   },[DisplayMinAmountFilterValue]);
@@ -205,6 +214,9 @@ function DashboardContent() {
 function function66(e){
   console.log("function66:", e)
 }
+
+
+
 
   return (
     <div style={{overflow:'hidden'}}>
@@ -316,19 +328,19 @@ function function66(e){
             <div style={{border:'0px solid #0f0', width:'82.5%', left:'17vw',top:'7.5vh', zIndex:'9999', height:'92%', position:'absolute',}}>
               
               {/* address header  */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'center', borderRadius:'20px', height:'10%', position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'center', borderRadius:'10px', height:'10%', position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div style={{position:'absolute', top:'5%'}}>
-                  <div style={{fontSize:'1.5vw'}}>0xf216b...866f2</div>
-                  <div style={{fontSize:'1vw'}}>SomeGuy.eth</div>
+                  <div style={{fontSize:'1.5vw'}}>{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</div>
+                  <div style={{fontSize:'1vw'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN: <>...</>}</div>
                 </div>
               </div>
 
               {/* aliases */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'20px', height:'20%', position:'absolute',top:'12%',display:'flex', justifyContent:'center',alignItems:'center'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'10px', height:'20%', position:'absolute',top:'12%',display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div style={{position:'absolute', top:'2%', paddingLeft:'1vw',width:'100%', border:'0px solid #ff0'}}>
                   <div style={{fontSize:'1vw',paddingBottom:'2vh',}}>Known Aliases:</div>
                   <div style={{display:'grid', gridTemplateColumns:'repeat(2, 1fr)',width:'100%',border:'0px solid #f0f',fontSize:'0.75vw', textAlign:'center',left:'0',position:'absolute'}}>
-                    <div > SomeGuy.eth</div>
+                    <div > ayyyy.eth</div>
                     <div > ENS </div>
                     <div > ThisGuyOnOS</div>
                     <div > OpenSea </div>
@@ -339,7 +351,7 @@ function function66(e){
               </div>
 
               {/* misc stats */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'29.5%', textAlign:'center', borderRadius:'20px', height:'32%', position:'absolute',top:'0%',left:'16.9vw', display:'flex', justifyContent:'center',alignItems:'center'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'29.5%', textAlign:'center', borderRadius:'10px', height:'32%', position:'absolute',top:'0%',left:'16.9vw', display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div>
                   <div>Misc Stats</div>
                   <div>wallet age:</div>
@@ -348,7 +360,7 @@ function function66(e){
               </div>
 
               {/* Token Heuristic Inflow/Outflow */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'left', borderRadius:'20px', height:'33%', position:'absolute',top:'33.5%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',top:'33.5%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div>
                   <div>Heuristic Inflow/Outflow</div>
                   <div>Common Senders To this Address:</div>
@@ -358,7 +370,7 @@ function function66(e){
               </div>
 
               {/* User-defined notes */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'left', borderRadius:'20px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div>
                   <div>Notes</div>
                   <div>Enter manual notes here about address:</div>
@@ -367,28 +379,69 @@ function function66(e){
               </div>
 
               {/* Community Held Tokens */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'49%', textAlign:'left', borderRadius:'20px', height:'32%', position:'absolute',top:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
-                <div>
-                  <div>Token Balances For this Address</div>
-                  <div>(Vertical Divider)</div>
-                  <div>When clicking a balance, show on right: Other holders of this token from your watchedToken collections</div>
-                  <div>Show Staked Token locations (locked in contract somewhere)</div>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'49%', textAlign:'left', borderRadius:'5px', height:'66%', position:'absolute',top:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+                <div style={{display:'flex', justifyContent:'center'}}>
+                  <div style={{borderRadius:'10px',overflowY:'scroll',display:'flex', justifyContent:'center',alignItems:'center', height:'100%', border:'0px solid #0f0',position:'absolute',top:'0',left:'0',width:'49.5%',}}>
+                    
+                    
+                    <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0'}}>
+                      <thead style={{position:'sticky', top:'0'}}>
+                        <th>Token</th>
+                        <th>Balance</th>
+                        <th>USD</th>
+                      </thead>
+
+                      {selectedAddressListOfTokens? selectedAddressListOfTokens.length > 0? Object.keys(selectedAddressListOfTokens[0]).map((token, index) => {
+                          return (
+                            selectedAddressListOfTokens[0][token].metadata?
+                            <tr>
+                              <td>{selectedAddressListOfTokens[0][token].metadata.symbol}</td>
+                              <td>{parseFloat((selectedAddressListOfTokens[0][token].metadata.balance)/ (10 **18)).toFixed(4)}</td>
+                              
+                              <td>$5.00</td>
+                            </tr>
+                            : <> </>
+                          )
+                        })
+                        : <> </>
+                        : <> </>
+                      }
+                      
+                      
+                    </table>
+                      
+                    
+                  </div>
+                  <div style={{display:'flex', overflowY:'scroll',justifyContent:'center',alignItems:'center', height:'100%', borderRadius:'10px',position:'absolute',top:'0',right:'0',width:'49.5%',}}>
+                  <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0'}}>
+                        <thead style={{position:'sticky', top:'0'}}>
+                          <th>Address</th>
+                          <th>Balance</th>
+                          <th>USD</th>
+                        </thead>
+                        <tr>
+                          <td>Token1</td>
+                          <td>100</td>
+                          <td>100</td>
+                        </tr>
+                      </table>
+                  </div>
+                  
+                  
+
+
+                  {/* Token Balances For this Address */}
+                  {/* <div>When clicking a balance, show on right: Other holders of this token from your watchedToken collections</div>
+                  <div>Show Staked Token locations (locked in contract somewhere)</div> */}
                 </div>
               </div>
 
-              {/* OpenSea activity */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'49%', textAlign:'center', borderRadius:'20px', height:'33%', position:'absolute',bottom:'33.45%',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
-                <div>
-                  <div>Recent OpenSea activity</div>
-                
-                </div>
-              </div>
+            
 
               {/* Address TX activity */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'49%', textAlign:'center', borderRadius:'20px', height:'33%', position:'absolute',bottom:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'49%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div>
                   <div>Address TX activity</div>
-                
                 </div>
               </div>
 

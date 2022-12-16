@@ -30,6 +30,9 @@ const DatabaseInfoGrabber = () => {
     const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
     const {updateFriendlyName, setupdateFriendlyName} = useContext(GeneralContext);
     const {systemStatuses, setSystemStatuses} = useContext(GeneralContext);
+    const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
+    const {heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN} = useContext(GeneralContext);
+    const {selectedAddressListOfTokens, setselectedAddressListOfTokens} = useContext(GeneralContext);
 
     useEffect(() => {
         console.log('MinAmountFilterValue,MaxAmountFilterValue: ', MinAmountFilterValue,MaxAmountFilterValue)
@@ -37,6 +40,33 @@ const DatabaseInfoGrabber = () => {
             fetchTransactions( viewingTokenAddress , MinAmountFilterValue, MaxAmountFilterValue)
         }
     },[MinAmountFilterValue,MaxAmountFilterValue]);
+    
+    useEffect(() => {
+        if (heldTokensSelectedAddress){
+            fetchSelectedAddressHeldTokens( heldTokensSelectedAddress )
+            fetchFNforAddress( heldTokensSelectedAddress )
+        }
+    },[heldTokensSelectedAddress]);
+
+    function fetchFNforAddress(address) {
+        console.log('fetching friendly name for address: ', address)
+        fetch('http://10.0.3.2:4000/friendlyName/' + address)
+        .then(response => response.json())
+        .then(data => {
+            console.log('FN Lookup:\t['+address+'] friendly name: ', data[0].friendlyName);
+            data[0]? data[0].friendlyName? setheldTokensSelectedAddressFN(data[0].friendlyName) : setheldTokensSelectedAddressFN('') : setheldTokensSelectedAddressFN('')
+        })
+    }
+
+    function fetchSelectedAddressHeldTokens(address) {
+        console.log('fetching held tokens for address: ', address)
+        fetch('http://10.0.3.2:4000/tokenBalances/' + address)
+        .then(response => response.json())
+        .then(data => {
+            console.log('['+address+'] token balances: ', data);
+            setselectedAddressListOfTokens(data);
+        })
+    }
 
     function fetchAllSystemStatuses() {
         fetch('http://10.0.3.2:4000/system/systemStatus')
@@ -191,7 +221,7 @@ const DatabaseInfoGrabber = () => {
             fetchChainDataHeartbeat();
             fetchLatestBlockFromChain();
             fetchAllSystemStatuses();
-        }, 30000);
+        }, 10000);
     },[])
 
 

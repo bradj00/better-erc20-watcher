@@ -62,6 +62,32 @@ app.listen(listenPort, () => {
 
         });
 
+        // get token balances for a given address
+        app.get('/tokenBalances/:address', cors(),(req, res) => {
+            const lookupAddy = req.params.address;
+            console.log('>>>>>> lookupAddy: ', lookupAddy);
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                }
+                const db = client.db('pivotTables');
+                const collection = db.collection('allAddresses');
+                //get all columns where address = address
+                // create regex variable to search for lookupAddy with case insensitive
+                const regex = new RegExp(lookupAddy, 'i');
+                const addressColumns = await collection.find({address: regex}).toArray();
+                console.log('addressColumns: ', addressColumns);
+                res.send(addressColumns)
+
+
+
+            });
+
+
+
+
+        });
+
         app.get('/', cors(),(req, res) => {
             // console.log('5\t');
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {

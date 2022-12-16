@@ -23,7 +23,7 @@ export default function Deposits() {
   const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext);
   
   return (
-    <div style={{position:'absolute',textAlign:'center', height:'100%', border:'0px solid #ff0', width:'100%', userSelect:'none' }}>
+    <div style={{position:'absolute',textAlign:'center', height:'100%', border:'0px solid #ff0', width:'100%',  }}>
     <React.Fragment>
       <Title><span style={{ fontSize:'3vh'}}>{clickedDetailsAddressFN? clickedDetailsAddressFN == 'Uniswap v3 Pool'? <>DEX Volume</> : <>Token Volume</>: <>Token Volume</>}</span></Title>
       

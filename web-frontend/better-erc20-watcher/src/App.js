@@ -1,4 +1,5 @@
 import TokenOverviewDashboard from './dashboard/TokenOverviewDashboard.js';
+import TokenHoldersDashboard from './dashboard/TokenHoldersDashboard.js';
 import AddressSummaryDashboard from './dashboard/AddressSummaryDashboard.js';
 import DatabaseInfoGrabber from './dashboard/DatabaseInfoGrabber.js';
 import React, {useContext, useEffect, useState} from 'react';
@@ -22,6 +23,9 @@ const [watchedTokenList, setWatchedTokenList] = useState();
 const [filteredtxData, setfilteredtxData] = useState();
 const [totalVolume, setTotalVolume] = useState();
 const [clickedTokenSymbol, setclickedTokenSymbol] = useState();
+const [heldTokensSelectedAddress, setheldTokensSelectedAddress] = useState();
+const [heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN] = useState();
+const [selectedAddressListOfTokens, setselectedAddressListOfTokens] = useState();
 
 const [filteredtxDataInflow,   setfilteredtxDataInflow] = useState();
 const [filteredtxDataOutflow,   setfilteredtxDataOutflow] = useState();
@@ -75,8 +79,9 @@ const contextObj = {
   txDataChart, settxDataChart,
   systemStatuses, setSystemStatuses,
   displayPanel, setdisplayPanel,
-  
-
+  heldTokensSelectedAddress, setheldTokensSelectedAddress,
+  selectedAddressListOfTokens, setselectedAddressListOfTokens,
+  heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN,
 }
 
 
@@ -91,6 +96,8 @@ return (
           <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
           {displayPanel == 'watchingTokens'? <TokenOverviewDashboard />: <></>}
           {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
+          {displayPanel == 'tokenSummary'? <TokenHoldersDashboard />: <></>}
+          
           
       </div>
     <DatabaseInfoGrabber />

@@ -105,7 +105,7 @@ export default function Orders() {
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
-  
+  const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
   const {RequestFriendlyLookup, setRequestFriendlyLookup} = useContext(GeneralContext);
   const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
 
@@ -113,7 +113,9 @@ export default function Orders() {
 
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow, setfilteredtxDataOutflow} = useContext(GeneralContext);
+  const {displayPanel, setdisplayPanel} = useContext(GeneralContext); 
 
+  
   useEffect(() => {
     setTimeout(()=>{
       // console.log('update');
@@ -180,10 +182,17 @@ export default function Orders() {
       }
     }
     else if (rowClickMode == 'summary'){
-
+      if (fromOrTo == 'from'){
+        setheldTokensSelectedAddress(row.from_address)
+      }
+      else if (fromOrTo == 'to'){
+        setheldTokensSelectedAddress(row.to_address)
+      }
+      
+      setdisplayPanel('addressSummary');
     }
 
-
+    // 
   }
 
 
