@@ -26,6 +26,8 @@ const [clickedTokenSymbol, setclickedTokenSymbol] = useState();
 const [heldTokensSelectedAddress, setheldTokensSelectedAddress] = useState();
 const [heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN] = useState();
 const [selectedAddressListOfTokens, setselectedAddressListOfTokens] = useState();
+const [communityHeldListFromSelected, setcommunityHeldListFromSelected] = useState();
+const [communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy] = useState();
 
 const [filteredtxDataInflow,   setfilteredtxDataInflow] = useState();
 const [filteredtxDataOutflow,   setfilteredtxDataOutflow] = useState();
@@ -82,6 +84,8 @@ const contextObj = {
   heldTokensSelectedAddress, setheldTokensSelectedAddress,
   selectedAddressListOfTokens, setselectedAddressListOfTokens,
   heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN,
+  communityHeldListFromSelected, setcommunityHeldListFromSelected,
+  communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy,
 }
 
 

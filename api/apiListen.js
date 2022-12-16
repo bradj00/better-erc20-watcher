@@ -82,11 +82,41 @@ app.listen(listenPort, () => {
 
 
             });
-
+            
 
 
 
         });
+        
+
+
+
+
+
+        //this needs to be paginated on the API side and infinitescrolled on the front end or else it wont be performant for large lists
+        app.get('/findCommonHeld/:token', cors(),(req, res) => {
+            const token = req.params.token;
+            console.log('>>>>>> token: ', token);
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                }
+                const db = client.db('pivotTables');
+                const collection = db.collection('allAddresses');
+                //get all columns where address = address
+                // create regex variable to search for lookupAddy with case insensitive
+                const regex = new RegExp(token, 'i');
+                const communityHeldArr = await collection.find({[token]: {$exists: true}}).toArray();
+                console.log('communityHeldArr: ', communityHeldArr);
+                res.send(communityHeldArr)
+            });
+        });
+
+
+
+
+
+
 
         app.get('/', cors(),(req, res) => {
             // console.log('5\t');
@@ -431,4 +461,4 @@ function condenseArray(tempArray, filterMin, filterMax) {
     }
     // console.log('condensed array: ', tempArray2.length)
     return tempArray2;
-  }
+}

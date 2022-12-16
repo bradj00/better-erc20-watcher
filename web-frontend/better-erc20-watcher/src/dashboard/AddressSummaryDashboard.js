@@ -32,7 +32,7 @@ import en from 'javascript-time-ago/locale/en';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import {commaNumber} from './helpers/h.js';
 import ConnectionStatusBanner from './ConnectionStatusBanner';
-
+import '../App.css';
 
 
 TimeAgo.addDefaultLocale(en);
@@ -134,6 +134,10 @@ function DashboardContent() {
   const {selectedAddressListOfTokens, setselectedAddressListOfTokens} = useContext(GeneralContext);
   const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
   const {heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN} = useContext(GeneralContext);
+  
+  const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
+  const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
+
 
   useEffect(() => {
     // if (selectedAddressListOfTokens){
@@ -159,6 +163,12 @@ function DashboardContent() {
   useEffect(() => {
     // console.log("CATCH- chainData heartbeat diff from db: ", chainDataHeartbeatDiff);
   },[chainDataHeartbeatDiff]);
+
+  useEffect(() => {
+    if (communityHeldListFromSelected){
+      console.log('communityHeldListFromSelected: ', communityHeldListFromSelected)
+    }
+  },[communityHeldListFromSelected]);
 
 
 
@@ -394,9 +404,10 @@ function function66(e){
                       {selectedAddressListOfTokens? selectedAddressListOfTokens.length > 0? Object.keys(selectedAddressListOfTokens[0]).map((token, index) => {
                           return (
                             selectedAddressListOfTokens[0][token].metadata?
-                            <tr>
+                            <tr style={{backgroundColor: token && communityHeldListFromSelectedAddy? token.toLowerCase() == communityHeldListFromSelectedAddy.toLowerCase()? "rgba(200,150,10,0.5)":"":"", cursor:'pointer'}} onClick={()=>{ setcommunityHeldListFromSelectedAddy(selectedAddressListOfTokens[0][token].metadata.token_address) }}>
+                              {/* selectedAddressListOfTokens */}
                               <td>{selectedAddressListOfTokens[0][token].metadata.symbol}</td>
-                              <td>{parseFloat((selectedAddressListOfTokens[0][token].metadata.balance)/ (10 **18)).toFixed(4)}</td>
+                              <td>{parseFloat((selectedAddressListOfTokens[0][token].metadata.balance)/ (10 **selectedAddressListOfTokens[0][token].metadata.decimals)).toFixed(4)}</td>
                               
                               <td>$5.00</td>
                             </tr>
@@ -419,11 +430,30 @@ function function66(e){
                           <th>Balance</th>
                           <th>USD</th>
                         </thead>
-                        <tr>
-                          <td>Token1</td>
-                          <td>100</td>
-                          <td>100</td>
-                        </tr>
+                        
+                        {communityHeldListFromSelected && communityHeldListFromSelected.length > 0 && communityHeldListFromSelectedAddy? communityHeldListFromSelected.length > 0? communityHeldListFromSelected.sort(
+                          (a, b) => b[communityHeldListFromSelectedAddy]? a[communityHeldListFromSelectedAddy]? b[communityHeldListFromSelectedAddy].metadata.balance - a[communityHeldListFromSelectedAddy].metadata.balance : 0: 0).map((token, index) => {
+
+                            
+                          //this needs to be paginated on the API side and infinitescrolled here or else it wont be performant for large lists
+                          return (
+                             token.address?
+                             <tr style={{backgroundColor:'rgba(200,150,10,0.4)'}}>
+                               <td><a target="_blank" href={"https://etherscan.io/address/"+token.address}>{getEllipsisTxt(token.address,4)}</a></td>
+                               <td>{token[communityHeldListFromSelectedAddy]? commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals)).toFixed(4)): <></>}</td>
+                               
+                               <td>$5.00</td>
+                             </tr>
+                             : <> </>
+  )
+                         })
+                         : <> </>
+                         : <> </>
+                       }
+
+
+
+
                       </table>
                   </div>
                   

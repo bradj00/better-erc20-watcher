@@ -33,7 +33,9 @@ const DatabaseInfoGrabber = () => {
     const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
     const {heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN} = useContext(GeneralContext);
     const {selectedAddressListOfTokens, setselectedAddressListOfTokens} = useContext(GeneralContext);
-
+    
+    const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
+    const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
     useEffect(() => {
         console.log('MinAmountFilterValue,MaxAmountFilterValue: ', MinAmountFilterValue,MaxAmountFilterValue)
         if (MinAmountFilterValue !=1 && MaxAmountFilterValue != 1){
@@ -42,12 +44,28 @@ const DatabaseInfoGrabber = () => {
     },[MinAmountFilterValue,MaxAmountFilterValue]);
     
     useEffect(() => {
+        if (communityHeldListFromSelectedAddy){
+            console.log('~~~~ communityHeldListFromSelectedAddy: ', communityHeldListFromSelectedAddy);
+            fetchCommonlyHeldToken(communityHeldListFromSelectedAddy)
+        }
+    },[communityHeldListFromSelectedAddy]);
+
+    useEffect(() => {
         if (heldTokensSelectedAddress){
             fetchSelectedAddressHeldTokens( heldTokensSelectedAddress )
             fetchFNforAddress( heldTokensSelectedAddress )
         }
     },[heldTokensSelectedAddress]);
 
+    function fetchCommonlyHeldToken(token) {
+        console.log('fetching community held list for token filter: ', token)
+        fetch('http://10.0.3.2:4000/findCommonHeld/' + token)
+        .then(response => response.json())
+        .then(data => {
+            console.log('['+token+'] common held list: ', data);
+            setcommunityHeldListFromSelected(data);
+        })
+    }
     function fetchFNforAddress(address) {
         console.log('fetching friendly name for address: ', address)
         fetch('http://10.0.3.2:4000/friendlyName/' + address)
