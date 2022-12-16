@@ -23,6 +23,11 @@ using:
 <sub>( translator.js service querying OpenSea api for human readable name and caching to mongo )</sub>
 ![image](https://user-images.githubusercontent.com/99688245/202107232-82cb591c-a2cf-423a-b455-df82a6be85a0.png)
 
+
+<sub>( Address Summary stats, includes held tokens common to the existing database of watched addresses )</sub>
+<sub>( This will be good for stepping into a community and quickly seeing commonly held ERC20 tokens and patterns)</sub>
+![image](https://user-images.githubusercontent.com/99688245/208028929-ed45110e-3a76-4acd-8277-064d8c441af3.png)
+
 <sub>( OneNote User Guide detailing mechanical operation and use )</sub>
 ![image](https://user-images.githubusercontent.com/99688245/201840676-3fedcf9d-adc2-4f10-8afb-2a1b1bba0dce.png)
 
