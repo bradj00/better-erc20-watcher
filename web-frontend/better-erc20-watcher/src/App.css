@@ -279,6 +279,7 @@ tr:nth-child(odd) {
   border: 1px solid rgba(0,255,0,0.4);
   background-color:rgba(0,255,0,0.1);
   border-radius: 0.5vh;
+  grid-column: span 2;
 
 }
 .microServiceSpacer{
@@ -286,4 +287,25 @@ tr:nth-child(odd) {
   justify-content: center;
   align-items: center;
   font-size: 1.5vh;
+}
+
+.errorService {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5vh;
+  border: 1px solid rgba(255,0,0,0.4);
+  background-color:rgba(255,0,0,0.1);
+  border-radius: 0.5vh;
+  grid-column: span 2;
+}
+.warningService {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5vh;
+  border: 1px solid rgba(255,255,0,0.4);
+  background-color:rgba(255,255,0,0.1);
+  border-radius: 0.5vh;
+  grid-column: span 2;
 }
