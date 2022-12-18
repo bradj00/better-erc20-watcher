@@ -232,11 +232,24 @@ app.listen(listenPort, () => {
                 }
                 const db = client.db('pivotTables');
                 const collection = db.collection('allAddresses');
-                //get all columns where address = address
-                // create regex variable to search for lookupAddy with case insensitive
                 const regex = new RegExp(token, 'i');
                 const communityHeldArr = await collection.find({[token]: {$exists: true}}).toArray();
-                console.log('communityHeldArr: ', communityHeldArr);
+                // console.log('communityHeldArr: ', communityHeldArr);
+                console.log(Object.keys(communityHeldArr[0]), communityHeldArr.length);
+
+
+                for(let i = 0; i < communityHeldArr.length; i++){
+                    const db = client.db('friendlyNames');
+                    const collection = db.collection('lookup');
+                    const friendlyName = await collection.find({address: communityHeldArr[i].address}).toArray();
+                    // place friendlyName[0].friendlyName into communityHeldArr[i].friendlyName
+                    communityHeldArr[i].friendlyName = friendlyName[0].friendlyName;
+
+                    console.log('['+chalk.magenta(communityHeldArr[i].address)+']\tfriendlyName: ', friendlyName[0].friendlyName);
+                }
+                
+
+
                 res.send(communityHeldArr)
             });
         });

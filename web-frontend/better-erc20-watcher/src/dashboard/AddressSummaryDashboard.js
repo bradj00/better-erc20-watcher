@@ -119,6 +119,7 @@ function DashboardContent() {
   
   const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
   const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
+  const [clickedTokenUsdQuote, setclickedTokenUsdQuote] = React.useState({});
   const [heldValueUsd, setheldValueUsd] = React.useState(0);
   
   const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
@@ -219,6 +220,26 @@ function DashboardContent() {
     setfilteredtxDataOutflow();
   }
   
+  useEffect(()=>{
+    if (clickedTokenUsdQuote){
+      console.log('clickedTokenUsdQuote: ', clickedTokenUsdQuote)
+    }
+  },[clickedTokenUsdQuote]);
+
+  // useEffect(()=>{
+  //   // if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token].usdValue[0].usdValue) {
+  //   if (selectedAddressListOfTokens && selectedAddressListOfTokens[0]) {
+  //     // let temp addy = token_address 
+
+  //     for (let token in selectedAddressListOfTokens[0]){
+  //       if (selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0].usdValue){
+  //         //settokenUsdQuotes with token_address as key and usdValue as value
+  //         settokenUsdQuotes({...tokenUsdQuotes, [token]: selectedAddressListOfTokens[0][token].usdValue[0].usdValue});
+  //       }
+  //     }
+  //   }
+  // },[selectedAddressListOfTokens]);
+
   useEffect(()=>{
     if (searchInput){
       console.log('search input: ', searchInput)
@@ -374,7 +395,7 @@ function function66(e){
               {/* address header  */}
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'center', borderRadius:'10px', height:'10%', position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div style={{position:'absolute', top:'5%'}}>
-                  <div style={{fontSize:'1.5vw'}}>{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</div>
+                  <div style={{fontSize:'1.5vw'}}> <a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>  </div>
                   <div style={{fontSize:'1vw'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN: <>...</>}</div>
                 </div>
               </div>
@@ -404,7 +425,7 @@ function function66(e){
               </div> */}
 
               {/* Token Heuristic Inflow/Outflow */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'30%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',top:'33.5%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',top:'33.5%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div>
                   <div>Heuristic Inflow/Outflow</div>
                   <div>Common Senders To this Address:</div>
@@ -414,16 +435,15 @@ function function66(e){
               </div>
 
               {/* User-defined notes */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'30%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div>
-                  <div>Notes</div>
-                  <div>Enter manual notes here about address:</div>
-                  <div>...</div>
+                  <div style={{fontSize:'2vw'}}>Staked Balances</div>
+                  <div>Display Staked/Deposited/Locked balances belonging to this address</div>
                 </div>
               </div>
 
               {/* Community Held Tokens */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'69%', textAlign:'left', borderRadius:'5px', height:'66%', position:'absolute',top:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'79.5%', textAlign:'left', borderRadius:'5px', height:'66%', position:'absolute',top:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div style={{display:'flex', justifyContent:'center'}}>
                   <div style={{borderRadius:'10px',overflowY:'scroll',display:'flex', justifyContent:'center',alignItems:'center', height:'100%', border:'0px solid #0f0',position:'absolute',top:'0',left:'0',width:'49.5%',}}>
                     
@@ -457,7 +477,7 @@ function function66(e){
                               selectedAddressListOfTokens[0][token].metadata?
                               selectedAddressListOfTokens[0][token]?selectedAddressListOfTokens[0][token].usdValue? selectedAddressListOfTokens[0][token].usdValue[0].usdValue?
                               
-                              <tr style={{backgroundColor: token && communityHeldListFromSelectedAddy? token.toLowerCase() == communityHeldListFromSelectedAddy.toLowerCase()? "rgba(200,150,10,0.5)":"":"", cursor:'pointer'}} onClick={()=>{ setcommunityHeldListFromSelectedAddy(selectedAddressListOfTokens[0][token].metadata.token_address) }}>
+                              <tr style={{backgroundColor: token && communityHeldListFromSelectedAddy? token.toLowerCase() == communityHeldListFromSelectedAddy.toLowerCase()? "rgba(200,150,10,0.5)":"":"", cursor:'pointer'}} onClick={()=>{ setcommunityHeldListFromSelectedAddy(selectedAddressListOfTokens[0][token].metadata.token_address); setclickedTokenUsdQuote(selectedAddressListOfTokens[0][token].usdValue[0].usdValue.usdPrice) }}>
                                 {/* selectedAddressListOfTokens */}
                                 <td >
                                 <button 
@@ -498,23 +518,33 @@ function function66(e){
                   <div style={{display:'flex', overflowY:'scroll',justifyContent:'center',alignItems:'center', height:'100%', borderRadius:'10px',position:'absolute',top:'0',right:'0',width:'49.5%',}}>
                   <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0'}}>
                         <thead style={{position:'sticky', top:'0'}}>
+                          <th>Name</th>
                           <th>Address</th>
                           <th>Balance</th>
                           <th>USD</th>
                         </thead>
-                        
+                         
                         {communityHeldListFromSelected && communityHeldListFromSelected.length > 0 && communityHeldListFromSelectedAddy? communityHeldListFromSelected.length > 0? communityHeldListFromSelected.sort(
                           (a, b) => b[communityHeldListFromSelectedAddy]? a[communityHeldListFromSelectedAddy]? b[communityHeldListFromSelectedAddy].metadata.balance - a[communityHeldListFromSelectedAddy].metadata.balance : 0: 0).map((token, index) => {
-
-                            
-                          //this needs to be paginated on the API side and infinitescrolled here or else it wont be performant for large lists
-                          return (
+                          // console.log('Address that shares common token: ', token.address, communityHeldListFromSelected)   
+                          // if (selectedAddressListOfTokens[0][token.address]){ console.log('~~~~~~~~~~',selectedAddressListOfTokens[0][token.address])  }
+                        
+ 
+                          //this needs to be paginated on the API side and infinitescrolled here or else it wont be performant for large lists 
+                          return (  
                              token.address?
                              <tr style={{backgroundColor:'rgba(200,150,10,0.4)'}}>
+                               <td>{token.friendlyName.length === 42 && token.friendlyName.startsWith('0x')? <></>: token.friendlyName}</td>
                                <td><a target="_blank" href={"https://etherscan.io/address/"+token.address}>{getEllipsisTxt(token.address,4)}</a></td>
-                               <td style={{textAlign:'right'}}>{token[communityHeldListFromSelectedAddy]? commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals)).toFixed(4)): <></>}</td>
-                               
-                               <td style={{textAlign:'right'}}>$5.00</td>
+                               <td style={{textAlign:'right'}}>
+                                {token[communityHeldListFromSelectedAddy]?
+                                 commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals)).toFixed(4))
+                                 : <></>}
+                               </td>
+                                
+                               <td style={{textAlign:'right'}}>
+                                  $ {clickedTokenUsdQuote?token[communityHeldListFromSelectedAddy]? commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals) * clickedTokenUsdQuote).toFixed(2)): <></>: <></>}
+                               </td>
                              </tr>
                              : <> </>
   )

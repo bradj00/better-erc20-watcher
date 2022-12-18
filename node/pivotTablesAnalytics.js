@@ -23,10 +23,10 @@ const dbNamePivots = 'pivotTables';
 
 console.clear();
 
-// main();
+main();
 
 // update all held tokens for all addresses that have made TXs in the watchedTokens database
-getHeldTokensForAllAddresses();
+// getHeldTokensForAllAddresses();
 
 //update all token prices in pivot table 'allTokenPrices'
 // getAllTokenBalanceUsdPrices();
@@ -156,7 +156,7 @@ async function getAllAddresses() {
     // console.log('------------------')
     // console.log(temp, typeof temp);
     // console.log('------------------')
-    await db2.collection('allAddresses').insertMany(temp, [{"continueOnError": true}] );   
+    await db2.collection('allAddresses').insertMany(temp, [{"continueOnError": true, "ignoreUndefined": true, "ignoreDuplicates": true}] );  
     client.close();
     resolve(uniqueAddresses);
     });

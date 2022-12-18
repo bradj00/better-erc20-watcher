@@ -1,5 +1,6 @@
 import TokenOverviewDashboard from './dashboard/TokenOverviewDashboard.js';
 import TokenHoldersDashboard from './dashboard/TokenHoldersDashboard.js';
+import SettingsDashboard from './dashboard/SettingsDashboard.js';
 import AddressSummaryDashboard from './dashboard/AddressSummaryDashboard.js';
 import DatabaseInfoGrabber from './dashboard/DatabaseInfoGrabber.js';
 import React, {useContext, useEffect, useState} from 'react';
@@ -104,6 +105,7 @@ return (
           {displayPanel == 'watchingTokens'? <TokenOverviewDashboard />: <></>}
           {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
           {displayPanel == 'tokenSummary'? <TokenHoldersDashboard />: <></>}
+          {displayPanel == 'settingsDashboard'? <SettingsDashboard />: <></>}
           
           
       </div>
