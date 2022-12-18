@@ -119,6 +119,7 @@ function DashboardContent() {
   
   const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
   const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
+  const [heldValueUsd, setheldValueUsd] = React.useState(0);
   
   const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
   const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
@@ -126,12 +127,18 @@ function DashboardContent() {
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
   const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
+  
+  const [updateBlacklistRequest, setupdateBlacklistRequest] = React.useState();
+
   const [searchInput, setsearchInput] = useState("")
   const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
   const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
   const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
   const timeAgo = new TimeAgo('en-US'); 
+  
   const {selectedAddressListOfTokens, setselectedAddressListOfTokens} = useContext(GeneralContext);
+  const [selectedAddressListOfTokensSorted, setselectedAddressListOfTokensSorted] = React.useState();
+
   const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
   const {heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN} = useContext(GeneralContext);
   
@@ -141,10 +148,36 @@ function DashboardContent() {
 
 
   useEffect(() => {
-    // if (selectedAddressListOfTokens){
+    if (updateBlacklistRequest){
+      const url = "http://10.0.3.2:4000/addToBlacklist/"+updateBlacklistRequest;
+      fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        console.log("-----addToBlacklist: ", data);
+        setupdateBlacklistRequest();
+      } )
+    }
+  },[updateBlacklistRequest]);
+
+  useEffect(() => {
+    if (selectedAddressListOfTokens){
       console.log("-----selectedAddressListOfTokens: ", selectedAddressListOfTokens);
-    // }
+      let addressArray = Object.values(selectedAddressListOfTokens[0]);
+      let sorted = addressArray.sort((a, b) => {
+        if(a[0] && b[0] && a[0].usdValue && b[0].usdValue) {
+            return a[0].usdValue[0].usdValue.extendedValue > b[0].usdValue[0].usdValue.extendedValue ? 1 : -1;
+        }
+        else return -1;
+      });
+      setselectedAddressListOfTokensSorted(sorted);
+    }
   },[selectedAddressListOfTokens]);
+
+  useEffect(() => {
+    if (selectedAddressListOfTokensSorted){
+      console.log("-----selectedAddressListOfTokensSorted: ", selectedAddressListOfTokensSorted);
+    }
+  },[selectedAddressListOfTokensSorted]);
   
   useEffect(() => {
 
@@ -395,26 +428,63 @@ function function66(e){
                   <div style={{borderRadius:'10px',overflowY:'scroll',display:'flex', justifyContent:'center',alignItems:'center', height:'100%', border:'0px solid #0f0',position:'absolute',top:'0',left:'0',width:'49.5%',}}>
                     
                     
+                    <div onClick={()=>{console.log('clicked: ',heldTokensSelectedAddress);setgetUpdatedTokenBalance(heldTokensSelectedAddress)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div>
                     <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0'}}>
-                      <div onClick={()=>{console.log('clicked: ',heldTokensSelectedAddress);setgetUpdatedTokenBalance(heldTokensSelectedAddress)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute', top:'0'}}><RotateRightIcon /> </div>
-                      <thead style={{position:'sticky', top:'0'}}>
+                      <tr style={{backgroundColor:'rgba(0,0,0,0.9)',position:'sticky', top:'0'}}>
+                        <th>hide</th>
+                        <th>Contract</th>
                         <th>Token</th>
                         <th>Balance</th>
                         <th>USD</th>
-                      </thead>
+                      </tr>
 
                       {selectedAddressListOfTokens? selectedAddressListOfTokens.length > 0? Object.keys(selectedAddressListOfTokens[0]).map((token, index) => {
-                          return (
-                            selectedAddressListOfTokens[0][token].metadata?
-                            <tr style={{backgroundColor: token && communityHeldListFromSelectedAddy? token.toLowerCase() == communityHeldListFromSelectedAddy.toLowerCase()? "rgba(200,150,10,0.5)":"":"", cursor:'pointer'}} onClick={()=>{ setcommunityHeldListFromSelectedAddy(selectedAddressListOfTokens[0][token].metadata.token_address) }}>
-                              {/* selectedAddressListOfTokens */}
-                              <td>{selectedAddressListOfTokens[0][token].metadata.symbol}</td>
-                              <td>{parseFloat((selectedAddressListOfTokens[0][token].metadata.balance)/ (10 **selectedAddressListOfTokens[0][token].metadata.decimals)).toFixed(4)}</td>
+                          
+                          // filter out any tokens that have a '.' in the symbol... these are likely not real tokens                          
+                          if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].metadata && selectedAddressListOfTokens[0][token].metadata.symbol && selectedAddressListOfTokens[0][token].metadata.symbol.toLowerCase().includes('.') ){
+                            return (<></>)
+                          }
+
+                          //filter out tokens that have extendedValue < 1
+                          if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0].usdValue && (selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue < 1 || selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue > 1000000000000)  ){
+                            return (<></>)
+                          }
+                          if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && (selectedAddressListOfTokens[0][token].usdValue[0].blacklisted ) ){
+                            return (<></>)
+                          }
+                          else {
+                            return (
+                              selectedAddressListOfTokens[0][token].metadata?
+                              selectedAddressListOfTokens[0][token]?selectedAddressListOfTokens[0][token].usdValue? selectedAddressListOfTokens[0][token].usdValue[0].usdValue?
                               
-                              <td>$5.00</td>
-                            </tr>
-                            : <> </>
-                          )
+                              <tr style={{backgroundColor: token && communityHeldListFromSelectedAddy? token.toLowerCase() == communityHeldListFromSelectedAddy.toLowerCase()? "rgba(200,150,10,0.5)":"":"", cursor:'pointer'}} onClick={()=>{ setcommunityHeldListFromSelectedAddy(selectedAddressListOfTokens[0][token].metadata.token_address) }}>
+                                {/* selectedAddressListOfTokens */}
+                                <td >
+                                <button 
+                                  style={{height:'2vh'}}
+                                  onClick={() => {
+                                    const confirmBox = window.confirm(
+                                      "Do you really want to add this token to BLACKLIST?"
+                                    )
+                                    if (confirmBox === true) {
+                                      setupdateBlacklistRequest(selectedAddressListOfTokens[0][token].metadata.token_address);
+                                    }
+                                  }}>
+                                </button>
+
+                                </td>
+                                <td><a href={`https://etherscan.io/token/${selectedAddressListOfTokens[0][token].metadata.token_address}`} target="_blank" rel="noopener noreferrer">{getEllipsisTxt(selectedAddressListOfTokens[0][token].metadata.token_address, 4)}</a></td>
+                                <td>{selectedAddressListOfTokens[0][token].metadata.symbol}</td>
+                                <td style={{textAlign:'right'}}>{commaNumber(parseFloat((selectedAddressListOfTokens[0][token].metadata.balance)/ (10 **selectedAddressListOfTokens[0][token].metadata.decimals)).toFixed(4))}</td>
+                                
+                                <td style={{textAlign:'right'}}>${selectedAddressListOfTokens[0][token]?selectedAddressListOfTokens[0][token].usdValue? selectedAddressListOfTokens[0][token].usdValue[0].usdValue?  commaNumber( parseFloat(selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue).toFixed(2))  :<>0.00</>:<>0.00</>:<>0.00</>}</td>
+                              </tr>
+                              : <> </>
+                              : <> </>
+                              : <> </>
+                              : <> </>
+                            )
+                          }
                         })
                         : <> </>
                         : <> </>
@@ -442,9 +512,9 @@ function function66(e){
                              token.address?
                              <tr style={{backgroundColor:'rgba(200,150,10,0.4)'}}>
                                <td><a target="_blank" href={"https://etherscan.io/address/"+token.address}>{getEllipsisTxt(token.address,4)}</a></td>
-                               <td>{token[communityHeldListFromSelectedAddy]? commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals)).toFixed(4)): <></>}</td>
+                               <td style={{textAlign:'right'}}>{token[communityHeldListFromSelectedAddy]? commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals)).toFixed(4)): <></>}</td>
                                
-                               <td>$5.00</td>
+                               <td style={{textAlign:'right'}}>$5.00</td>
                              </tr>
                              : <> </>
   )

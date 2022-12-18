@@ -41,6 +41,40 @@ app.listen(listenPort, () => {
     //     if (err) { console.log('error connecting to mongo: ', err); }
     //     console.log('MongoDB Connected');
     
+        app.get('/addToBlacklist/:address', cors(),(req, res) => {
+            const theAddy = req.params.address;
+            console.log('>>>>>> blacklist: ', theAddy);
+
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                }
+                const db = client.db('pivotTables');
+                const collection = db.collection('tokenUsdValues');
+                const result = await collection.updateOne ( { address: theAddy }, { $set: { blacklisted: true } } );
+                console.log('result: ', result);
+                res.send(result);
+            });
+
+
+        });
+        app.get('/removeFromBlacklist/:address', cors(),(req, res) => {
+            const theAddy = req.params.address;
+            console.log('>>>>>> blacklist: ', theAddy);
+
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                }
+                const db = client.db('pivotTables');
+                const collection = db.collection('tokenUsdValues');
+                const result = await collection.updateOne ( { address: theAddy }, { $set: { blacklisted: false } } );
+                console.log('result: ', result);
+                res.send(result);
+            });
+
+
+        });
 
         app.get('/latestBlock', cors(),(req, res) => {
             
@@ -133,33 +167,49 @@ app.listen(listenPort, () => {
                 //get all columns where address = address
                 // create regex variable to search for lookupAddy with case insensitive
                 const regex = new RegExp(lookupAddy, 'i');
-                const addressColumns = await collection.find({address: regex}).toArray();
-                console.log('addressColumns: ', addressColumns);
-                console.log(Object.keys(addressColumns[0]));
-                const keys = Object.keys(addressColumns[0]);
-                //remove "_id" "address" and "data" from keys array
-                const index = keys.indexOf("_id");
-                if (index > -1) {
-                    keys.splice(index, 1);
+                let addressColumns = await collection.find({address: regex}).toArray();
+                if (!addressColumns[0]) {
+                    res.send();
+                }else {
+                    console.log('addressColumns: ', addressColumns);
+                    console.log(Object.keys(addressColumns[0]));
+                    
+                    const keys = Object.keys(addressColumns[0]);
+                    //remove "_id" "address" and "data" from keys array
+                    const index = keys.indexOf("_id");
+                    if (index > -1) {
+                        keys.splice(index, 1);
+                    }
+                    const index2 = keys.indexOf("address");
+                    if (index2 > -1) {
+                        keys.splice(index2, 1);
+                    }
+                    const index3 = keys.indexOf("data");
+                    if (index3 > -1) {
+                        keys.splice(index3, 1);
+                    }
+                    // console.log('keys: ', keys);
+                    // update keys into mongo collection "tokenUsdValues" in database "pivotTables"
+                    //get current timestamp
+                    const timestamp = new Date().getTime();
+                    for (const key of keys) {
+                        const updateDoc = await db.collection('tokenUsdValues').updateOne ({address: key}, {$set: {dataRequested: true}}, {upsert: true});
+                    }
+                    
+                    // go through addressColumns[0] and add usdValue to each token
+                    for (const key of keys) {
+                        if (addressColumns[0][key]){
+
+                            const knownUsdTokenValueObj = await db.collection('tokenUsdValues').find({address: key}).toArray();
+                            addressColumns[0][key]["usdValue"] = knownUsdTokenValueObj;
+                            if (addressColumns[0][key]["usdValue"][0].usdValue){
+                                addressColumns[0][key]["usdValue"][0].usdValue["extendedValue"] = addressColumns[0][key]["usdValue"][0].usdValue.usdPrice * (addressColumns[0][key]["metadata"]["balance"] / 10**addressColumns[0][key]["metadata"]["decimals"]);
+                            }
+                        }
+                    }
+
+                    res.send(addressColumns)
                 }
-                const index2 = keys.indexOf("address");
-                if (index2 > -1) {
-                    keys.splice(index2, 1);
-                }
-                const index3 = keys.indexOf("data");
-                if (index3 > -1) {
-                    keys.splice(index3, 1);
-                }
-                // console.log('keys: ', keys);
-                // update keys into mongo collection "tokenUsdValues" in database "pivotTables"
-                //get current timestamp
-                const timestamp = new Date().getTime();
-                for (const key of keys) {
-                    const updateDoc = await db.collection('tokenUsdValues').updateOne ({address: key}, {$set: {usdValue: 0, lastFetched: timestamp}}, {upsert: true});
-                }
-                
-                
-                res.send(addressColumns)
             });
             
 

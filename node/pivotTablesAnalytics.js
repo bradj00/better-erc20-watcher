@@ -24,8 +24,12 @@ const dbNamePivots = 'pivotTables';
 console.clear();
 
 // main();
-// getHeldTokensForAllAddresses();
-getAllTokenBalanceUsdPrices();
+
+// update all held tokens for all addresses that have made TXs in the watchedTokens database
+getHeldTokensForAllAddresses();
+
+//update all token prices in pivot table 'allTokenPrices'
+// getAllTokenBalanceUsdPrices();
 
 function main() {
     getAllAddresses()
@@ -53,15 +57,17 @@ async function getHeldTokensForAllAddresses() {
     // get all addresses from pivot table 'allAddresses'
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
     const db = client.db("pivotTables");
-    let allAddresses = await db
-        .collection("allAddresses")
-        .find({})
-        .toArray();
+    let allAddresses = await db.collection("allAddresses").find({}).toArray();
 
     // filter out addresses that have already been processed (already have more than 2 fields in the document, indicating we pulled token balances from moralis successfully)
     let filteredAddresses = allAddresses.filter(address => 
         Object.keys(address).length <= 2
     );
+    // filter filterdAddresses again, removing any addresses that have a field called 'probablyContract' (we set this field if we couldn't get token balances from moralis, indicating the address is probably a contract)
+    filteredAddresses = filteredAddresses.filter(address =>
+        !address.hasOwnProperty('probablyContract')
+    )
+
     console.log("all addresses", allAddresses.length);
     console.log("unprocessed addresses", filteredAddresses.length);
     // for each address, get all tokens held from Moralis api and update document in collection  'allAddresses' (db 'pivotTables')  adding a new field called the token address and the value is the balance of that token held by that address
@@ -75,7 +81,8 @@ async function getHeldTokensForAllAddresses() {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         console.log('['+count+' / '+filteredAddresses.length+']\taddress: ', address.address)
         let balances = await getAddressBalancesFromMoralis(address.address);
-        if (balances) {
+        console.log('RETURNED RAW BALANCES: ', balances)
+        if (balances && balances.length > 0) {
             // console.log(balances.length)
             //for each token held, add a new field to the document where address == address.address in the collection 'filteredAddresses' with the token address as the field name and the balance as the value
             for (const token of balances) {
@@ -83,6 +90,9 @@ async function getHeldTokensForAllAddresses() {
                 let update = await db.collection('allAddresses').updateOne({ address: address.address }, { $set: { [token.token_address]: {metadata: token} } });
                 // console.log('update: ', update)
             }
+        }else {
+            //set an empty object for the token address if we couldn't get the token balances from moralis so we don't re-check this address again. Filters contracts.
+            await db.collection('allAddresses').updateOne({ address: address.address }, { $set: { probablyContract: true} });
         }
 
     }
@@ -158,35 +168,28 @@ async function getAllTokenBalanceUsdPrices(){
     //for each of them, call getUsdPriceFromMoralis(tokenAddress) and store in collection 'allTokenBalanceUsdPrices' in database 'pivotTables'
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
     const db = client.db("pivotTables");
-    let allAddresses = await db.collection("allAddresses").find({}).toArray();
-    let uniqueTokenAddresses = [];
-
+    
+    // list of addresses we put into table to be looked up. This started when you click an address summary in web frontend and the held tokens are added to this list.
+    let allAddresses = await db.collection("tokenUsdValues").find({}).toArray();
+    //for each of these addresses, getUsdPriceFromMoralis(tokenAddress) and update the usdValue field in the document
+    let count = 0;
     for (const address of allAddresses) {
-        for (const tokenAddress in address) {
-            if (tokenAddress == 'address') {
-                continue;
-            }
-            uniqueTokenAddresses.push(tokenAddress);
-            
-            console.log(tokenAddress);
-            // console.log('address: ', address.address, ' symbol: ', address.symbol, '\ttokenAddress: ', tokenAddress)
-        }
+        count++;
+        // console.log(chalk.rgb(0,255,0)('address: ',address.address))
+        let tokenAddress = address.address;
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        console.log('['+count+' / '+allAddresses.length+']\taddress: ', tokenAddress)
+        let usdPriceObj = await getUsdPriceFromMoralis(tokenAddress);
+        let update = await db.collection("tokenUsdValues").updateOne({address: tokenAddress}, {$set: {usdValue: usdPriceObj}}, );
     }
-    console.log('uniqueTokenAddresses.length: ', uniqueTokenAddresses.length)
-    uniqueTokenAddresses = [...new Set(uniqueTokenAddresses)];
-    console.log('uniqueTokenAddresses.length: ', uniqueTokenAddresses.length)
-    console.log(uniqueTokenAddresses)
-    // for (const tokenAddress of uniqueTokenAddresses) {
-    //     if (tokenAddress == '0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e') {
-    //         console.log(tokenAddress);
-    //     }
-    // }
+        
 }
 
 async function getUsdPriceFromMoralis(tokenAddress){
-    
-    let url = 'https://deep-index.moralis.io/api/v2/erc20/'+tokenAddress+'/price?chain=eth';
-        console.log('getting url: ', chalk.magenta(url))
+    return new Promise((resolve, reject) => {
+        let url = 'https://deep-index.moralis.io/api/v2/erc20/'+tokenAddress+'/price?chain=eth';
+            
+        console.log('getting usd price: ', chalk.magenta(url))
         axios.get(url ,{
             headers: {
             Accept: "application/json",
@@ -195,14 +198,15 @@ async function getUsdPriceFromMoralis(tokenAddress){
             },
         })
         .then(({data}) => {
-            console.log('---------------------------------')
-            console.log(data)
-            console.log('---------------------------------')
+            // console.log('---------------------------------')
+            // console.log(data)
+            // console.log('---------------------------------')
 
             resolve(data);
         })
         .catch((error) => {
-            console.error('error fetching from moralis: \n\n',error.code, Object.keys(error))
+            console.error('['+chalk.cyan(tokenAddress)+'] error fetching from moralis: ',error.response.data.message)
             resolve();
         })
+    });
 }
