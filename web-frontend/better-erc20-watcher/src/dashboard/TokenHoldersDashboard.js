@@ -174,7 +174,7 @@ function DashboardContent() {
 
   useEffect(()=>{
     if (latestEthBlock){
-      console.log('latestEthBlock: ', latestEthBlock)
+      // console.log('latestEthBlock: ', latestEthBlock)
     }
   },[latestEthBlock]);
 

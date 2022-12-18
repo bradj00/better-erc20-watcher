@@ -33,6 +33,7 @@ const DatabaseInfoGrabber = () => {
     const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
     const {heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN} = useContext(GeneralContext);
     const {selectedAddressListOfTokens, setselectedAddressListOfTokens} = useContext(GeneralContext);
+    const {getUpdatedTokenBalance, setgetUpdatedTokenBalance} = useContext(GeneralContext);
     
     const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
     const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
@@ -57,6 +58,23 @@ const DatabaseInfoGrabber = () => {
         }
     },[heldTokensSelectedAddress]);
 
+    useEffect(() => {
+        if (getUpdatedTokenBalance && getUpdatedTokenBalance != undefined){
+            fetchUpdatedTokenBalance(getUpdatedTokenBalance);
+            setgetUpdatedTokenBalance();
+        }
+    },[getUpdatedTokenBalance]);
+
+    //pulls specifically fresh data from the Moralis API
+    function fetchUpdatedTokenBalance(address) {
+        console.log('fetching updated token balance for address: ', address)
+        fetch('http://10.0.3.2:4000/updateTokenBalances/' + address)
+        .then(response => response.json())
+        .then(data => {
+            console.log('['+address+'] token balances: ', data);
+            setselectedAddressListOfTokens(data);
+        })
+    }
     function fetchCommonlyHeldToken(token) {
         console.log('fetching community held list for token filter: ', token)
         fetch('http://10.0.3.2:4000/findCommonHeld/' + token)
@@ -76,6 +94,7 @@ const DatabaseInfoGrabber = () => {
         })
     }
 
+    //pulls only cached data from mongoDB
     function fetchSelectedAddressHeldTokens(address) {
         console.log('fetching held tokens for address: ', address)
         fetch('http://10.0.3.2:4000/tokenBalances/' + address)
@@ -203,7 +222,7 @@ const DatabaseInfoGrabber = () => {
         if (!viewingTokenAddress){
             return;
         }
-        console.log('viewingTokenAddress: ', viewingTokenAddress)
+        // console.log('viewingTokenAddress: ', viewingTokenAddress)
         
         let url = 'http://10.0.3.2:4000/txs/' + viewingTokenAddress + '?pageNumber=allData&filterMin='+MinAmountFilterValue+'&filterMax='+MaxAmountFilterValue;
         fetch(url)
@@ -285,7 +304,7 @@ const DatabaseInfoGrabber = () => {
         let checkedMaxValue = 0;
         if (data && data.result){
             if (MinAmountFilterValue || MaxAmountFilterValue){
-                console.log('MinAmountFilterValue: ', MinAmountFilterValue, ' MaxAmountFilterValue: ', MaxAmountFilterValue);
+                // console.log('MinAmountFilterValue: ', MinAmountFilterValue, ' MaxAmountFilterValue: ', MaxAmountFilterValue);
                 if (!MinAmountFilterValue){ checkedMinValue = 0 } else { checkedMinValue = MinAmountFilterValue } 
                 if (!MaxAmountFilterValue){ checkedMaxValue = 999999999 } else { checkedMaxValue = MaxAmountFilterValue } 
                 const temp = data.result.filter((item) => {

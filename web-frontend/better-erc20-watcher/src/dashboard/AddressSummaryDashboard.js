@@ -33,7 +33,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import {commaNumber} from './helpers/h.js';
 import ConnectionStatusBanner from './ConnectionStatusBanner';
 import '../App.css';
-
+import RotateRightIcon from '@mui/icons-material/RotateRight';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -137,6 +137,7 @@ function DashboardContent() {
   
   const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
   const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
+  const {getUpdatedTokenBalance, setgetUpdatedTokenBalance} = useContext(GeneralContext);
 
 
   useEffect(() => {
@@ -193,7 +194,7 @@ function DashboardContent() {
 
   useEffect(()=>{
     if (latestEthBlock){
-      console.log('latestEthBlock: ', latestEthBlock)
+      // console.log('latestEthBlock: ', latestEthBlock)
     }
   },[latestEthBlock]);
 
@@ -361,16 +362,16 @@ function function66(e){
               </div>
 
               {/* misc stats */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'29.5%', textAlign:'center', borderRadius:'10px', height:'32%', position:'absolute',top:'0%',left:'16.9vw', display:'flex', justifyContent:'center',alignItems:'center'}}>
+              {/* <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'29.5%', textAlign:'center', borderRadius:'10px', height:'32%', position:'absolute',top:'0%',left:'16.9vw', display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div>
                   <div>Misc Stats</div>
                   <div>wallet age:</div>
                   <div>...</div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Token Heuristic Inflow/Outflow */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',top:'33.5%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'30%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',top:'33.5%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div>
                   <div>Heuristic Inflow/Outflow</div>
                   <div>Common Senders To this Address:</div>
@@ -380,7 +381,7 @@ function function66(e){
               </div>
 
               {/* User-defined notes */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'30%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div>
                   <div>Notes</div>
                   <div>Enter manual notes here about address:</div>
@@ -389,12 +390,13 @@ function function66(e){
               </div>
 
               {/* Community Held Tokens */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'49%', textAlign:'left', borderRadius:'5px', height:'66%', position:'absolute',top:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'69%', textAlign:'left', borderRadius:'5px', height:'66%', position:'absolute',top:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div style={{display:'flex', justifyContent:'center'}}>
                   <div style={{borderRadius:'10px',overflowY:'scroll',display:'flex', justifyContent:'center',alignItems:'center', height:'100%', border:'0px solid #0f0',position:'absolute',top:'0',left:'0',width:'49.5%',}}>
                     
                     
                     <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0'}}>
+                      <div onClick={()=>{console.log('clicked: ',heldTokensSelectedAddress);setgetUpdatedTokenBalance(heldTokensSelectedAddress)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute', top:'0'}}><RotateRightIcon /> </div>
                       <thead style={{position:'sticky', top:'0'}}>
                         <th>Token</th>
                         <th>Balance</th>

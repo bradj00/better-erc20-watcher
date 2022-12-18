@@ -24,7 +24,9 @@ const dbNamePivots = 'pivotTables';
 console.clear();
 
 // main();
-getHeldTokensForAllAddresses();
+// getHeldTokensForAllAddresses();
+getAllTokenBalanceUsdPrices();
+
 function main() {
     getAllAddresses()
         .then((uniqueAddresses) => {
@@ -86,7 +88,7 @@ async function getHeldTokensForAllAddresses() {
     }
 }
 
-
+//get all held erc20 tokens' balances from moralis
 function getAddressBalancesFromMoralis(address){
     return new Promise((resolve, reject) => {
         let url = 'https://deep-index.moralis.io/api/v2/'+address+'/erc20?chain=eth';
@@ -150,3 +152,57 @@ async function getAllAddresses() {
     });
 }
 
+
+async function getAllTokenBalanceUsdPrices(){
+    //get all addresses from pivot table 'allAddresses'
+    //for each of them, call getUsdPriceFromMoralis(tokenAddress) and store in collection 'allTokenBalanceUsdPrices' in database 'pivotTables'
+    const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
+    const db = client.db("pivotTables");
+    let allAddresses = await db.collection("allAddresses").find({}).toArray();
+    let uniqueTokenAddresses = [];
+
+    for (const address of allAddresses) {
+        for (const tokenAddress in address) {
+            if (tokenAddress == 'address') {
+                continue;
+            }
+            uniqueTokenAddresses.push(tokenAddress);
+            
+            console.log(tokenAddress);
+            // console.log('address: ', address.address, ' symbol: ', address.symbol, '\ttokenAddress: ', tokenAddress)
+        }
+    }
+    console.log('uniqueTokenAddresses.length: ', uniqueTokenAddresses.length)
+    uniqueTokenAddresses = [...new Set(uniqueTokenAddresses)];
+    console.log('uniqueTokenAddresses.length: ', uniqueTokenAddresses.length)
+    console.log(uniqueTokenAddresses)
+    // for (const tokenAddress of uniqueTokenAddresses) {
+    //     if (tokenAddress == '0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e') {
+    //         console.log(tokenAddress);
+    //     }
+    // }
+}
+
+async function getUsdPriceFromMoralis(tokenAddress){
+    
+    let url = 'https://deep-index.moralis.io/api/v2/erc20/'+tokenAddress+'/price?chain=eth';
+        console.log('getting url: ', chalk.magenta(url))
+        axios.get(url ,{
+            headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "X-API-Key" : moralisApiKey
+            },
+        })
+        .then(({data}) => {
+            console.log('---------------------------------')
+            console.log(data)
+            console.log('---------------------------------')
+
+            resolve(data);
+        })
+        .catch((error) => {
+            console.error('error fetching from moralis: \n\n',error.code, Object.keys(error))
+            resolve();
+        })
+}

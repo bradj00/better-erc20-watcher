@@ -61,6 +61,64 @@ app.listen(listenPort, () => {
             });
 
         });
+        
+        app.get('/updateTokenBalances/:address', cors(),(req, res) => {
+            const theAddy = req.params.address;
+            console.log('>>>>>> address: ', theAddy);
+            let url = 'https://deep-index.moralis.io/api/v2/'+theAddy+'/erc20?chain=eth';
+            // console.log('>>>>>> url: ', url);
+            axios.get(url ,{
+                headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                "X-API-Key" : moralisApiKey
+                },
+            })
+            .then(({data}) => {
+                MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                    if (err) {
+                        h.fancylog(err, 'error');
+                    }
+                    const db = client.db('pivotTables');
+                    const collection = db.collection('allAddresses');
+                    // update document where "address" == theAddy
+                    const updateDoc = await collection.updateOne ({address: theAddy}, {$set: {data}}, {upsert: true});
+                    
+                    //after we update the info, pull it from mongo and send it back to the client
+                    const regex = new RegExp(theAddy, 'i');
+
+                    let temp = [{address: theAddy}];
+                    temp[0]["data"] = [];
+                    if (data) {
+                        for (const token of data) {
+                            let update = await db.collection('allAddresses').updateOne({ address: theAddy }, { $set: { [token.token_address]: {metadata: token} } });
+                            //push token to temp array
+                            // temp.push({[token.token_address]: token});
+                            console.log(token)
+                            temp[0][token.token_address] = {metadata: token};
+                            temp[0]["data"].push(token);
+                            //if last item in array, send temp array to client
+                            if (data.indexOf(token) === data.length - 1) {
+                                client.close();
+                                res.send(temp);
+                            }
+                        }
+                    }
+                    // res.send(addressColumns)
+
+
+                    // const addressColumns = await collection.find({address: regex}).toArray();
+                    //     console.log('addressColumns: ', addressColumns);
+                        
+                });
+
+            })
+            .catch((err) => {
+                console.log('error: ', err);
+                res.send('{success: false}');
+            });
+
+        });
 
         // get token balances for a given address
         app.get('/tokenBalances/:address', cors(),(req, res) => {
@@ -77,10 +135,31 @@ app.listen(listenPort, () => {
                 const regex = new RegExp(lookupAddy, 'i');
                 const addressColumns = await collection.find({address: regex}).toArray();
                 console.log('addressColumns: ', addressColumns);
+                console.log(Object.keys(addressColumns[0]));
+                const keys = Object.keys(addressColumns[0]);
+                //remove "_id" "address" and "data" from keys array
+                const index = keys.indexOf("_id");
+                if (index > -1) {
+                    keys.splice(index, 1);
+                }
+                const index2 = keys.indexOf("address");
+                if (index2 > -1) {
+                    keys.splice(index2, 1);
+                }
+                const index3 = keys.indexOf("data");
+                if (index3 > -1) {
+                    keys.splice(index3, 1);
+                }
+                // console.log('keys: ', keys);
+                // update keys into mongo collection "tokenUsdValues" in database "pivotTables"
+                //get current timestamp
+                const timestamp = new Date().getTime();
+                for (const key of keys) {
+                    const updateDoc = await db.collection('tokenUsdValues').updateOne ({address: key}, {$set: {usdValue: 0, lastFetched: timestamp}}, {upsert: true});
+                }
+                
+                
                 res.send(addressColumns)
-
-
-
             });
             
 
@@ -267,6 +346,9 @@ app.listen(listenPort, () => {
                 });
             });
         });
+
+
+        //I dont think this is used anymore...deprecated by pivotTablesAnalytics.js job 
         app.get('/tokenInfo/:tokenAddress', cors(), async (req, res) => {
             
             const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+req.params.tokenAddress;

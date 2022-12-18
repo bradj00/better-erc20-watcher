@@ -34,6 +34,7 @@ const [filteredtxDataOutflow,   setfilteredtxDataOutflow] = useState();
 const [chainDataHeartbeat, setchainDataHeartbeat] = useState();
 const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = useState();
 const [latestEthBlock, setlatestEthBlock] = useState();
+const [getUpdatedTokenBalance, setgetUpdatedTokenBalance] = useState();
 
 
 const [MinAmountFilterValue, setMinAmountFilterValue] = useState(1);
@@ -86,6 +87,8 @@ const contextObj = {
   heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN,
   communityHeldListFromSelected, setcommunityHeldListFromSelected,
   communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy,
+  getUpdatedTokenBalance, setgetUpdatedTokenBalance,
+
 }
 
 
