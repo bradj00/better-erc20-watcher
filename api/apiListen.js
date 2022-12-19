@@ -171,8 +171,8 @@ app.listen(listenPort, () => {
                 if (!addressColumns[0]) {
                     res.send();
                 }else {
-                    console.log('addressColumns: ', addressColumns);
-                    console.log(Object.keys(addressColumns[0]));
+                    // console.log('addressColumns: ', addressColumns);
+                    // console.log(Object.keys(addressColumns[0]));
                     
                     const keys = Object.keys(addressColumns[0]);
                     //remove "_id" "address" and "data" from keys array
@@ -192,8 +192,21 @@ app.listen(listenPort, () => {
                     // update keys into mongo collection "tokenUsdValues" in database "pivotTables"
                     //get current timestamp
                     const timestamp = new Date().getTime();
+                    
+                    //independent of call, trigger update of backend usd token values (in cache)
+                    getAllTokenBalanceUsdPrices(keys);
+
                     for (const key of keys) {
-                        const updateDoc = await db.collection('tokenUsdValues').updateOne ({address: key}, {$set: {dataRequested: true}}, {upsert: true});
+                        // const updateDoc = await db.collection('tokenUsdValues').updateOne ({address: key}, {$set: {dataRequested: true}}, {upsert: true});
+                        const regex = new RegExp(key, 'i');
+                        const query = await db.collection('tokenUsdValues').findOne({address: regex});
+                        
+
+                        if (!("dataRequested" in query)) {
+                            await db.collection('tokenUsdValues').updateOne ({address: key}, {$set: {dataRequested: true}}, {upsert: true});
+                        } else {
+                            console.log('\n\ndata already requested for: ', key);    
+                        }
                     }
                     
                     // go through addressColumns[0] and add usdValue to each token
@@ -313,7 +326,7 @@ app.listen(listenPort, () => {
         //request to set up new watched token
         app.get('/system/watchNewToken/:tokenAddress', cors(), async (req, res) => {
             const tokenAddress = req.params.tokenAddress;
-            // console.log('4\t');
+            
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 const db = client.db('watchedTokens');
                 const collectionlist = await db.listCollections().toArray();
@@ -355,6 +368,87 @@ app.listen(listenPort, () => {
             });
              
 
+        });
+        
+
+        app.get('/fetchTokenUsdPrice/:address', cors(), async (req, res1) => {
+            //get token price from Moralis
+            getUsdPriceFromMoralis(req.params.address).then((price) => {
+                res1.send(price);
+            });
+        });
+
+        app.get('/getStakedMegaBalances/:address', cors(), async (req, res1) => {
+            const address = req.params.address;
+            const slicedAddress = req.params.address.replace('0x', '');
+            const getFresh = req.query.getFresh;
+            console.log('getFresh: ', getFresh)
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                const db = client.db('pivotTables');
+                const collection = db.collection('stakedBalances');
+                const stakedBalances = await collection.find({address: address}).toArray();
+                
+                if ((stakedBalances.length == 0) || getFresh==true) {
+                    //fetch in-game balances
+                    console.log('fetching................')
+                    let payload = {"jsonrpc":"2.0","id":17,"method":"eth_call","params":[{"data":"0xf8b2cb4f000000000000000000000000"+slicedAddress,"to":"0x0d4a54716005d11f1e42c4d615ab8221f9a0d7e3"},"latest"]}
+                    const url = "https://misty-dawn-mountain.matic.quiknode.pro/4a6d10967c8875ef8d3488a9efc37234045b809b/"
+                    let res2 = await axios.post(url, payload)
+                    let data = res2.data;
+                    let megaBalance = parseInt(data.result, 16) / (10 ** 18)
+                    await collection.updateOne({address: address}, {$set: {address: address, megaBalance: megaBalance}}, {upsert: true});
+                    ////////////////////////////
+                    
+                    //fetch perk staked balances 
+                    let payload2 = {"address":address}
+                    const url2 = "https://ws.mcp3d.com/perks/address"
+
+                    let res3 = await axios.post(url2, payload2);
+                    let data2 = res3.data;
+                    let totalPerkStaked = 0;
+                    for (let districts in data2){
+                        for (let perk in data2[districts]){
+                            // console.log('perk: ', data2[districts][perk]);
+                            totalPerkStaked += parseInt(data2[districts][perk] / (10**18)) ;
+                        }
+                    }
+                    console.log(address+'\ttotalPerkStaked: ', totalPerkStaked)
+                    await collection.updateOne({address: address}, {$set: {perkStaked: totalPerkStaked}}, {upsert: true});
+                    ////////////////////////////    
+
+
+
+                    //fetch office accrued un-collected balance
+                    let payload3 = {"region_id":43,"address":address,"withToday":true}
+                    const url3 = "https://ws.mcp3d.com/balances"
+
+                    let res4 = await axios.post(url3, payload3);
+                    let data3 = res4.data;
+                    let totalAccruedMega = (data3.centers.collect / (10**18));
+                    console.log(address+'\ttotalAccruedMega: ', totalAccruedMega)
+                    await collection.updateOne({address: address}, {$set: {officeAccruedMega: totalAccruedMega}}, {upsert: true});
+
+
+
+
+
+
+
+
+
+                    client.close();
+                    res1.send({megaBalance: megaBalance, perkStaked: totalPerkStaked, officeAccruedMega: totalAccruedMega});
+                }
+                else { 
+                    console.log('cached mega wallet balance: ', stakedBalances);
+                    res1.send(stakedBalances[0]); 
+                    client.close();
+                }
+
+
+
+                
+            });
         });
         
         
@@ -606,4 +700,68 @@ function condenseArray(tempArray, filterMin, filterMax) {
     }
     // console.log('condensed array: ', tempArray2.length)
     return tempArray2;
+}
+
+
+
+
+async function getUsdPriceFromMoralis(tokenAddress){
+    return new Promise((resolve, reject) => {
+        let url = 'https://deep-index.moralis.io/api/v2/erc20/'+tokenAddress+'/price?chain=eth';
+            
+        console.log('getting usd price: ', url)
+        axios.get(url ,{
+            headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            "X-API-Key" : moralisApiKey
+            },
+        })
+        .then(({data}) => {
+            // console.log('---------------------------------')
+            // console.log(data)
+            // console.log('---------------------------------')
+
+            resolve(data);
+        })
+        .catch((error) => {
+            console.error('['+chalk.cyan(tokenAddress)+'] '+chalk.red('error fetching from moralis: '),error.response.data.message)
+            resolve({});
+        })
+    });
+}
+
+
+async function getAllTokenBalanceUsdPrices(tokenArray){
+
+    MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+        const db = client.db('pivotTables');
+        // console.log('~~~~~tokenArray: ', tokenArray.length);
+        
+        let count = 0;
+        let uniqueAddresses = [...new Set(tokenArray)];
+        for (const address of uniqueAddresses) {
+            count++;
+            console.log(chalk.rgb(0,255,0)('address: ',address))
+            let tokenAddress = address;
+
+            //check if usdValue already exists in tokenUsdValues where address == tokenAddress
+            const regex = new RegExp(tokenAddress, 'i');
+            let usdValue = await db.collection("tokenUsdValues").findOne({address : regex});
+            console.log('dataRequested: ', usdValue.dataRequested)
+            if (usdValue) {
+                if (usdValue.dataRequested == false){
+                    console.log('usdValue already exists: ', usdValue)
+                    continue;
+                }
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            console.log('['+count+' / '+uniqueAddresses.length+']\taddress: ', tokenAddress)
+            let usdPriceObj = await getUsdPriceFromMoralis(tokenAddress);
+            console.log('usdPriceObj: ', usdPriceObj)
+            console.log('---------------------------------')
+            let update = await db.collection("tokenUsdValues").updateOne({address: tokenAddress}, {$set: {usdValue: usdPriceObj, dataRequested:false}}, );
+        }    
+    })
 }

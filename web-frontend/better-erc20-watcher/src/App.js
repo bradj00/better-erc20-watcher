@@ -29,6 +29,8 @@ const [heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN] = useState()
 const [selectedAddressListOfTokens, setselectedAddressListOfTokens] = useState();
 const [communityHeldListFromSelected, setcommunityHeldListFromSelected] = useState();
 const [communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy] = useState();
+const [selectedAddyInGameBalance, setselectedAddyInGameBalance] = useState();
+const [megaPriceUsd, setmegaPriceUsd] = useState();
 
 const [filteredtxDataInflow,   setfilteredtxDataInflow] = useState();
 const [filteredtxDataOutflow,   setfilteredtxDataOutflow] = useState();
@@ -89,6 +91,8 @@ const contextObj = {
   communityHeldListFromSelected, setcommunityHeldListFromSelected,
   communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy,
   getUpdatedTokenBalance, setgetUpdatedTokenBalance,
+  selectedAddyInGameBalance, setselectedAddyInGameBalance,
+  megaPriceUsd, setmegaPriceUsd,
 
 }
 

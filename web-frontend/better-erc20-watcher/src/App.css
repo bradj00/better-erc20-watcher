@@ -282,7 +282,15 @@ tr:nth-child(odd) {
   grid-column: span 2;
 
 }
-.microServiceSpacer{
+.emptySpacer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5vh;
+  background-color:rgba(0,0,255,0.3);
+}
+
+.gridIconSpacer{
   display: flex;
   justify-content: center;
   align-items: center;

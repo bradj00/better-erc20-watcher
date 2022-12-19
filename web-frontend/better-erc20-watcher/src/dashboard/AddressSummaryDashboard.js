@@ -120,7 +120,7 @@ function DashboardContent() {
   const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
   const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
   const [clickedTokenUsdQuote, setclickedTokenUsdQuote] = React.useState({});
-  const [heldValueUsd, setheldValueUsd] = React.useState(0);
+  // const [heldValueUsd, setheldValueUsd] = React.useState(0);
   
   const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
   const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
@@ -146,7 +146,13 @@ function DashboardContent() {
   const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
   const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
   const {getUpdatedTokenBalance, setgetUpdatedTokenBalance} = useContext(GeneralContext);
-
+  
+  const {selectedAddyInGameBalance, setselectedAddyInGameBalance} = useContext(GeneralContext);
+  const {megaPriceUsd, setmegaPriceUsd} = useContext(GeneralContext);
+  
+  useEffect(() => {
+    console.log('megaPriceUsd: ', megaPriceUsd);
+  },[megaPriceUsd]);
 
   useEffect(() => {
     if (updateBlacklistRequest){
@@ -186,6 +192,12 @@ function DashboardContent() {
   useEffect(() => {
 
   },[DisplayMaxAmountFilterValue]);
+  
+  useEffect(() => {
+    if (selectedAddyInGameBalance){
+      console.log("-----selectedAddyInGameBalance: ", selectedAddyInGameBalance);
+    }
+  },[selectedAddyInGameBalance]);
 
 
   useEffect(() => {
@@ -396,7 +408,7 @@ function function66(e){
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'center', borderRadius:'10px', height:'10%', position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div style={{position:'absolute', top:'5%'}}>
                   <div style={{fontSize:'1.5vw'}}> <a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>  </div>
-                  <div style={{fontSize:'1vw'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN: <>...</>}</div>
+                  <div style={{fontSize:'1vw'}}> <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN: <>...</>}</span>  </div>
                 </div>
               </div>
 
@@ -435,11 +447,61 @@ function function66(e){
               </div>
 
               {/* User-defined notes */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
-                <div>
-                  <div style={{fontSize:'2vw'}}>Staked Balances</div>
-                  <div>Display Staked/Deposited/Locked balances belonging to this address</div>
-                </div>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', }}>
+                {/* <div> */}
+                  {/* <div style={{fontSize:'2vw'}}>Staked Balances</div>
+                  <div>Display Staked/Deposited/Locked balances belonging to this address</div> */}
+
+                    <div onClick={()=>{console.log('fetching fresh stashed tokens balances..',)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div>
+
+                    {selectedAddyInGameBalance?
+                    <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
+                      <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
+                        <td colspan="5">
+                          &nbsp;Stashed tokens for <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
+                        </td>
+                        
+                      </tr>
+                      <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.9)',position:'sticky', }}>
+                        <td colspan="4" >
+                          &nbsp;Location
+                        </td>
+                        <td style={{textAlign:'right',}}>Amount</td>
+                        <td style={{textAlign:'right',}}>USD</td>
+                      </tr>
+                      {selectedAddyInGameBalance?
+                      <tr style={{textAlign:'left', backgroundColor:'rgba(200,200,200,0.1)',position:'sticky', }}>
+                        <td colspan="4">
+                          &nbsp;Mega World Wallet
+                        </td>
+                        <td style={{textAlign:'right',}}>{selectedAddyInGameBalance? commaNumber(parseFloat(selectedAddyInGameBalance.megaBalance).toFixed(2)) : 0}</td>
+                        <td style={{textAlign:'right',}}>${selectedAddyInGameBalance? commaNumber(parseFloat(selectedAddyInGameBalance.megaBalance * megaPriceUsd.usdPrice).toFixed(2)) : 0}</td>
+                      </tr>
+                      :<></>}
+                      {selectedAddyInGameBalance?
+                      <tr style={{textAlign:'left', backgroundColor:'rgba(200,200,200,0.1)',position:'sticky', }}>
+                        <td colspan="4" style={{textAlign:'left',}}>
+                          &nbsp;Mega World District Staking
+                        </td>
+                        <td style={{textAlign:'right',}}>{selectedAddyInGameBalance? commaNumber(parseFloat(selectedAddyInGameBalance.perkStaked).toFixed(2)) : 0}</td>
+                        <td style={{textAlign:'right',}}>${selectedAddyInGameBalance && megaPriceUsd? commaNumber(parseFloat(selectedAddyInGameBalance.perkStaked * megaPriceUsd.usdPrice).toFixed(2)) : 0}</td>
+                      </tr>
+                      :<></>}
+                      {selectedAddyInGameBalance?
+                      <tr style={{textAlign:'left', backgroundColor:'rgba(200,200,200,0.1)',position:'sticky', }}>
+                        <td colspan="4" style={{textAlign:'left',}}>
+                          &nbsp;Mega World Offices Accruing
+                        </td>
+                        <td style={{textAlign:'right',}}>{selectedAddyInGameBalance? commaNumber(parseFloat(selectedAddyInGameBalance.officeAccruedMega).toFixed(2)) : 0}</td>
+                        <td style={{textAlign:'right',}}>${selectedAddyInGameBalance && megaPriceUsd? commaNumber(parseFloat(selectedAddyInGameBalance.officeAccruedMega * megaPriceUsd.usdPrice).toFixed(2)) : 0}</td>
+                      </tr>
+                      :<></>}
+
+                    </table>
+                    :<>loading stashed tokens...</>}
+
+
+                {/* </div> */}
               </div>
 
               {/* Community Held Tokens */}
@@ -448,8 +510,14 @@ function function66(e){
                   <div style={{borderRadius:'10px',overflowY:'scroll',display:'flex', justifyContent:'center',alignItems:'center', height:'100%', border:'0px solid #0f0',position:'absolute',top:'0',left:'0',width:'49.5%',}}>
                     
                     
-                    <div onClick={()=>{console.log('clicked: ',heldTokensSelectedAddress);setgetUpdatedTokenBalance(heldTokensSelectedAddress)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div>
-                    <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0'}}>
+                    <div onClick={()=>{console.log('clicked: ',heldTokensSelectedAddress);setselectedAddyInGameBalance(false); setgetUpdatedTokenBalance(heldTokensSelectedAddress)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div>
+                    <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
+                      <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
+                        <td colspan="4">
+                          &nbsp;Tokens Held By <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
+                        </td>
+                      </tr>
+                      
                       <tr style={{backgroundColor:'rgba(0,0,0,0.9)',position:'sticky', top:'0'}}>
                         <th>hide</th>
                         <th>Contract</th>
@@ -493,7 +561,7 @@ function function66(e){
                                 </button>
 
                                 </td>
-                                <td><a href={`https://etherscan.io/token/${selectedAddressListOfTokens[0][token].metadata.token_address}`} target="_blank" rel="noopener noreferrer">{getEllipsisTxt(selectedAddressListOfTokens[0][token].metadata.token_address, 4)}</a></td>
+                                <td><a href={`https://etherscan.io/token/${selectedAddressListOfTokens[0][token].metadata.token_address}?a=${heldTokensSelectedAddress}`} target="_blank" rel="noopener noreferrer">{getEllipsisTxt(selectedAddressListOfTokens[0][token].metadata.token_address, 4)}</a></td>
                                 <td>{selectedAddressListOfTokens[0][token].metadata.symbol}</td>
                                 <td style={{textAlign:'right'}}>{commaNumber(parseFloat((selectedAddressListOfTokens[0][token].metadata.balance)/ (10 **selectedAddressListOfTokens[0][token].metadata.decimals)).toFixed(4))}</td>
                                 
@@ -516,14 +584,21 @@ function function66(e){
                     
                   </div>
                   <div style={{display:'flex', overflowY:'scroll',justifyContent:'center',alignItems:'center', height:'100%', borderRadius:'10px',position:'absolute',top:'0',right:'0',width:'49.5%',}}>
-                  <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0'}}>
-                        <thead style={{position:'sticky', top:'0'}}>
+                  <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
+                        
+                        <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky',}}>
+                          <td colspan="4">
+                            &nbsp;Community Balances for Selected Token
+                          </td>
+                        </tr>
+      
+                        <tr style={{position:'sticky', top:'0',backgroundColor:'rgba(0,0,0,0.9)',}}>
                           <th>Name</th>
                           <th>Address</th>
                           <th>Balance</th>
                           <th>USD</th>
-                        </thead>
-                         
+                        </tr>
+                        
                         {communityHeldListFromSelected && communityHeldListFromSelected.length > 0 && communityHeldListFromSelectedAddy? communityHeldListFromSelected.length > 0? communityHeldListFromSelected.sort(
                           (a, b) => b[communityHeldListFromSelectedAddy]? a[communityHeldListFromSelectedAddy]? b[communityHeldListFromSelectedAddy].metadata.balance - a[communityHeldListFromSelectedAddy].metadata.balance : 0: 0).map((token, index) => {
                           // console.log('Address that shares common token: ', token.address, communityHeldListFromSelected)   
@@ -533,7 +608,7 @@ function function66(e){
                           //this needs to be paginated on the API side and infinitescrolled here or else it wont be performant for large lists 
                           return (  
                              token.address?
-                             <tr style={{backgroundColor:'rgba(200,150,10,0.4)'}}>
+                             <tr onClick={()=>{ console.log('clicked: ',token.address); setheldTokensSelectedAddress(token.address) }} style={{cursor:'pointer', backgroundColor:'rgba(200,150,10,0.4)'}}>
                                <td>{token.friendlyName.length === 42 && token.friendlyName.startsWith('0x')? <></>: token.friendlyName}</td>
                                <td><a target="_blank" href={"https://etherscan.io/address/"+token.address}>{getEllipsisTxt(token.address,4)}</a></td>
                                <td style={{textAlign:'right'}}>

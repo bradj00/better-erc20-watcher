@@ -23,13 +23,13 @@ const dbNamePivots = 'pivotTables';
 
 console.clear();
 
-main();
+// main();
 
 // update all held tokens for all addresses that have made TXs in the watchedTokens database
 // getHeldTokensForAllAddresses();
 
 //update all token prices in pivot table 'allTokenPrices'
-// getAllTokenBalanceUsdPrices();
+getAllTokenBalanceUsdPrices();
 
 function main() {
     getAllAddresses()
@@ -173,12 +173,13 @@ async function getAllTokenBalanceUsdPrices(){
     let allAddresses = await db.collection("tokenUsdValues").find({}).toArray();
     //for each of these addresses, getUsdPriceFromMoralis(tokenAddress) and update the usdValue field in the document
     let count = 0;
-    for (const address of allAddresses) {
+    let uniqueAddresses = [...new Set(allAddresses)];
+    for (const address of uniqueAddresses) {
         count++;
         // console.log(chalk.rgb(0,255,0)('address: ',address.address))
         let tokenAddress = address.address;
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log('['+count+' / '+allAddresses.length+']\taddress: ', tokenAddress)
+        console.log('['+count+' / '+uniqueAddresses.length+']\taddress: ', tokenAddress)
         let usdPriceObj = await getUsdPriceFromMoralis(tokenAddress);
         let update = await db.collection("tokenUsdValues").updateOne({address: tokenAddress}, {$set: {usdValue: usdPriceObj}}, );
     }

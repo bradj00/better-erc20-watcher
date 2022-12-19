@@ -14,18 +14,32 @@ const SettingsDisplayGrid = () => {
 
                 <div className="microService" style={{gridColumn:'span 2',}}>
                     <div style={{position:'relative'}}>
-                        <div style={{position:'absolute', top:'-0.4vw',left:'-1.1vw'}}><CheckCircleIcon style={{fontSize:'2vh', color:'#0f0'}}/></div>
+                        <div title="TXs begin processing here" style={{position:'absolute', top:'-0.4vw',left:'-1.1vw'}}><CheckCircleIcon style={{fontSize:'2vh', color:'#0f0'}}/></div>
                         <div>Ingestion Engine</div>
                     </div>
                 </div>
 
-                <div  style={{gridColumn:'span 18'}}></div>
+                <div  style={{gridColumn:'span 1'}}></div>
+
+                <div className="microService errorService" >
+                    <div style={{position:'relative'}}>
+                        <div>API Gateway</div>
+                    </div>
+                </div>
+
+                <div className="emptySpacer"  style={{gridColumn:'span 15'}}></div>
                 
-                <div className="microServiceSpacer" style={{gridColumn:'span 2'}}>
+                <div className="gridIconSpacer" style={{gridColumn:'span 2'}}>
                   <KeyboardDoubleArrowDownIcon />
                 </div>
 
-                <div  style={{gridColumn:'span 18'}}></div>
+                <div  style={{gridColumn:'span 1'}}></div>
+                
+                <div className="gridIconSpacer" style={{gridColumn:'span 2'}}>
+                  <KeyboardDoubleArrowDownIcon />
+                </div>
+
+                <div  className="emptySpacer" style={{gridColumn:'span 15'}}></div>
 
                 <div className="microService" style={{gridColumn:'span 2',}}>
                     <div style={{position:'relative'}}>
@@ -33,22 +47,21 @@ const SettingsDisplayGrid = () => {
                     </div>
                 </div>
                 
-                <div className="microServiceSpacer">
+                <div className="gridIconSpacer" >
                   <DoubleArrowIcon />
                 </div>
                 
-                <div className="microService errorService" >
-                    <div style={{position:'relative'}}>
-                        <div>API Gateway</div>
-                    </div>
-                </div>
+                
                 
                 <div className="microService" >
                     ...
                 </div>
                 
-                <div  style={{gridColumn:'span 1'}}></div>
+                <div className="gridIconSpacer" >
+                  <DoubleArrowIcon />
+                </div>
 
+                
                 <div className="microService warningService" >
                   Community Held Tokens Cacher
                 </div>

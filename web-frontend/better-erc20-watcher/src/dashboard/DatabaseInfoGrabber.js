@@ -21,6 +21,12 @@ const DatabaseInfoGrabber = () => {
     const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
     const {chainDataHeartbeatDiff, setchainDataHeartbeatDiff} = useContext(GeneralContext);
     
+    const {selectedAddyInGameBalance, setselectedAddyInGameBalance} = useContext(GeneralContext);
+    
+    // explicit context variables needed because we are watching staking and deposit behavior for these addresses
+    const {megaPriceUsd, setmegaPriceUsd} = useContext(GeneralContext);
+    /////////////////////////////////////////////
+    
     const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
     const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
     const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
@@ -37,6 +43,8 @@ const DatabaseInfoGrabber = () => {
     
     const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
     const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
+    
+    
     useEffect(() => {
         console.log('MinAmountFilterValue,MaxAmountFilterValue: ', MinAmountFilterValue,MaxAmountFilterValue)
         if (MinAmountFilterValue !=1 && MaxAmountFilterValue != 1){
@@ -55,6 +63,7 @@ const DatabaseInfoGrabber = () => {
         if (heldTokensSelectedAddress){
             fetchSelectedAddressHeldTokens( heldTokensSelectedAddress )
             fetchFNforAddress( heldTokensSelectedAddress )
+            fetchInGameMegaBalance( heldTokensSelectedAddress )
         }
     },[heldTokensSelectedAddress]);
 
@@ -73,6 +82,15 @@ const DatabaseInfoGrabber = () => {
         .then(data => {
             console.log('['+address+'] token balances: ', data);
             setselectedAddressListOfTokens(data);
+        })
+    }
+    function fetchInGameMegaBalance(token) {
+        console.log('fetching in-game mega balance for address: ', token)
+        fetch('http://10.0.3.2:4000/getStakedMegaBalances/'+token+'?getFresh=false')
+        .then(response => response.json())
+        .then(data => {
+            console.log('['+token+'] in-game mega balance: ', data);
+            setselectedAddyInGameBalance(data);
         })
     }
     function fetchCommonlyHeldToken(token) {
@@ -102,6 +120,17 @@ const DatabaseInfoGrabber = () => {
         .then(data => {
             console.log('['+address+'] token balances: ', data);
             setselectedAddressListOfTokens(data);
+        })
+    }
+
+    //explicit fetch calls for special tokens we are watching for staking / deposit contracts over.
+    function fetchMegaPriceUsd(address) {
+        console.log('fetching mega price for address: ', address)
+        fetch('http://10.0.3.2:4000/fetchTokenUsdPrice/' + address)
+        .then(response => response.json())
+        .then(data => {
+            console.log('['+address+'] mega price: ', data);
+            setmegaPriceUsd(data);
         })
     }
 
@@ -248,7 +277,9 @@ const DatabaseInfoGrabber = () => {
         fetchAllSystemStatuses();
         fetchLatestBlockFromChain();
         fetchChainDataHeartbeat();
-        
+
+        //explicit call because we are watching this token for wallet and staking behavior too
+        fetchMegaPriceUsd('0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e');
 
         // setInterval(()=>{
         //     fetchAllSystemStatuses();
