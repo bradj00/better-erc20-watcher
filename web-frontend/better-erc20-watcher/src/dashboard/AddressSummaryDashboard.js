@@ -408,7 +408,7 @@ function function66(e){
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'center', borderRadius:'10px', height:'10%', position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div style={{position:'absolute', top:'5%'}}>
                   <div style={{fontSize:'1.5vw'}}> <a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>  </div>
-                  <div style={{fontSize:'1vw'}}> <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN: <>...</>}</span>  </div>
+                  <div style={{fontSize:'1vw'}}> <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN.startsWith('0x') && heldTokensSelectedAddressFN.length === 42? getEllipsisTxt(heldTokensSelectedAddressFN,6):heldTokensSelectedAddressFN: <>...</>}</span>  </div>
                 </div>
               </div>
 
@@ -458,7 +458,7 @@ function function66(e){
                     <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
                       <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
                         <td colspan="5">
-                          &nbsp;Stashed tokens for <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
+                          &nbsp;Stashed tokens for <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN.startsWith('0x') && heldTokensSelectedAddressFN.length === 42? getEllipsisTxt(heldTokensSelectedAddressFN,6):heldTokensSelectedAddressFN: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
                         </td>
                         
                       </tr>
@@ -514,7 +514,7 @@ function function66(e){
                     <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
                       <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
                         <td colspan="4">
-                          &nbsp;Tokens Held By <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
+                          &nbsp;Tokens Held By <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN.startsWith('0x') && heldTokensSelectedAddressFN.length === 42? getEllipsisTxt(heldTokensSelectedAddressFN,6):heldTokensSelectedAddressFN: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
                         </td>
                       </tr>
                       
@@ -534,7 +534,7 @@ function function66(e){
                           }
 
                           //filter out tokens that have extendedValue < 1
-                          if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0].usdValue && (selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue < 1 || selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue > 1000000000000)  ){
+                          if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && selectedAddressListOfTokens[0][token].usdValue[0].usdValue && (selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue < 1 || selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue > 1000000000000)  ){
                             return (<></>)
                           }
                           if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && (selectedAddressListOfTokens[0][token].usdValue[0].blacklisted ) ){
@@ -543,7 +543,7 @@ function function66(e){
                           else {
                             return (
                               selectedAddressListOfTokens[0][token].metadata?
-                              selectedAddressListOfTokens[0][token]?selectedAddressListOfTokens[0][token].usdValue? selectedAddressListOfTokens[0][token].usdValue[0].usdValue?
+                              selectedAddressListOfTokens[0][token]?selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0]? selectedAddressListOfTokens[0][token].usdValue[0].usdValue?
                               
                               <tr style={{backgroundColor: token && communityHeldListFromSelectedAddy? token.toLowerCase() == communityHeldListFromSelectedAddy.toLowerCase()? "rgba(200,150,10,0.5)":"":"", cursor:'pointer'}} onClick={()=>{ setcommunityHeldListFromSelectedAddy(selectedAddressListOfTokens[0][token].metadata.token_address); setclickedTokenUsdQuote(selectedAddressListOfTokens[0][token].usdValue[0].usdValue.usdPrice) }}>
                                 {/* selectedAddressListOfTokens */}
@@ -587,7 +587,7 @@ function function66(e){
                   <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
                         
                         <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky',}}>
-                          <td colspan="4">
+                          <td title="Only addresses that have a recorded TX from a Watched Token show in this list." colspan="4">
                             &nbsp;Community Balances for Selected Token
                           </td>
                         </tr>

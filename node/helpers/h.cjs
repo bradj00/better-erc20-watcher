@@ -19,6 +19,11 @@ const fancylog = (str, bracketedStr, tokenAddress, spinner) => {
       if (bracketedStr == 'error'){ bracketedStr = ' error ';}
       
       switch (bracketedStr){
+        case 'MegaWorld':
+          red = 0;
+          green = 255;
+          blue = 0;
+          break;
         case 'moralis':
           red = 0;
           green = 255;

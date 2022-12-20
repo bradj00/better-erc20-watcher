@@ -6,7 +6,7 @@ import chalk from 'chalk';
 import * as MongoClientQ from 'mongodb';
 import { resolve } from 'path';
 import { getSystemErrorMap } from 'util';
-import * as h from './helpers/h.cjs';
+import * as h from '../helpers/h.cjs';
 
 const MongoClient = MongoClientQ.MongoClient;
 const mongoUrl = 'mongodb://localhost:27017';
@@ -163,7 +163,7 @@ function checkIfAddressesExistInFriendlyNames( uniqueAddys ){
             countTrue++;
             var collectionExists = await dbFN.collection('lookup').find({address: address}).toArray();
             // console.log('collectionExists: ', collectionExists, 'address: ', address, 'count: ', count, 'countTrue: ', countTrue, )
-            if (collectionExists && typeof collectionExists[0] == 'object' && collectionExists[0].friendlyName) {
+            if (collectionExists && typeof collectionExists[0] == 'object' && collectionExists[0].OpenSea) {
                 uniqueAddysCachedPresent.push(address);
             } else {
                 uniqueAddysToLookup.push(address);
@@ -297,7 +297,7 @@ const LookupSingleAddress =  (singleAddress, count, totalCount) => {
                 const { data } = await axios.get(url, {})
                 console.log('got: ', data.username);
                 if (data.username == null) { data.username = singleAddress }
-                db.collection("lookup").updateOne({address: singleAddress }, {$set:{ 'friendlyName': data.username }},{upsert: true},  function(err, result) {
+                db.collection("lookup").updateOne({address: singleAddress }, {$set:{ 'OpenSea': data.username }},{upsert: true},  function(err, result) {
                     if (err) console.log('Mongo ERR: ',err);
                     client.close();
                     resolve(data.username);
@@ -311,7 +311,7 @@ const LookupSingleAddress =  (singleAddress, count, totalCount) => {
                 console.log(error.code); // usually means the name is not found on OpenSea if 404 ERR_BAD_REQUEST
                 console.log('------------------------------------');
 
-                db.collection("lookup").updateOne({address: singleAddress }, {$set:{ 'friendlyName': singleAddress }},{upsert: true},  function(err, result) {
+                db.collection("lookup").updateOne({address: singleAddress }, {$set:{ 'OpenSea': singleAddress }},{upsert: true},  function(err, result) {
                     if (err) console.log('Mongo ERR: ',err);
                     client.close();
                     resolve(singleAddress);

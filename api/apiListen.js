@@ -201,11 +201,12 @@ app.listen(listenPort, () => {
                         const regex = new RegExp(key, 'i');
                         const query = await db.collection('tokenUsdValues').findOne({address: regex});
                         
-
-                        if (!("dataRequested" in query)) {
-                            await db.collection('tokenUsdValues').updateOne ({address: key}, {$set: {dataRequested: true}}, {upsert: true});
-                        } else {
-                            console.log('\n\ndata already requested for: ', key);    
+                        if (query){
+                            if (!("dataRequested" in query)) { 
+                                await db.collection('tokenUsdValues').updateOne ({address: key}, {$set: {dataRequested: true}}, {upsert: true});
+                            } else {
+                                // console.log('\n\ndata already requested for: ', key);    
+                            }
                         }
                     }
                     
@@ -215,7 +216,7 @@ app.listen(listenPort, () => {
 
                             const knownUsdTokenValueObj = await db.collection('tokenUsdValues').find({address: key}).toArray();
                             addressColumns[0][key]["usdValue"] = knownUsdTokenValueObj;
-                            if (addressColumns[0][key]["usdValue"][0].usdValue){
+                            if (addressColumns[0][key]["usdValue"][0] && addressColumns[0][key]["usdValue"][0].usdValue){
                                 addressColumns[0][key]["usdValue"][0].usdValue["extendedValue"] = addressColumns[0][key]["usdValue"][0].usdValue.usdPrice * (addressColumns[0][key]["metadata"]["balance"] / 10**addressColumns[0][key]["metadata"]["decimals"]);
                             }
                         }
@@ -258,7 +259,7 @@ app.listen(listenPort, () => {
                     // place friendlyName[0].friendlyName into communityHeldArr[i].friendlyName
                     communityHeldArr[i].friendlyName = friendlyName[0].friendlyName;
 
-                    console.log('['+chalk.magenta(communityHeldArr[i].address)+']\tfriendlyName: ', friendlyName[0].friendlyName);
+                    // console.log('['+chalk.magenta(communityHeldArr[i].address)+']\tfriendlyName: ', friendlyName[0].friendlyName);
                 }
                 
 
@@ -726,7 +727,10 @@ async function getUsdPriceFromMoralis(tokenAddress){
         })
         .catch((error) => {
             console.error('['+chalk.cyan(tokenAddress)+'] '+chalk.red('error fetching from moralis: '),error.response.data.message)
-            resolve({});
+            
+            //we still need to put this into mongo so we dont re-check it every time.
+
+            resolve(0);
         })
     });
 }
@@ -742,16 +746,16 @@ async function getAllTokenBalanceUsdPrices(tokenArray){
         let uniqueAddresses = [...new Set(tokenArray)];
         for (const address of uniqueAddresses) {
             count++;
-            console.log(chalk.rgb(0,255,0)('address: ',address))
+            // console.log(chalk.rgb(0,255,0)('address: ',address))
             let tokenAddress = address;
 
             //check if usdValue already exists in tokenUsdValues where address == tokenAddress
             const regex = new RegExp(tokenAddress, 'i');
             let usdValue = await db.collection("tokenUsdValues").findOne({address : regex});
-            console.log('dataRequested: ', usdValue.dataRequested)
+            // console.log('dataRequested: ', usdValue.dataRequested)
             if (usdValue) {
                 if (usdValue.dataRequested == false){
-                    console.log('usdValue already exists: ', usdValue)
+                    // console.log('usdValue already exists: ', usdValue)
                     continue;
                 }
             }
@@ -759,9 +763,27 @@ async function getAllTokenBalanceUsdPrices(tokenArray){
             await new Promise((resolve) => setTimeout(resolve, 1000));
             console.log('['+count+' / '+uniqueAddresses.length+']\taddress: ', tokenAddress)
             let usdPriceObj = await getUsdPriceFromMoralis(tokenAddress);
-            console.log('usdPriceObj: ', usdPriceObj)
-            console.log('---------------------------------')
-            let update = await db.collection("tokenUsdValues").updateOne({address: tokenAddress}, {$set: {usdValue: usdPriceObj, dataRequested:false}}, );
-        }    
+
+            // console.log(chalk.cyan('__usdPriceObj: ', usdPriceObj));
+            // console.log(usdPriceObj);
+            if (usdPriceObj == 0) { 
+                usdPriceObj = {
+                    nativePrice: {
+                      value: '0',
+                      decimals: 18,
+                      name: 'Ether',
+                      symbol: 'ETH'
+                    },
+                    usdPrice: 0,
+                    exchangeAddress: '',
+                    exchangeName: ''
+                  }
+
+                // console.log(chalk.cyan('usdPriceObj: '), usdPriceObj)
+            }
+            // console.log('usdPriceObj: ', usdPriceObj)
+            // console.log('---------------------------------')
+            let update = await db.collection("tokenUsdValues").updateOne({address: tokenAddress}, {$set: {usdValue: usdPriceObj, dataRequested:false}}, {upsert: true} );
+        }     
     })
 }
