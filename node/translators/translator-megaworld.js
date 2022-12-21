@@ -20,7 +20,7 @@ var sleepSeconds = 300; // 5 minutes between each run
 
 
 console.clear();
-console.log(chalk.cyan.underline.inverse('translator.js')+'\n');
+console.log(chalk.cyan.underline.inverse('translator-megaworld.js')+'\n');
 // connect to mongo, create a list of unique addresses from all documents in each watchedTokens database collection.
 // then, create a unique list of addresses from that array of addresses.
 // then, for each address, check if it has a collection in the friendlyNames database.
@@ -191,14 +191,14 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
 
             if(friendlyName[0]){
                 if (silentSwitch == 'loud'){
-                    // console.log('updating all collections matching address: ', chalk.magenta(addresses[i]),' with friendlyName: ', chalk.magenta(friendlyName[0].friendlyName));
-                    h.fancylog('updating all collections matching address: '+ chalk.magenta(addresses[i])+' with friendlyName: '+chalk.magenta(friendlyName[0].friendlyName), ' mongo ')
+                    // console.log('updating all collections matching address: ', chalk.magenta(addresses[i]),' with friendlyName: ', chalk.magenta(friendlyName[0]));
+                    h.fancylog('updating all collections matching address: '+ chalk.magenta(addresses[i])+' with friendlyName: '+chalk.magenta(friendlyName[0]), ' mongo ')
                 }
 
                 
                 for (let j = 0; j < collections.length; j++) {
-                    db.collection(collections[j].name).updateMany({from_address: addresses[i]}, {$set: {from_address_friendlyName: friendlyName[0].friendlyName}})
-                    db.collection(collections[j].name).updateMany(  {to_address: addresses[i]}, {$set: {to_address_friendlyName: friendlyName[0].friendlyName}})
+                    db.collection(collections[j].name).updateMany({from_address: addresses[i]}, {$set: {from_address_friendlyName: friendlyName[0]}})
+                    db.collection(collections[j].name).updateMany(  {to_address: addresses[i]}, {$set: {to_address_friendlyName: friendlyName[0]}})
                 }
             }
             else { 

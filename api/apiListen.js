@@ -257,7 +257,7 @@ app.listen(listenPort, () => {
                     const collection = db.collection('lookup');
                     const friendlyName = await collection.find({address: communityHeldArr[i].address}).toArray();
                     // place friendlyName[0].friendlyName into communityHeldArr[i].friendlyName
-                    communityHeldArr[i].friendlyName = friendlyName[0].friendlyName;
+                    communityHeldArr[i].friendlyName = friendlyName[0];
 
                     // console.log('['+chalk.magenta(communityHeldArr[i].address)+']\tfriendlyName: ', friendlyName[0].friendlyName);
                 }
@@ -465,13 +465,13 @@ app.listen(listenPort, () => {
                 
                 
                 if (pageNumber == 'allData') { //bad. temporary to display all data while I mock up the summarized chart loading. This will be replaced by paginated data + infinite scrolling
-                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {  
+                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(100).toArray(function(err, result) {  
                         client.close();
                         res.send({totalPages: 1, result: result})
                     });
                 }
                 else if (pageNumber == 'chart') {
-                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(1000).toArray(function(err, result) {    
+                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(2000).toArray(function(err, result) {    
                         client.close();
                         res.send({totalPages: 1, result: condenseArray(result, filterMin, filterMax)})                    
                         // res.send({totalPages: 1, result: result}) 
@@ -555,7 +555,7 @@ app.listen(listenPort, () => {
                     if (err) {
                         console.log('error: ', err);
                     }
-                    // console.log('result: ', result);
+                    console.log('~~Friendly Name: ', result);
                     client.close();
                     res.send(result)
                 });
@@ -580,7 +580,7 @@ app.listen(listenPort, () => {
                     }
                     const db2 = client.db('friendlyNames');
                     //update or insert the friendlyName into the collection where address matches the address in the request
-                    db2.collection("lookup").updateOne({address: address}, {$set: {friendlyName: friendlyName}}, {upsert: true}, function(err, result) {
+                    db2.collection("lookup").updateOne({address: address}, {$set: {manuallyDefined: friendlyName}}, {upsert: true}, function(err, result) {
                         if (err) { 
                             h.fancylog(err, 'error');
                         }

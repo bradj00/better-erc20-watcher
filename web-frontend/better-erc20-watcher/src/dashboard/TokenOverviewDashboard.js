@@ -289,7 +289,7 @@ function function66(e){
                   
                     :
                     <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-                    {clickedDetailsAddressFN}
+                    {JSON.stringify(clickedDetailsAddressFN)}
                     </div>
                   :
                   <div style={{zIndex:'9999', color:'#999' }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>

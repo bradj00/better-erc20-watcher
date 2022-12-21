@@ -107,8 +107,8 @@ const DatabaseInfoGrabber = () => {
         fetch('http://10.0.3.2:4000/friendlyName/' + address)
         .then(response => response.json())
         .then(data => {
-            console.log('FN Lookup:\t['+address+'] friendly name: ', data[0].friendlyName);
-            data[0]? data[0].friendlyName? setheldTokensSelectedAddressFN(data[0].friendlyName) : setheldTokensSelectedAddressFN('') : setheldTokensSelectedAddressFN('')
+            console.log('FN Lookup:\t['+address+'] friendly name: ', data[0]);
+            data[0]?  setheldTokensSelectedAddressFN(data[0]) : setheldTokensSelectedAddressFN('') 
         })
     }
 
@@ -155,38 +155,7 @@ const DatabaseInfoGrabber = () => {
         })
     }
 
-    useEffect(() => {
-        if (watchedTokenList){
-            console.log('watched token list: ', watchedTokenList);
-            fetchTransactions(watchedTokenList[1].address, MinAmountFilterValue, MaxAmountFilterValue);
-        }
-    },[watchedTokenList]);
-
-
-    useEffect(() => {
-        if (updateFriendlyName){
-            console.log('updating address '+RequestFriendlyLookup+' with manually defined Friendly Name: ', updateFriendlyName);
-            updateAFriendlyName(RequestFriendlyLookup,updateFriendlyName);
-        }
-    },[updateFriendlyName]);
-
-    useEffect(() => {
-        if (clickedDetailsAddress){
-            console.log('clickedDetailsAddress: ', clickedDetailsAddress);
-            fetchAddressFilteredTransactions(viewingTokenAddress, clickedDetailsAddress);
-        }else {
-            console.log('clearing filtered txs')
-            setFilteredAddyData();
-        }
-    },[clickedDetailsAddress]);
-    
-    useEffect(()=>{
-        if (RequestFriendlyLookup){
-            console.log('RequestFriendlyLookup: ', RequestFriendlyLookup);
-            fetchFriendlyNameLookup(RequestFriendlyLookup);
-        }
-    },[RequestFriendlyLookup])
-
+   
     function updateAFriendlyName(address, friendlyName){
         
         console.log('updating address '+address+' with manually defined Friendly Name: ', friendlyName)
@@ -217,8 +186,8 @@ const DatabaseInfoGrabber = () => {
         .then(response => response.json())
         .then(data => {
             console.log('looked up friendly name for address: ', address, 'result: ', data)
-            if (data && data[0] && data[0].friendlyName){
-                setFriendlyLookupResponse(data[0].friendlyName)
+            if (data && data[0] && data[0]){
+                setFriendlyLookupResponse(data[0])
             }else {
                 setFriendlyLookupResponse('no friendly name found')
             }
@@ -263,6 +232,7 @@ const DatabaseInfoGrabber = () => {
         .then(response => response.json())
         .then(data => setDataChart(data))
     }
+    
     // function updateHeartBeatDifferenceMarkers(){
     //     // console.log('chainDataHeartbeat: ',chainDataHeartbeat);
     //     if (chainDataHeartbeat){
@@ -271,6 +241,40 @@ const DatabaseInfoGrabber = () => {
     //         setchainDataHeartbeatDiff(temp - chainDataHeartbeat);
     //     }
     // }
+
+    useEffect(() => {
+        if (watchedTokenList){
+            console.log('watched token list: ', watchedTokenList);
+            fetchTransactions(watchedTokenList[1].address, MinAmountFilterValue, MaxAmountFilterValue);
+        }
+    },[watchedTokenList]);
+
+
+    useEffect(() => {
+        if (updateFriendlyName){
+            console.log('updating address '+RequestFriendlyLookup+' with manually defined Friendly Name: ', updateFriendlyName);
+            updateAFriendlyName(RequestFriendlyLookup,updateFriendlyName);
+        }
+    },[updateFriendlyName]);
+
+    useEffect(() => {
+        if (clickedDetailsAddress){
+            console.log('clickedDetailsAddress: ', clickedDetailsAddress);
+            fetchAddressFilteredTransactions(viewingTokenAddress, clickedDetailsAddress);
+        }else {
+            console.log('clearing filtered txs')
+            setFilteredAddyData();
+        }
+    },[clickedDetailsAddress]);
+    
+    useEffect(()=>{
+        if (RequestFriendlyLookup){
+            console.log('RequestFriendlyLookup: ', RequestFriendlyLookup);
+            fetchFriendlyNameLookup(RequestFriendlyLookup);
+        }
+    },[RequestFriendlyLookup])
+
+
 
     useEffect(() => {
         fetchWatchedTokenList();

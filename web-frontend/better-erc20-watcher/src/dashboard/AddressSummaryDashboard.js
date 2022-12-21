@@ -34,7 +34,7 @@ import {commaNumber} from './helpers/h.js';
 import ConnectionStatusBanner from './ConnectionStatusBanner';
 import '../App.css';
 import RotateRightIcon from '@mui/icons-material/RotateRight';
-
+import VisibilityIcon from '@mui/icons-material/Visibility';
 TimeAgo.addDefaultLocale(en);
 
 
@@ -142,6 +142,7 @@ function DashboardContent() {
 
   const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
   const {heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN} = useContext(GeneralContext);
+  const {heldTokensSelectedAddressFNdisplayed, setheldTokensSelectedAddressFNdisplayed} = useContext(GeneralContext);
   
   const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
   const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
@@ -153,6 +154,23 @@ function DashboardContent() {
   useEffect(() => {
     console.log('megaPriceUsd: ', megaPriceUsd);
   },[megaPriceUsd]);
+
+  useEffect(() => {
+    console.log('~~heldTokensSelectedAddressFNdisplayed: ', heldTokensSelectedAddressFNdisplayed);
+  },[heldTokensSelectedAddressFNdisplayed]);
+
+  useEffect(() => {
+    console.log('heldTokensSelectedAddressFN: ', heldTokensSelectedAddressFN);
+    for (const key in heldTokensSelectedAddressFN) {
+      if (heldTokensSelectedAddressFN.hasOwnProperty(key) && key !== "_id") {
+        const element = heldTokensSelectedAddressFN[key];
+        if (!element.startsWith("0x")) {
+          setheldTokensSelectedAddressFNdisplayed(element);
+          break;
+        }
+      }
+    }
+  },[heldTokensSelectedAddressFN]);
 
   useEffect(() => {
     if (updateBlacklistRequest){
@@ -292,7 +310,16 @@ function function66(e){
   console.log("function66:", e)
 }
 
+function determineWhichFNtoShow(tokenObj){
+  for (var key in tokenObj) {
+    if (key !== '_id' && !tokenObj[key].startsWith("0x")) {
+        return (<td style={{color:'#fff'}}>{tokenObj[key]}</td>);
+    }
+  }
 
+
+  return (<td style={{color:'#aaa'}}>{getEllipsisTxt(tokenObj["address"], 4)}</td>);
+}
 
 
   return (
@@ -405,24 +432,42 @@ function function66(e){
             <div style={{border:'0px solid #0f0', width:'82.5%', left:'17vw',top:'7.5vh', zIndex:'9999', height:'92%', position:'absolute',}}>
               
               {/* address header  */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'center', borderRadius:'10px', height:'10%', position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
+              {/* <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'center', borderRadius:'10px', height:'10%', position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div style={{position:'absolute', top:'5%'}}>
                   <div style={{fontSize:'1.5vw'}}> <a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>  </div>
-                  <div style={{fontSize:'1vw'}}> <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN.startsWith('0x') && heldTokensSelectedAddressFN.length === 42? getEllipsisTxt(heldTokensSelectedAddressFN,6):heldTokensSelectedAddressFN: <>...</>}</span>  </div>
+                  <div style={{fontSize:'1vw'}}> <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span>  </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* aliases */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'10px', height:'20%', position:'absolute',top:'12%',display:'flex', justifyContent:'center',alignItems:'center'}}>
-                <div style={{position:'absolute', top:'2%', paddingLeft:'1vw',width:'100%', border:'0px solid #ff0'}}>
-                  <div style={{fontSize:'1vw',paddingBottom:'2vh',}}>Known Aliases:</div>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'10px', height:'20%', position:'absolute',top:'0%',display:'flex', justifyContent:'center',alignItems:'center'}}>
+                <div style={{position:'absolute', top:'12%', paddingLeft:'1vw',width:'100%', border:'0px solid #ff0'}}>
+                  
+                  
+
                   <div style={{display:'grid', gridTemplateColumns:'repeat(2, 1fr)',width:'100%',border:'0px solid #f0f',fontSize:'0.75vw', textAlign:'center',left:'0',position:'absolute'}}>
-                    <div > ayyyy.eth</div>
-                    <div > ENS </div>
-                    <div > ThisGuyOnOS</div>
-                    <div > OpenSea </div>
-                    <div > Builder9227</div>
-                    <div > In-Game </div>
+                    
+                    
+                    <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'-2vh', paddingRight:'0.1vw'}}>
+                      <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
+                        <td colspan="4">
+                          &nbsp;<span style={{color:'rgba(255,150,18,1)',fontSize:'1.75vh'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span> (<a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>)
+                        </td>
+                      </tr>
+                      <tr style={{backgroundColor:'rgba(0,0,0,0.9)',position:'sticky', top:'0'}}>
+                        <th>Name</th>
+                        <th>Source</th>
+                        <th style={{display:'flex', justifyContent:'center', alignItems:'center', }}><VisibilityIcon style={{fontSize:'2vh'}}/></th>
+                      </tr>
+                      {Object.keys(heldTokensSelectedAddressFN).filter(key => key !== '_id' && key !== 'address').map(token => (
+                        <tr key={token}>
+                          <td>{heldTokensSelectedAddressFN[token]? heldTokensSelectedAddressFN[token].startsWith('0x') && heldTokensSelectedAddressFN[token].length === 42? getEllipsisTxt(heldTokensSelectedAddressFN[token],6):heldTokensSelectedAddressFN[token] : <>...</>}</td>
+                          <td>{token}</td>
+                        </tr>
+                      ))}
+                    </table>
+                    
+                    
                   </div>
                 </div>
               </div>
@@ -458,7 +503,7 @@ function function66(e){
                     <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
                       <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
                         <td colspan="5">
-                          &nbsp;Stashed tokens for <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN.startsWith('0x') && heldTokensSelectedAddressFN.length === 42? getEllipsisTxt(heldTokensSelectedAddressFN,6):heldTokensSelectedAddressFN: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
+                          &nbsp;Stashed tokens for <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
                         </td>
                         
                       </tr>
@@ -514,7 +559,7 @@ function function66(e){
                     <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
                       <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
                         <td colspan="4">
-                          &nbsp;Tokens Held By <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFN? heldTokensSelectedAddressFN.startsWith('0x') && heldTokensSelectedAddressFN.length === 42? getEllipsisTxt(heldTokensSelectedAddressFN,6):heldTokensSelectedAddressFN: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
+                          &nbsp;Tokens Held By <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
                         </td>
                       </tr>
                       
@@ -603,13 +648,13 @@ function function66(e){
                           (a, b) => b[communityHeldListFromSelectedAddy]? a[communityHeldListFromSelectedAddy]? b[communityHeldListFromSelectedAddy].metadata.balance - a[communityHeldListFromSelectedAddy].metadata.balance : 0: 0).map((token, index) => {
                           // console.log('Address that shares common token: ', token.address, communityHeldListFromSelected)   
                           // if (selectedAddressListOfTokens[0][token.address]){ console.log('~~~~~~~~~~',selectedAddressListOfTokens[0][token.address])  }
-                        
+                            console.log('token: ', token)
  
                           //this needs to be paginated on the API side and infinitescrolled here or else it wont be performant for large lists 
                           return (  
                              token.address?
                              <tr onClick={()=>{ console.log('clicked: ',token.address); setheldTokensSelectedAddress(token.address) }} style={{cursor:'pointer', backgroundColor:'rgba(200,150,10,0.4)'}}>
-                               <td>{token.friendlyName.length === 42 && token.friendlyName.startsWith('0x')? <></>: token.friendlyName}</td>
+                               {determineWhichFNtoShow(token.friendlyName)}
                                <td><a target="_blank" href={"https://etherscan.io/address/"+token.address}>{getEllipsisTxt(token.address,4)}</a></td>
                                <td style={{textAlign:'right'}}>
                                 {token[communityHeldListFromSelectedAddy]?
