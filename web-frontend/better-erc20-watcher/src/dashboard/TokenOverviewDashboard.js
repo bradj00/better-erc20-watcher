@@ -206,6 +206,20 @@ function function66(e){
   console.log("function66:", e)
 }
 
+const displayAddressFN = (clickedDetailsAddressFN) => {
+  let firstAddress;
+  Object.keys(clickedDetailsAddressFN).map(key => {
+    if (key !== '_id' && key !== 'address' && !clickedDetailsAddressFN[key].startsWith('0x') ) {
+      firstAddress = clickedDetailsAddressFN[key];
+      return;
+    } else if (key === 'address') {
+      firstAddress = getEllipsisTxt(clickedDetailsAddressFN[key], 6);
+      return;
+    }
+  });
+  return firstAddress;
+}
+
   return (
     <div style={{overflow:'hidden'}}>
     <ThemeProvider theme={mdTheme}>
@@ -289,7 +303,7 @@ function function66(e){
                   
                     :
                     <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-                    {JSON.stringify(clickedDetailsAddressFN)}
+                    {displayAddressFN(clickedDetailsAddressFN)}
                     </div>
                   :
                   <div style={{zIndex:'9999', color:'#999' }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>

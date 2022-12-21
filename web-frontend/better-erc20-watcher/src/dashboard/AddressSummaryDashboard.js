@@ -312,7 +312,7 @@ function function66(e){
 
 function determineWhichFNtoShow(tokenObj){
   for (var key in tokenObj) {
-    if (key !== '_id' && !tokenObj[key].startsWith("0x")) {
+    if (key !== 'ENS' && key !== '_id' && !tokenObj[key].startsWith("0x")) {
         return (<td style={{color:'#fff'}}>{tokenObj[key]}</td>);
     }
   }
@@ -459,12 +459,31 @@ function determineWhichFNtoShow(tokenObj){
                         <th>Source</th>
                         <th style={{display:'flex', justifyContent:'center', alignItems:'center', }}><VisibilityIcon style={{fontSize:'2vh'}}/></th>
                       </tr>
-                      {Object.keys(heldTokensSelectedAddressFN).filter(key => key !== '_id' && key !== 'address').map(token => (
-                        <tr key={token}>
-                          <td>{heldTokensSelectedAddressFN[token]? heldTokensSelectedAddressFN[token].startsWith('0x') && heldTokensSelectedAddressFN[token].length === 42? getEllipsisTxt(heldTokensSelectedAddressFN[token],6):heldTokensSelectedAddressFN[token] : <>...</>}</td>
-                          <td>{token}</td>
-                        </tr>
-                      ))}
+                      {heldTokensSelectedAddressFN? Object.keys(heldTokensSelectedAddressFN).filter(key => key !== '_id' && key !== 'address' && key !== 'ENS').map(friendlyNameKey => {
+                        console.log(typeof friendlyNameKey)
+                       
+                        return(
+                          <tr key={friendlyNameKey}>
+                            <td >{heldTokensSelectedAddressFN[friendlyNameKey]? heldTokensSelectedAddressFN[friendlyNameKey].startsWith('0x') && heldTokensSelectedAddressFN[friendlyNameKey].length === 42? getEllipsisTxt(heldTokensSelectedAddressFN[friendlyNameKey],6):heldTokensSelectedAddressFN[friendlyNameKey] : <>...</>}</td> 
+                            <td style={{overflowX:'hidden',maxWidth:'0.75vw'}}>{friendlyNameKey}</td>
+                          </tr>
+                        )
+                      }): <></>}
+                      
+                      
+                      {heldTokensSelectedAddressFN? Object.keys(heldTokensSelectedAddressFN).filter(key => key === 'ENS').map((friendlyNameKey, index) => {
+                        if(typeof heldTokensSelectedAddressFN[friendlyNameKey] === 'string' && heldTokensSelectedAddressFN[friendlyNameKey].startsWith('0x') && heldTokensSelectedAddressFN[friendlyNameKey].length === 42){
+                          return <></>
+                        }
+                        else {
+                          return(
+                            <tr key={friendlyNameKey}>
+                              <td style={{overflowX:'hidden',maxWidth:'3vw'}}>{heldTokensSelectedAddressFN[friendlyNameKey]? heldTokensSelectedAddressFN[friendlyNameKey] : <></> }</td> 
+                              <td style={{overflowX:'hidden',maxWidth:'1vw'}}>{friendlyNameKey}</td>
+                            </tr>
+                          )
+                        }
+                      }): <></>}
                     </table>
                     
                     
@@ -571,6 +590,10 @@ function determineWhichFNtoShow(tokenObj){
                         <th>USD</th>
                       </tr>
 
+                    
+                     
+
+
                       {selectedAddressListOfTokens? selectedAddressListOfTokens.length > 0? Object.keys(selectedAddressListOfTokens[0]).map((token, index) => {
                           
                           // filter out any tokens that have a '.' in the symbol... these are likely not real tokens                          
@@ -582,9 +605,11 @@ function determineWhichFNtoShow(tokenObj){
                           if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && selectedAddressListOfTokens[0][token].usdValue[0].usdValue && (selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue < 1 || selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue > 1000000000000)  ){
                             return (<></>)
                           }
+                          //filter out blacklisted
                           if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && (selectedAddressListOfTokens[0][token].usdValue[0].blacklisted ) ){
                             return (<></>)
                           }
+                          
                           else {
                             return (
                               selectedAddressListOfTokens[0][token].metadata?
@@ -592,7 +617,7 @@ function determineWhichFNtoShow(tokenObj){
                               
                               <tr style={{backgroundColor: token && communityHeldListFromSelectedAddy? token.toLowerCase() == communityHeldListFromSelectedAddy.toLowerCase()? "rgba(200,150,10,0.5)":"":"", cursor:'pointer'}} onClick={()=>{ setcommunityHeldListFromSelectedAddy(selectedAddressListOfTokens[0][token].metadata.token_address); setclickedTokenUsdQuote(selectedAddressListOfTokens[0][token].usdValue[0].usdValue.usdPrice) }}>
                                 {/* selectedAddressListOfTokens */}
-                                <td >
+                                <td>
                                 <button 
                                   style={{height:'2vh'}}
                                   onClick={() => {

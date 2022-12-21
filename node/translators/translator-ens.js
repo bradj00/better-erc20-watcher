@@ -304,7 +304,13 @@ const LookupSingleAddress =  (singleAddress, count, totalCount) => {
                 
                 
                 if (data.data == null || data.data == '') { data.data = singleAddress }
-                db.collection("lookup").updateOne({address: singleAddress }, {$set:{ 'ENS': data.data }},{upsert: true},  function(err, result) {
+                
+                //convert data.data to an array of values where value is the key value pair
+                let temp1 = [];
+                for (const [key, value] of Object.entries(data.data)) {
+                    temp1.push(value);
+                }
+                db.collection("lookup").updateOne({address: singleAddress }, {$set:{ 'ENS': temp1 }},{upsert: true},  function(err, result) {
                     if (err) console.log('Mongo ERR: ',err);
                     client.close();
                     resolve(data.data);
