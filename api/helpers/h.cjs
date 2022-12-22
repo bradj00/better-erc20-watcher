@@ -57,6 +57,21 @@ const fancylog = (str, bracketedStr, tokenAddress, spinner) => {
   return "";
 };
 
+const displayAddressFN = (clickedDetailsAddressFN) => {
+  let firstAddress;
+  Object.keys(clickedDetailsAddressFN).map(key => {
+    if (key !== '_id' && key !== 'address' && !clickedDetailsAddressFN[key].startsWith('0x') ) {
+      firstAddress = clickedDetailsAddressFN[key];
+      return;
+    } else if (key === 'address') {
+      firstAddress = getEllipsisTxt(clickedDetailsAddressFN[key], 6);
+      return;
+    }
+  });
+  return firstAddress;
+}
+
+exports.displayAddressFN = displayAddressFN;
 exports.fancylog = fancylog;
 exports.getEllipsisTxt = getEllipsisTxt;
 

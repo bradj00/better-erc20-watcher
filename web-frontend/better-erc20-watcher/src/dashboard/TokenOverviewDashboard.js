@@ -209,7 +209,7 @@ function function66(e){
 const displayAddressFN = (clickedDetailsAddressFN) => {
   let firstAddress;
   Object.keys(clickedDetailsAddressFN).map(key => {
-    if (key !== '_id' && key !== 'address' && !clickedDetailsAddressFN[key].startsWith('0x') ) {
+    if (key !== '_id' && key !== 'address' && typeof clickedDetailsAddressFN[key] === 'string' && !clickedDetailsAddressFN[key].startsWith('0x') ) {
       firstAddress = clickedDetailsAddressFN[key];
       return;
     } else if (key === 'address') {

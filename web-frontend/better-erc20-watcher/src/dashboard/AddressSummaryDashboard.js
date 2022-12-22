@@ -35,8 +35,12 @@ import ConnectionStatusBanner from './ConnectionStatusBanner';
 import '../App.css';
 import RotateRightIcon from '@mui/icons-material/RotateRight';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-TimeAgo.addDefaultLocale(en);
+import CommunityTokenTr from './subcomponents/CommunityTokenTr';
+import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
 
+
+
+TimeAgo.addDefaultLocale(en);
 
 
 function Copyright(props) {
@@ -106,6 +110,22 @@ const mdTheme = createTheme({
   },
 });
 
+const displayAddressFN = (clickedDetailsAddressFN) => {
+  let firstAddress;
+  Object.keys(clickedDetailsAddressFN).map(key => {
+    if (key !== '_id' && key !== 'address' && typeof clickedDetailsAddressFN[key] === 'string' && !clickedDetailsAddressFN[key].startsWith('0x') ) {
+      firstAddress = clickedDetailsAddressFN[key];
+      return;
+    } else if (key === 'address') {
+      firstAddress = getEllipsisTxt(clickedDetailsAddressFN[key], 6);
+      return;
+    }
+  });
+  return firstAddress;
+}
+
+
+
 function DashboardContent() {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
@@ -161,15 +181,10 @@ function DashboardContent() {
 
   useEffect(() => {
     console.log('heldTokensSelectedAddressFN: ', heldTokensSelectedAddressFN);
-    for (const key in heldTokensSelectedAddressFN) {
-      if (heldTokensSelectedAddressFN.hasOwnProperty(key) && key !== "_id") {
-        const element = heldTokensSelectedAddressFN[key];
-        if (!element.startsWith("0x")) {
-          setheldTokensSelectedAddressFNdisplayed(element);
-          break;
-        }
+      if (heldTokensSelectedAddressFN){
+        setheldTokensSelectedAddressFNdisplayed(displayAddressFN(heldTokensSelectedAddressFN));
       }
-    }
+         
   },[heldTokensSelectedAddressFN]);
 
   useEffect(() => {
@@ -439,7 +454,7 @@ function determineWhichFNtoShow(tokenObj){
                 </div>
               </div> */}
 
-              {/* aliases */}
+              {/* aliases dashboard*/}
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'10px', height:'20%', position:'absolute',top:'0%',display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div style={{position:'absolute', top:'12%', paddingLeft:'1vw',width:'100%', border:'0px solid #ff0'}}>
                   
@@ -451,7 +466,7 @@ function determineWhichFNtoShow(tokenObj){
                     <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'-2vh', paddingRight:'0.1vw'}}>
                       <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
                         <td colspan="4">
-                          &nbsp;<span style={{color:'rgba(255,150,18,1)',fontSize:'1.75vh'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span> (<a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>)
+                          &nbsp;Ids of <span style={{color:'rgba(255,150,18,1)',fontSize:'1.75vh'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span> (<a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>)
                         </td>
                       </tr>
                       <tr style={{backgroundColor:'rgba(0,0,0,0.9)',position:'sticky', top:'0'}}>
@@ -460,14 +475,15 @@ function determineWhichFNtoShow(tokenObj){
                         <th style={{display:'flex', justifyContent:'center', alignItems:'center', }}><VisibilityIcon style={{fontSize:'2vh'}}/></th>
                       </tr>
                       {heldTokensSelectedAddressFN? Object.keys(heldTokensSelectedAddressFN).filter(key => key !== '_id' && key !== 'address' && key !== 'ENS').map(friendlyNameKey => {
-                        console.log(typeof friendlyNameKey)
-                       
-                        return(
-                          <tr key={friendlyNameKey}>
-                            <td >{heldTokensSelectedAddressFN[friendlyNameKey]? heldTokensSelectedAddressFN[friendlyNameKey].startsWith('0x') && heldTokensSelectedAddressFN[friendlyNameKey].length === 42? getEllipsisTxt(heldTokensSelectedAddressFN[friendlyNameKey],6):heldTokensSelectedAddressFN[friendlyNameKey] : <>...</>}</td> 
-                            <td style={{overflowX:'hidden',maxWidth:'0.75vw'}}>{friendlyNameKey}</td>
-                          </tr>
+                        // console.log(typeof friendlyNameKey)
+                        if(!(heldTokensSelectedAddressFN[friendlyNameKey].startsWith('0x') && heldTokensSelectedAddressFN[friendlyNameKey].length === 42)){
+                         return(
+                         <tr key={friendlyNameKey}>
+                            <td >{heldTokensSelectedAddressFN[friendlyNameKey]? heldTokensSelectedAddressFN[friendlyNameKey] : <>...</>}</td> 
+                            <td style={{overflowX:'hidden',maxWidth:'0.75vw'}}>{friendlyNameKey === "manuallyDefined" ? "manual" : friendlyNameKey}</td>
+                         </tr>
                         )
+                      }
                       }): <></>}
                       
                       
@@ -510,7 +526,7 @@ function determineWhichFNtoShow(tokenObj){
                 </div>
               </div>
 
-              {/* User-defined notes */}
+              {/* Staked/Deposited/Stashed tokens dashboard */}
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', }}>
                 {/* <div> */}
                   {/* <div style={{fontSize:'2vw'}}>Staked Balances</div>
@@ -595,6 +611,8 @@ function determineWhichFNtoShow(tokenObj){
 
 
                       {selectedAddressListOfTokens? selectedAddressListOfTokens.length > 0? Object.keys(selectedAddressListOfTokens[0]).map((token, index) => {
+                          // <CommunityTokenTr key={index} token={token} index={index} selectedAddressListOfTokens={selectedAddressListOfTokens} />
+                          
                           
                           // filter out any tokens that have a '.' in the symbol... these are likely not real tokens                          
                           if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].metadata && selectedAddressListOfTokens[0][token].metadata.symbol && selectedAddressListOfTokens[0][token].metadata.symbol.toLowerCase().includes('.') ){
@@ -663,6 +681,7 @@ function determineWhichFNtoShow(tokenObj){
                         </tr>
       
                         <tr style={{position:'sticky', top:'0',backgroundColor:'rgba(0,0,0,0.9)',}}>
+                          <th><ModeEditOutlineIcon style={{fontSize:'0.75vw'}}/></th>
                           <th>Name</th>
                           <th>Address</th>
                           <th>Balance</th>
@@ -671,28 +690,30 @@ function determineWhichFNtoShow(tokenObj){
                         
                         {communityHeldListFromSelected && communityHeldListFromSelected.length > 0 && communityHeldListFromSelectedAddy? communityHeldListFromSelected.length > 0? communityHeldListFromSelected.sort(
                           (a, b) => b[communityHeldListFromSelectedAddy]? a[communityHeldListFromSelectedAddy]? b[communityHeldListFromSelectedAddy].metadata.balance - a[communityHeldListFromSelectedAddy].metadata.balance : 0: 0).map((token, index) => {
-                          // console.log('Address that shares common token: ', token.address, communityHeldListFromSelected)   
-                          // if (selectedAddressListOfTokens[0][token.address]){ console.log('~~~~~~~~~~',selectedAddressListOfTokens[0][token.address])  }
-                            console.log('token: ', token)
+                          return(<CommunityTokenTr key={index} token={token} index={index} />)
+                          
+  //                           // console.log('Address that shares common token: ', token.address, communityHeldListFromSelected)   
+  //                         // if (selectedAddressListOfTokens[0][token.address]){ console.log('~~~~~~~~~~',selectedAddressListOfTokens[0][token.address])  }
+  //                           console.log('token: ', token)
  
-                          //this needs to be paginated on the API side and infinitescrolled here or else it wont be performant for large lists 
-                          return (  
-                             token.address?
-                             <tr onClick={()=>{ console.log('clicked: ',token.address); setheldTokensSelectedAddress(token.address) }} style={{cursor:'pointer', backgroundColor:'rgba(200,150,10,0.4)'}}>
-                               {determineWhichFNtoShow(token.friendlyName)}
-                               <td><a target="_blank" href={"https://etherscan.io/address/"+token.address}>{getEllipsisTxt(token.address,4)}</a></td>
-                               <td style={{textAlign:'right'}}>
-                                {token[communityHeldListFromSelectedAddy]?
-                                 commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals)).toFixed(4))
-                                 : <></>}
-                               </td>
+  //                         //this needs to be paginated on the API side and infinitescrolled here or else it wont be performant for large lists 
+  //                         return (  
+  //                            token.address?
+  //                            <tr onClick={()=>{ console.log('clicked: ',token.address); setheldTokensSelectedAddress(token.address) }} style={{cursor:'pointer', backgroundColor:'rgba(200,150,10,0.4)'}}>
+  //                              {determineWhichFNtoShow(token.friendlyName)}
+  //                              <td><a target="_blank" href={"https://etherscan.io/address/"+token.address}>{getEllipsisTxt(token.address,4)}</a></td>
+  //                              <td style={{textAlign:'right'}}>
+  //                               {token[communityHeldListFromSelectedAddy]?
+  //                                commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals)).toFixed(4))
+  //                                : <></>}
+  //                              </td>
                                 
-                               <td style={{textAlign:'right'}}>
-                                  $ {clickedTokenUsdQuote?token[communityHeldListFromSelectedAddy]? commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals) * clickedTokenUsdQuote).toFixed(2)): <></>: <></>}
-                               </td>
-                             </tr>
-                             : <> </>
-  )
+  //                              <td style={{textAlign:'right'}}>
+  //                                 $ {clickedTokenUsdQuote?token[communityHeldListFromSelectedAddy]? commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals) * clickedTokenUsdQuote).toFixed(2)): <></>: <></>}
+  //                              </td>
+  //                            </tr>
+  //                            : <> </>
+  // )
                          })
                          : <> </>
                          : <> </>

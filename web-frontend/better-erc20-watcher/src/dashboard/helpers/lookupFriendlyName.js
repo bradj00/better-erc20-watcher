@@ -36,8 +36,8 @@ function getLookup(){
 
 
 function updateAddressName(){
-    const friendlyName = "Cosmic_Sandwich";
-    const address = "0x451e9948f930c33bcda8d97f99fc1df4737921db";
+    const friendlyName = "";
+    const address = "";
 
     MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
         if (err) throw err;

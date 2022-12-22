@@ -23,13 +23,24 @@ const dbNamePivots = 'pivotTables';
 
 console.clear();
 
+//////////////////////////////////////////////////////
+// we need this script to update the community held tokens, since we need to update balances for ALL tokens held by ALL addresses in the watchedTokens database to get that data
+// the question is, how often do we want to do this, or do it on demand maybe?
+//////////////////////////////////////////////////////
+
+//1 get all unique addresses from the watchedTokens database and add them to the pivot table 'allAddresses'
 // main();
 
-// update all held tokens for all addresses that have made TXs in the watchedTokens database
-// getHeldTokensForAllAddresses();
+//2 update all held tokens for all addresses that have made TXs in the watchedTokens database
+getHeldTokensForAllAddresses(true);
 
-//update all token prices in pivot table 'allTokenPrices'
-getAllTokenBalanceUsdPrices();
+
+// currently 2800+ tokens to sift through. Maybe this should be done on demand from the community held tokens screen (refresh for just that token)
+//3 update all token prices in pivot table 'allTokenPrices'
+// getAllTokenBalanceUsdPrices();
+
+
+
 
 function main() {
     getAllAddresses()
@@ -53,16 +64,25 @@ function main() {
     }, 1000 * 60 * 60 * 24); // run every 24 hours
 }
 
-async function getHeldTokensForAllAddresses() {
+
+//somehow we need to call this logic dynamically when the user clicks on a token in the community held tokens screen
+async function getHeldTokensForAllAddresses(freshData) {
     // get all addresses from pivot table 'allAddresses'
     const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
     const db = client.db("pivotTables");
     let allAddresses = await db.collection("allAddresses").find({}).toArray();
-
+    let filteredAddresses;
+    
     // filter out addresses that have already been processed (already have more than 2 fields in the document, indicating we pulled token balances from moralis successfully)
-    let filteredAddresses = allAddresses.filter(address => 
-        Object.keys(address).length <= 2
-    );
+    if (!freshData) {
+        filteredAddresses = allAddresses.filter(address => 
+            Object.keys(address).length <= 2
+        );
+    }
+    else {
+        filteredAddresses = allAddresses
+    }
+
     // filter filterdAddresses again, removing any addresses that have a field called 'probablyContract' (we set this field if we couldn't get token balances from moralis, indicating the address is probably a contract)
     filteredAddresses = filteredAddresses.filter(address =>
         !address.hasOwnProperty('probablyContract')
@@ -137,6 +157,7 @@ async function getAllAddresses() {
     const coolAddresses = [];
     for (const collection of collections) {
         const addresses = await db.collection(collection.name).find({}, { projection: { to_address: 1, from_address: 1, address: 1 } }).toArray();
+        // console.log('addresses.length: ', addresses.length)
         for (const address of addresses) {
             if (address.to_address) {
                 coolAddresses.push(address.to_address);

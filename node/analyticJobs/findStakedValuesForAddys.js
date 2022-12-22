@@ -23,10 +23,10 @@ const stakingAddysArr = [
 //then for each address in "allAddresses", check each address against each staking address
 //therefore, each addy will be scanned for staking/deposits and their balance updated 
 
-getPlayerMegaPerkStaked('0x451e9948f930c33bcda8d97f99fc1df4737921db')
-.then((res) => {
-    console.log('totalPerkStated: ', res)
-})
+// getPlayerMegaPerkStaked('')
+// .then((res) => {
+//     console.log('totalPerkStated: ', res)
+// })
 async function getPlayerMegaPerkStaked(playerAddress) {
     return new Promise(async (resolve, reject) => {
         let payload = {"address":playerAddress}

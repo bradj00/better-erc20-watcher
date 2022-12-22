@@ -43,8 +43,14 @@ const DatabaseInfoGrabber = () => {
     
     const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
     const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
+    const {updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest} = useContext(GeneralContext);
     
-    
+    useEffect(() => {
+        if (updateCommitFriendlyNameRequest){
+            console.log('~~~~ updateCommitFriendlyNameRequest: ', updateCommitFriendlyNameRequest);
+            updateAFriendlyName(updateCommitFriendlyNameRequest.address, updateCommitFriendlyNameRequest.friendlyName)
+        }
+    },[updateCommitFriendlyNameRequest]);
     useEffect(() => {
         console.log('MinAmountFilterValue,MaxAmountFilterValue: ', MinAmountFilterValue,MaxAmountFilterValue)
         if (MinAmountFilterValue !=1 && MaxAmountFilterValue != 1){
@@ -165,6 +171,9 @@ const DatabaseInfoGrabber = () => {
         .then(response => response.json())
         .then(data => {
             console.log('ok: ', data);
+        })
+        .catch(err => {
+            console.log('--error updating friendly name: ', err);
         });
 
 
@@ -253,7 +262,7 @@ const DatabaseInfoGrabber = () => {
     useEffect(() => {
         if (updateFriendlyName){
             console.log('updating address '+RequestFriendlyLookup+' with manually defined Friendly Name: ', updateFriendlyName);
-            updateAFriendlyName(RequestFriendlyLookup,updateFriendlyName);
+            updateAFriendlyName(updateFriendlyName.address,updateFriendlyName.friendlyName);
         }
     },[updateFriendlyName]);
 
@@ -357,7 +366,7 @@ const DatabaseInfoGrabber = () => {
     },[data])
 
     useEffect(() => {
-        // console.log('filteredAddyData: ',filteredAddyData);
+        console.log('filteredAddyData: ',filteredAddyData);
         setfilteredtxData(filteredAddyData)
     },[filteredAddyData])
     

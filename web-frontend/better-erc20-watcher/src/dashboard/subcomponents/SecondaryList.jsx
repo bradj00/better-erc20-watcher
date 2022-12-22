@@ -69,6 +69,21 @@ const SecondaryList = () => {
         document.body.removeChild(textArea)
     };
 
+    const displayAddressFN = (clickedDetailsAddressFN) => {
+        let firstAddress;
+        Object.keys(clickedDetailsAddressFN).map(key => {
+          if (key !== '_id' && key !== 'address' && typeof clickedDetailsAddressFN[key] === 'string' && !clickedDetailsAddressFN[key].startsWith('0x') ) {
+            firstAddress = clickedDetailsAddressFN[key];
+            return;
+          } else if (key === 'address') {
+            firstAddress = getEllipsisTxt(clickedDetailsAddressFN[key], 6);
+            return;
+          }
+        });
+        return firstAddress;
+      }
+
+
     return (
         <React.Fragment>
             {/* <ListSubheader component="div" inset> */}
@@ -122,7 +137,7 @@ const SecondaryList = () => {
                 }
 
                 <div style={{zIndex:'10000', textAlign:'center', display:'flex', justifyContent:'center',alignItems:'center', border:'1px solid rgba(0,0,20,0.4)', borderRight:'0px solid #fff',borderLeft:'0px solid #fff', backgroundColor:'rgba(100,100,120,0.1)', position:'absolute',bottom:'0%',width:'100%',height:'40%',}}>
-                    {friendlyLookupResponse? friendlyLookupResponse.length > 0?
+                    {friendlyLookupResponse? 
                         <>
                             <div onClick={()=>{CopyToClipboard(RequestFriendlyLookup)}} style={{cursor:'pointer', position:'absolute',top:'1%',fontSize:'1vw'}}>
                                 {getEllipsisTxt(RequestFriendlyLookup, 6)}
@@ -130,7 +145,7 @@ const SecondaryList = () => {
 
                             <div style={{position:'absolute',top:'13%',left:'0%',width:'100%'}}>
                                 {/* {friendlyLookupResponse} */}
-                                FN:<input  value={DesiredFriendlyNameUpdate} onChange={(e) => setDesiredFriendlyNameUpdate(e.target.value)} style={{width:'82%', padding:'2%', backgroundColor:'rgba(0,0,0,0.4)', color:'#999', border:'none', textAlign:'center'}} placeholder={friendlyLookupResponse} />
+                                FN:<input  value={DesiredFriendlyNameUpdate} onChange={(e) => setDesiredFriendlyNameUpdate(e.target.value)} style={{width:'82%', padding:'2%', backgroundColor:'rgba(0,0,0,0.4)', color:'#999', border:'none', textAlign:'center'}} placeholder={displayAddressFN(friendlyLookupResponse)} />
                             </div>
 
                             <div onClick={()=>{finalizeFriendlyNameUpdate()}} style={{position:'absolute',top:'25%', width:'50%', height: '10%', backgroundColor:'rgba(0,0,0,0.4)', display:'flex', justifyContent:'center', alignItems:'center'}}>
@@ -138,7 +153,7 @@ const SecondaryList = () => {
                             </div>
                         </>
                     : 
-                        <>...</> : <>+++</>
+                        <>.qq..</> 
                         
                     }
                 </div>

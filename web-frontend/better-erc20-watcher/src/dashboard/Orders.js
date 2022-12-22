@@ -175,11 +175,11 @@ export default function Orders() {
     else if (rowClickMode == 'filter'){
       if (fromOrTo == 'from'){
         setclickedDetailsAddress(row.from_address)
-        setclickedDetailsAddressFN(row.from_address_friendlyName)
+        setclickedDetailsAddressFN(displayAddressFN(row.from_address_friendlyName))
       }
       else if (fromOrTo == 'to'){
         setclickedDetailsAddress(row.to_address)
-        setclickedDetailsAddressFN(row.to_address_friendlyName)
+        setclickedDetailsAddressFN(displayAddressFN(row.to_address_friendlyName))
       }
     }
     else if (rowClickMode == 'summary'){
@@ -196,6 +196,25 @@ export default function Orders() {
     // 
   }
 
+
+  const displayAddressFN = (clickedDetailsAddressFN) => {
+    let firstAddress;
+    Object.keys(clickedDetailsAddressFN).map(key => {
+      if (key !== '_id' && key !== 'ENS' && key !== 'address' && ( typeof clickedDetailsAddressFN[key] === 'string' && !clickedDetailsAddressFN[key].startsWith('0x') ) ) {
+        firstAddress = clickedDetailsAddressFN[key];
+        return;
+      }
+      else if (key === 'ENS' && Array.isArray(clickedDetailsAddressFN[key])) {
+        firstAddress = clickedDetailsAddressFN[key][0];
+        return;
+      }
+      else if (key === 'address') {
+        firstAddress = getEllipsisTxt(clickedDetailsAddressFN[key], 6);
+        return;
+      }
+    });
+    return firstAddress;
+  }
 
 
   return (
@@ -237,8 +256,8 @@ export default function Orders() {
                   <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
                   {/* <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell> */}
                   <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
-                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}  onClick={ ()=>{processTableClicked(row, 'from')} }   >{((row.from_address_friendlyName == undefined) )? getEllipsisTxt(row.from_address, 6): Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && key !== 'address'&& key !== 'ENS' && !value.startsWith('0x')) ? Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))? Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))[1] : getEllipsisTxt(row.from_address_friendlyName.address,6): getEllipsisTxt(row.from_address_friendlyName.address,6)}</TableCell>
-                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}      onClick={ ()=>{processTableClicked(row, 'to') } }>   {((row.to_address_friendlyName== undefined) )? getEllipsisTxt(row.to_address, 6): Object.entries(row.to_address_friendlyName).find(([key, value]) => key !== '_id' && key !== 'address'&& key !== 'ENS' && !value.startsWith('0x')) ? Object.entries(row.to_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))? Object.entries(row.to_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))[1] : getEllipsisTxt(row.to_address_friendlyName.address,6):getEllipsisTxt(row.to_address_friendlyName.address,6)} </TableCell>
+                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}  onClick={ ()=>{processTableClicked(row, 'from')} }>     {(row.from_address_friendlyName == undefined) ? getEllipsisTxt(row.from_address, 6): displayAddressFN(row.from_address_friendlyName)}</TableCell>
+                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}      onClick={ ()=>{processTableClicked(row, 'to') }}>   {(row.to_address_friendlyName== undefined) ? getEllipsisTxt(row.to_address, 6): displayAddressFN(row.to_address_friendlyName)} </TableCell>
                   <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
                 </TableRow>
                 
@@ -257,7 +276,7 @@ export default function Orders() {
                 <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
                 <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
                 <TableCell style={{fontSize:'1vw',color: "white"}}  onClick={ ()=>{processTableClicked(row, 'from') } }>{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && key !== 'address'&& key !== 'ENS' && !value.startsWith('0x')) ? Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))? Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))[1] : getEllipsisTxt(row.from_address_friendlyName.address,6): getEllipsisTxt(row.from_address_friendlyName.address,6)}</TableCell>
-                <TableCell style={{fontSize:'1vw',color: "white"}}      onClick={ ()=>{processTableClicked(row, 'to') } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6): Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && key !== 'address'&& key !== 'ENS' && !value.startsWith('0x')) ? Object.entries(row.to_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' &&  !value.startsWith('0x'))? Object.entries(row.to_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))[1] : getEllipsisTxt(row.to_address_friendlyName.address,6):getEllipsisTxt(row.to_address_friendlyName.address,6)}</TableCell>
+                <TableCell style={{fontSize:'1vw',color: "white"}}      onClick={ ()=>{processTableClicked(row, 'to') } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6):   Object.entries(row.to_address_friendlyName).find(([key, value]) => key !== '_id' && key !== 'address'&& key !== 'ENS' && !value.startsWith('0x')) ? Object.entries(row.to_address_friendlyName)  .find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))? Object.entries(row.to_address_friendlyName)  .find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))[1] : getEllipsisTxt(row.to_address_friendlyName.address,6):   getEllipsisTxt(row.to_address_friendlyName.address,6)  }</TableCell>
                 <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
               </TableRow>
             )})

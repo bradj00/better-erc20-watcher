@@ -48,6 +48,7 @@ const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState()
 
 const [systemStatuses, setSystemStatuses] = useState();
 
+const [updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest] = useState();
 const [RequestFriendlyLookup, setRequestFriendlyLookup] = useState();
 const [friendlyLookupResponse, setFriendlyLookupResponse] = useState();
 const [updateFriendlyName, setupdateFriendlyName] = useState();
@@ -95,8 +96,10 @@ const contextObj = {
   selectedAddyInGameBalance, setselectedAddyInGameBalance,
   megaPriceUsd, setmegaPriceUsd,
   heldTokensSelectedAddressFNdisplayed, setheldTokensSelectedAddressFNdisplayed,
-
+  updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest,
   
+
+
 
 }
 

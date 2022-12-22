@@ -98,7 +98,7 @@ app.listen(listenPort, () => {
         
         app.get('/updateTokenBalances/:address', cors(),(req, res) => {
             const theAddy = req.params.address;
-            console.log('>>>>>> address: ', theAddy);
+            console.log('>>>>>> update balances for: ', theAddy);
             let url = 'https://deep-index.moralis.io/api/v2/'+theAddy+'/erc20?chain=eth';
             // console.log('>>>>>> url: ', url);
             axios.get(url ,{
@@ -113,6 +113,7 @@ app.listen(listenPort, () => {
                     if (err) {
                         h.fancylog(err, 'error');
                     }
+                    console.log('data: ', data);
                     const db = client.db('pivotTables');
                     const collection = db.collection('allAddresses');
                     // update document where "address" == theAddy
@@ -212,13 +213,15 @@ app.listen(listenPort, () => {
                     
                     // go through addressColumns[0] and add usdValue to each token
                     for (const key of keys) {
-                        if (addressColumns[0][key]){
-
+                        if (typeof addressColumns[0][key] !== 'undefined' && key !== 'probablyContract' ) { 
                             const knownUsdTokenValueObj = await db.collection('tokenUsdValues').find({address: key}).toArray();
                             addressColumns[0][key]["usdValue"] = knownUsdTokenValueObj;
                             if (addressColumns[0][key]["usdValue"][0] && addressColumns[0][key]["usdValue"][0].usdValue){
                                 addressColumns[0][key]["usdValue"][0].usdValue["extendedValue"] = addressColumns[0][key]["usdValue"][0].usdValue.usdPrice * (addressColumns[0][key]["metadata"]["balance"] / 10**addressColumns[0][key]["metadata"]["decimals"]);
-                            }
+                            }   
+                        }else {
+                            console.log('weird key: ', key);
+                            console.log('weird addressColumns[0][key]: ', addressColumns[0][key]);
                         }
                     }
 
@@ -389,7 +392,7 @@ app.listen(listenPort, () => {
                 const collection = db.collection('stakedBalances');
                 const stakedBalances = await collection.find({address: address}).toArray();
                 
-                if ((stakedBalances.length == 0) || getFresh==true) {
+                if ((stakedBalances.length == 0) && getFresh==true) {
                     //fetch in-game balances
                     console.log('fetching................')
                     let payload = {"jsonrpc":"2.0","id":17,"method":"eth_call","params":[{"data":"0xf8b2cb4f000000000000000000000000"+slicedAddress,"to":"0x0d4a54716005d11f1e42c4d615ab8221f9a0d7e3"},"latest"]}
@@ -471,7 +474,7 @@ app.listen(listenPort, () => {
                     });
                 }
                 else if (pageNumber == 'chart') {
-                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(2000).toArray(function(err, result) {    
+                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(5000).toArray(function(err, result) {    
                         client.close();
                         res.send({totalPages: 1, result: condenseArray(result, filterMin, filterMax)})                    
                         // res.send({totalPages: 1, result: result}) 
@@ -566,7 +569,7 @@ app.listen(listenPort, () => {
 
 
         app.get('/updateFN/:address/:friendlyName',  cors(), async (req, res) => {
-            console.log('got FN update request: ',);
+            console.log('got FN update request: ', chalk.red(req.params.address), chalk.rgb(0,255,0)(req.params.friendlyName));
 
 
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
