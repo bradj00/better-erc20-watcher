@@ -23,7 +23,7 @@ using:
 <sub>( Address Summary stats, includes held tokens common to the existing database of watched addresses )</sub>
 
 <sub>( This will be good for stepping into a community and quickly seeing commonly held ERC20 tokens and patterns)</sub>
-![image](https://user-images.githubusercontent.com/99688245/208322968-e5399ea5-bfee-4968-9c21-367349adc997.png)
+![image](https://user-images.githubusercontent.com/99688245/209067702-db424e20-f33a-4654-9b50-1bff76a50d1c.png)
 
 
 <sub>( translator.js service querying OpenSea api for human readable name and caching to mongo )</sub>
