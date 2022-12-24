@@ -44,6 +44,8 @@ const DatabaseInfoGrabber = () => {
     const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
     const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
     const {updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest} = useContext(GeneralContext);
+    const {selectedAddressTxList, setselectedAddressTxList} = useContext(GeneralContext);
+    const {clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList} = useContext(GeneralContext);
     
     useEffect(() => {
         if (updateCommitFriendlyNameRequest){
@@ -70,6 +72,7 @@ const DatabaseInfoGrabber = () => {
             fetchSelectedAddressHeldTokens( heldTokensSelectedAddress )
             fetchFNforAddress( heldTokensSelectedAddress )
             fetchInGameMegaBalance( heldTokensSelectedAddress )
+            fetchAddressTokenTxList(heldTokensSelectedAddress);
         }
     },[heldTokensSelectedAddress]);
 
@@ -149,6 +152,35 @@ const DatabaseInfoGrabber = () => {
         })
     }
 
+    function fetchAddressTokenTxList(address) {
+        // setclockCountsArrayForSelectedAddressTxList(); //clear it out
+        console.log('fetching address token tx list for address: ', address)
+        fetch('http://10.0.3.2:4000/getAddressTXsforToken/'+address+'/filler-filter-change-me-when-we-add-token-filtering-to-mongo')
+        .then(response => response.json())
+        .then(data => {
+            console.log('address token tx list: ', data);
+            let temp = [];
+            //map each item.block_timestamp in data to a 24 hour time window and push to temp array
+            data.map((item) => {
+                temp.push(parseInt(item.block_timestamp.slice(11,13)) )
+                console.log('_______________________________________________________')
+                console.log(item.block_timestamp.slice(11,13) )
+                console.log('_______________________________________________________')
+            });
+            console.log('temp: ', temp);
+            //count the number of times each number appears in the  temp array and push to a new array
+            let counts = {};
+            temp.forEach(function(x) { counts[x] = (counts[x] || 0)+1; });
+            console.log('counts: ', counts);
+            //convert the counts object to an array of values
+            let countsArray = Object.values(counts);
+            console.log('countsArray: ', countsArray);
+
+            setclockCountsArrayForSelectedAddressTxList(countsArray);
+            setselectedAddressTxList(data);
+            // setWatchedTokenList(data);
+        })
+    }
     function fetchWatchedTokenList() {
         fetch('http://10.0.3.2:4000/watchedTokenList')
         .then(response => response.json())
@@ -270,6 +302,7 @@ const DatabaseInfoGrabber = () => {
         if (clickedDetailsAddress){
             console.log('clickedDetailsAddress: ', clickedDetailsAddress);
             fetchAddressFilteredTransactions(viewingTokenAddress, clickedDetailsAddress);
+            
         }else {
             console.log('clearing filtered txs')
             setFilteredAddyData();

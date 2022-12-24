@@ -39,6 +39,8 @@ const [chainDataHeartbeat, setchainDataHeartbeat] = useState();
 const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = useState();
 const [latestEthBlock, setlatestEthBlock] = useState();
 const [getUpdatedTokenBalance, setgetUpdatedTokenBalance] = useState();
+const [selectedAddressTxList, setselectedAddressTxList] = useState();
+const [clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList] = useState();
 
 
 const [MinAmountFilterValue, setMinAmountFilterValue] = useState(1);
@@ -97,8 +99,8 @@ const contextObj = {
   megaPriceUsd, setmegaPriceUsd,
   heldTokensSelectedAddressFNdisplayed, setheldTokensSelectedAddressFNdisplayed,
   updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest,
-  
-
+  selectedAddressTxList, setselectedAddressTxList,
+  clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList,
 
 
 }

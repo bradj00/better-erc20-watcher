@@ -402,49 +402,49 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
 
                     //for each token in tokenTxs, look up the friendlyNames for from and to addresses and add them to the object
                     tokenTxs.map((tx, index) => {
-                        return new Promise((resolve, reject) => {
-                            lookupSingleAddress(tx.from_address, index2).then((q) => {
-                                lookupSingleAddress(tx.to_address, index3).then((x) => {
+                        // return new Promise((resolve, reject) => {
+                            lookupSingleAddress(tx.from_address).then((q) => {
+                                lookupSingleAddress(tx.to_address).then((x) => {
                                     console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
                                     
                                     tokenTxs[index].from_address_friendlyName = q;
                                     tokenTxs[index].to_address_friendlyName = x;
 
-                                    if (index == tx.length-1){
-                                        resolve(true);
-                                    }
+                                    // if (index == tx.length-1){
+                                    //     resolve(true);
+                                    // }
                                 });
                             });
-                        });
-                    }).then(() => {
+                        // });
+                    })
 
-                        console.log('---------------------')
-                        console.log(tokenTxs);
-                        console.log('tokenTxs: ',tokenTxs.length);
-                        console.log('---------------------')
+                    console.log('---------------------')
+                    console.log(tokenTxs);
+                    console.log('tokenTxs: ',tokenTxs.length);
+                    console.log('---------------------')
 
-                        collection.insertMany(tokenTxs, [{"continueOnError": true}], function(err, res) {
-                            if (err) {
-    
-                                if (err && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
-                                    duplicateCount++;
-                                    h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
-                                } else if (res && res.insertedCount) {
-                                    h.fancylog("Number of documents inserted: " + res.insertedCount, ' mongo ', spinner) ;
-                                } else {
-                                    h.fancylog(chalk.red('mongo err: '), err, ' error ', spinner) ;
-                                }
-                                client.close();
-                                resolve(true);
+                    collection.insertMany(tokenTxs, [{"continueOnError": true}], function(err, res) {
+                        if (err) {
+
+                            if (err && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
+                                duplicateCount++;
+                                h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
+                            } else if (res && res.insertedCount) {
+                                h.fancylog("Number of documents inserted: " + res.insertedCount, ' mongo ', spinner) ;
                             } else {
-                                //there's no error and insertion was successful. 
-                                h.fancylog('cached ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
-                                client.close();
-                                resolve(true);
+                                h.fancylog(chalk.red('mongo err: '), err, ' error ', spinner) ;
                             }
-                            // client.close();
-                        });
+                            client.close();
+                            resolve(true);
+                        } else {
+                            //there's no error and insertion was successful. 
+                            h.fancylog('cached ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
+                            client.close();
+                            resolve(true);
+                        }
+                        // client.close();
                     });
+                
                         
                     
                 });

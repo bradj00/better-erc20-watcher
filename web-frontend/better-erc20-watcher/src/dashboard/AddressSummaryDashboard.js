@@ -37,7 +37,7 @@ import RotateRightIcon from '@mui/icons-material/RotateRight';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import CommunityTokenTr from './subcomponents/CommunityTokenTr';
 import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
-
+import TxTimeOfDayChart from './subcomponents/TxTimeOfDayChart.tsx';
 
 
 TimeAgo.addDefaultLocale(en);
@@ -142,6 +142,8 @@ function DashboardContent() {
   const [clickedTokenUsdQuote, setclickedTokenUsdQuote] = React.useState({});
   // const [heldValueUsd, setheldValueUsd] = React.useState(0);
   
+  const {selectedAddressTxList, setselectedAddressTxList} = useContext(GeneralContext);
+
   const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
   const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
   const {systemStatuses, setSystemStatuses} = useContext(GeneralContext);
@@ -159,6 +161,10 @@ function DashboardContent() {
   
   const {selectedAddressListOfTokens, setselectedAddressListOfTokens} = useContext(GeneralContext);
   const [selectedAddressListOfTokensSorted, setselectedAddressListOfTokensSorted] = React.useState();
+  
+  
+  const {clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList} = useContext(GeneralContext);
+
 
   const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
   const {heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN} = useContext(GeneralContext);
@@ -518,12 +524,16 @@ function determineWhichFNtoShow(tokenObj){
 
               {/* Token Heuristic Inflow/Outflow */}
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',top:'33.5%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
-                <div>
+                {/* <div>
                   <div>Heuristic Inflow/Outflow</div>
                   <div>Common Senders To this Address:</div>
                   <div>Common Receivers from this Address:</div>
                   <div>Initially funded from: (Binance, clickable address, etc)</div>
-                </div>
+                </div> */}
+                  <div style={{position:'absolute', left:'0', top:'0',width:'100%', height:'100%', border:'0px solid #0f0'}}>
+                    <TxTimeOfDayChart selectedAddressTxList={selectedAddressTxList} clockCountsArrayForSelectedAddressTxList={clockCountsArrayForSelectedAddressTxList}/>
+                  </div>
+
               </div>
 
               {/* Staked/Deposited/Stashed tokens dashboard */}

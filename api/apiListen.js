@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import * as h from './helpers/h.cjs'; 
 dotenv.config();
 // console.log('API_KEY: ', process.env.API_KEY);
+import getAllPaginatedData  from './helpers/fetchMoralisWithCursor.js';
 
 const MongoClient = MongoClientQ.MongoClient;
 // const mongoUrl = 'mongodb://localhost:27017';
@@ -15,13 +16,13 @@ const mongoUrl = process.env.MONGO_CONNECT_STRING;
 const dbName = process.env.DB_NAME;  
 const dbNameFN = process.env.DB_NAME_FN;
 const listenPort = process.env.API_LISTEN_PORT; 
+const moralisApiKey = process.env.API_KEY;
 
 
 const IgnoredAddresses = ["0x333e3763085fc14854978f89261890339cb2f6a9", "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"]
 // const IgnoredAddresses = []
 
 
-const moralisApiKey = process.env.API_KEY;
 
 const app = express();
 
@@ -58,6 +59,61 @@ app.listen(listenPort, () => {
 
 
         });
+
+        app.get('/getAddressTXsforToken/:address/:tokenAddress', cors(),(req, res) => { 
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                }
+                const db = client.db('pivotTables');
+                const collection = db.collection('addressTXsByToken');
+                //column: address
+                //column: every other column is a token address
+
+                //check if address column exists in collection
+                const regex = new RegExp(req.params.address, 'i');
+                
+                const addressExistsTo = await collection.findOne({to_address: regex});
+                const addressExistsFrom = await collection.findOne({from_address: regex});
+
+                if (addressExistsTo || addressExistsFrom) {
+                    console.log('address exists in collection');
+                    collection.find({ $or: [ { from_address: regex }, { to_address: regex } ] }).toArray((err, docs)=> {                         
+                        res.send(docs)
+                    });
+
+                } else {
+                    //if not, get it from moralis query and add it to the collection
+                    getAllPaginatedData(`https://deep-index.moralis.io/api/v2/${req.params.address}/erc20/transfers?chain=eth&limit=100&key=${moralisApiKey}`).then((result) => {
+                        console.log('finished getting ALL the great many TXS from Moralis.');
+                        console.log(result.length);
+
+                        // put them in the collection
+                        result.forEach(tx => {
+                            collection.insertOne({
+                              
+                              address: tx.address,
+                              transaction_hash: tx.transaction_hash,
+                              address: tx.address,
+                              block_timestamp: tx.block_timestamp,
+                              block_number: tx.block_number,
+                              block_hash: tx.block_hash,
+                              to_address: tx.to_address,
+                              from_address: tx.from_address,
+                              value: tx.value,
+                              transaction_index: tx.transaction_index,
+                              log_index: tx.log_index
+                            });
+                        });
+                        res.send(result);
+                    });
+                }
+
+                
+
+            });
+        });
+
         app.get('/removeFromBlacklist/:address', cors(),(req, res) => {
             const theAddy = req.params.address;
             console.log('>>>>>> blacklist: ', theAddy);
