@@ -79,6 +79,7 @@ app.listen(listenPort, () => {
                 if (addressExistsTo || addressExistsFrom) {
                     console.log('address exists in collection');
                     collection.find({ $or: [ { from_address: regex }, { to_address: regex } ] }).toArray((err, docs)=> {                         
+                        console.log('docs: ', docs.length);
                         res.send(docs)
                     });
 
@@ -102,7 +103,9 @@ app.listen(listenPort, () => {
                               from_address: tx.from_address,
                               value: tx.value,
                               transaction_index: tx.transaction_index,
-                              log_index: tx.log_index
+                              log_index: tx.log_index,
+                              from_address_friendlyName: tx.from_address_friendlyName,
+                              to_address_friendlyName: tx.to_address_friendlyName,
                             });
                         });
                         res.send(result);
@@ -334,11 +337,11 @@ app.listen(listenPort, () => {
 
 
         app.get('/', cors(),(req, res) => {
-            // console.log('5\t');
+            // console.log('5\t'); 
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 if (err) {
                     h.fancylog(err, 'error');
-                    
+                     
                 }
                 const db = client.db('heartbeats');
                 db.collection("chainData").find({"heartbeat": {$exists: true}}).sort({block_timestamp: -1}).limit(1).toArray(function(err, result) {

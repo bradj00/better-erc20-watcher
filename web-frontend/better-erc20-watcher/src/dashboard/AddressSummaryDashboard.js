@@ -747,9 +747,41 @@ function determineWhichFNtoShow(tokenObj){
             
 
               {/* Address TX activity */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'49%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{overflowY:'scroll', border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'49%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div>
-                  <div>Address TX activity</div>
+                  
+                  <table style={{ width:'100%',  textAlign:'center', position:'absolute',left:'0', top:'0', paddingRight:'0.1vw'}}>
+                    <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky',}}>
+                        <td colspan="4">
+                          &nbsp;ERC-20 Transfers for <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span>
+                        </td>
+                    </tr>
+                    <tr style={{textAlign:'right', position:'sticky', top:'0', backgroundColor:'rgba(0,0,0,0.9)'}}>
+                      <td>time</td>
+                      <td>from</td>
+                      <td>to</td>
+                      <td>amount</td>
+                      <td>tx hash</td>
+                    </tr>
+                    {selectedAddressTxList? selectedAddressTxList.length > 0? selectedAddressTxList.map((tx, index) => {
+                      console.log('tx: ', tx)
+                      return (
+                        <tr style={{textAlign:'right'}}>
+                          <td>{timeAgo.format(new Date(tx.block_timestamp))}</td>
+                          <td>{determineWhichFNtoShow(tx.from_address_friendlyName)}</td>
+                          <td>{determineWhichFNtoShow(tx.to_address_friendlyName)}</td>
+                          <td>{parseFloat(tx.value / (10**18)).toFixed(2)}</td>
+                          <td><a target="_blank" href={"https://etherscan.io/tx/"+tx.transaction_hash}>{getEllipsisTxt(tx.transaction_hash, 6)} </a></td>
+                        </tr>
+                      )
+                    })
+                    : <> </>
+                    : <> </>
+                  }
+                    
+                  </table>
+                    
+
                 </div>
               </div>
 

@@ -163,18 +163,24 @@ const DatabaseInfoGrabber = () => {
             //map each item.block_timestamp in data to a 24 hour time window and push to temp array
             data.map((item) => {
                 temp.push(parseInt(item.block_timestamp.slice(11,13)) )
-                console.log('_______________________________________________________')
-                console.log(item.block_timestamp.slice(11,13) )
-                console.log('_______________________________________________________')
+                // console.log('_______________________________________________________')
+                // console.log(item.block_timestamp.slice(11,13) )
+                // console.log('_______________________________________________________')
             });
             console.log('temp: ', temp);
             //count the number of times each number appears in the  temp array and push to a new array
             let counts = {};
             temp.forEach(function(x) { counts[x] = (counts[x] || 0)+1; });
             console.log('counts: ', counts);
+            
             //convert the counts object to an array of values
             let countsArray = Object.values(counts);
-            console.log('countsArray: ', countsArray);
+
+            //timezone shift the array to the left by 6 hours ...should put this in a global variable so others can set their own timezones
+            let tempArr = countsArray.splice(0, 6)
+            for (let i = 0; i < tempArr.length; i++) {
+                countsArray.push(tempArr[i]);
+            }
 
             setclockCountsArrayForSelectedAddressTxList(countsArray);
             setselectedAddressTxList(data);

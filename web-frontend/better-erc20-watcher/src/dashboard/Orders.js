@@ -249,7 +249,7 @@ export default function Orders() {
               const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
               // console.log(parseInt(rowAge)+' seconds old');
               const timeAgo = new TimeAgo('en-US')
-              
+              // console.log('from: ', row.from_address_friendlyName, 'to: ', row.to_address_friendlyName)
               return(
                 
                 <TableRow className={rowAge > 100? "rowHover": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>

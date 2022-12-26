@@ -1,12 +1,20 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
+import * as MongoClientQ from 'mongodb';
+import chalk from 'chalk';
+const MongoClient = MongoClientQ.MongoClient;
+// const mongoUrl = 'mongodb://localhost:27017';
 
 dotenv.config();
 
-
+const mongoUrl = process.env.MONGO_CONNECT_STRING;
+const dbName = process.env.DB_NAME;  
+const dbNameFN = process.env.DB_NAME_FN;
 const listenPort = process.env.API_LISTEN_PORT; 
 const moralisApiKey = process.env.API_KEY;
-const setLimit = 1000;
+
+
+ const setLimit = 1000;
 
 const getPaginatedData = async (url, nextCursor) => {
   try {
@@ -65,10 +73,25 @@ const getAllPaginatedData = async (url) => {
           nextCursor = q.data.data.cursor;
         }else {
           const final = await getPaginatedData(url, nextCursor);
-          for (let i = 0; i < final.data.data.result.length; i++) {
-            allResults.push(final.data.data.result[i]);
+          
+          if (final.data && final.data.data && final.data.data.result){
+            for (let i = 0; i < final.data.data.result.length; i++) {
+              allResults.push(final.data.data.result[i]);
+            }
           }
-          resolve(allResults)
+
+          //take allResults and add in their friendlyNames 
+          for (let i = 0; i < allResults.length; i++) {
+            const from = await lookupSingleAddress(allResults[i].from_address);
+            const to = await lookupSingleAddress(allResults[i].to_address);
+            allResults[i].from_address_friendlyName = from;
+            allResults[i].to_address_friendlyName = to;
+            if (i == allResults.length-1){
+              console.log('done')
+              resolve(allResults)
+            }
+          }
+
           break;
         }
 
@@ -77,5 +100,40 @@ const getAllPaginatedData = async (url) => {
     }
   });
 };
+
+
+
+function lookupSingleAddress(address){
+  return new Promise(async (resolve, reject) => {
+  try {
+      console.log('--------------ADDRESS IS: ', address)
+      // const client = await MongoClient.connect(mongoUrl, { useNewUrlParser: true });
+      MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err1, client) {
+      if (err1) console.log(chalk.magenta('error: ', err1));
+      const dbFN = client.db('friendlyNames');
+      const collection = await dbFN.collection('lookup').find({address: address}).toArray();
+  
+
+      if (collection.length === 0) { 
+          // even if it's blank lets move the task of looking up new addresses to translator.js and only use this function for mongo lookups
+          
+          client.close();
+          resolve(address);
+      } else {
+          client.close();
+          resolve(collection[0]);
+      }
+    });
+  } catch (error) {
+      console.error(error);
+      resolve(error);
+  }
+  });
+}
+
+
+
+
+
 
 export default getAllPaginatedData;

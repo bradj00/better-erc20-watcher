@@ -3,7 +3,7 @@ const chalk = require('chalk');
 // import chalk from 'chalk'; 
 
 const getEllipsisTxt = (str, n = 6) => {
-  if (str) { 
+  if (str && typeof str === 'string') { 
     return `${str.slice(0, n)}...${str.slice(str.length - n)}`;
   }
   return "";
@@ -60,7 +60,7 @@ const fancylog = (str, bracketedStr, tokenAddress, spinner) => {
 const displayAddressFN = (clickedDetailsAddressFN) => {
   let firstAddress;
   Object.keys(clickedDetailsAddressFN).map(key => {
-    if (key !== '_id' && key !== 'address' && !clickedDetailsAddressFN[key].startsWith('0x') ) {
+    if (key !== '_id' && key !== 'address' && clickedDetailsAddressFN[key] && !clickedDetailsAddressFN[key].startsWith('0x') ) {
       firstAddress = clickedDetailsAddressFN[key];
       return;
     } else if (key === 'address') {
