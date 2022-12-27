@@ -418,10 +418,10 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                         // });
                     })
 
-                    console.log('---------------------')
-                    console.log(tokenTxs);
-                    console.log('tokenTxs: ',tokenTxs.length);
-                    console.log('---------------------')
+                    // console.log('---------------------')
+                    // console.log(tokenTxs);
+                    // console.log('tokenTxs: ',tokenTxs.length);
+                    // console.log('---------------------')
 
                     collection.insertMany(tokenTxs, [{"continueOnError": true}], function(err, res) {
                         if (err) {

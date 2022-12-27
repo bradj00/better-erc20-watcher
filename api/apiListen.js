@@ -577,22 +577,22 @@ app.listen(listenPort, () => {
         });
 
 
-        //I dont think this is used anymore...deprecated by pivotTablesAnalytics.js job 
-        // app.get('/tokenInfo/:tokenAddress', cors(), async (req, res) => {
+        //gets the list of tokens we are watching top-level in the frontend UI
+        app.get('/tokenInfo/:tokenAddress', cors(), async (req, res) => {
             
-        //     const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+req.params.tokenAddress;
-        //     // console.log('>>>>>> url: ', url);
-        //     axios.get(url ,{
-        //         headers: {
-        //         Accept: "application/json",
-        //         "Content-Type": "application/json;charset=UTF-8",
-        //         "X-API-Key" : moralisApiKey
-        //         },
-        //     })
-        //     .then(({data}) => {
-        //         res.send(data);
-        //     })
-        // });
+            const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+req.params.tokenAddress;
+            // console.log('>>>>>> url: ', url);
+            axios.get(url ,{
+                headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                "X-API-Key" : moralisApiKey
+                },
+            })
+            .then(({data}) => {
+                res.send(data);
+            })
+        });
 
         //get transactions for a token by a holder address
         app.get('/txs/:collectionName/:filterAddress', cors(), async (req, res) => {

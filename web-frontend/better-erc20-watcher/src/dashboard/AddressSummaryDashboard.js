@@ -755,6 +755,7 @@ function determineWhichFNtoShow(tokenObj){
                         <td colspan="4">
                           &nbsp;ERC-20 Transfers for <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span>
                         </td>
+                        <td>                    <div onClick={()=>{console.log('requesting updated data....',)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div></td>
                     </tr>
                     <tr style={{textAlign:'right', position:'sticky', top:'0', backgroundColor:'rgba(0,0,0,0.9)'}}>
                       <td>time</td>

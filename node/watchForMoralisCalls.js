@@ -41,37 +41,80 @@ setInterval(()=>{
     });
 }, 2000); // Can be adjusted up or down later
 
+function doingAlookup(){
+    //set flag in database so we know we're doing a lookup and wont start another one, even though we check frequently.
+    
+    return new Promise((resolve, reject) => {
+        MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+            if (err) {
+                h.fancylog(err, 'error');
+                console.log('ERROR: ', err)
+            }
+            const db = client.db('externalLookupRequests');
+            const lookupRequests = db.collection('doingALookup').find({lookingUp: true}).toArray(async function(err, requests) {
+                if(err) {
+                    h.fancylog(err, 'error');
+                }
+                if(requests.length > 0) {
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            });
+
+        });
+    });
+}
+
 async function checkLookupRequests()  {
     MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
-        if (err) {
-            h.fancylog(err, 'error');
-            console.log('ERROR: ', err)
-        }
-        const db = client.db('externalLookupRequests');
-        const lookupRequests = db.collection('rBucket').find({}).toArray(async function(err, requests) {
-            if(err) {
-                h.fancylog(err, 'error');
-            }
-            if(requests.length > 0) {
-                h.fancylog('external api requests to process: ' + requests.length, 'system');
-                console.log('---------------------')
-                console.log(requests);
-                console.log('---------------------\n\n')
-                // do something with the requests
-                for (let i = 0; i < requests.length; i++) {
-                    console.log(chalk.magenta('request: '), requests[i]);
-                    await dispatcher(requests[i].instructionMap, requests[i].requestUrl, requests[i].requestPostData);
-                    // await new Promise(r => setTimeout(r, 1000));
-                }
+        if (err) {h.fancylog(err, 'error');}
 
+        const dbDoingLookup = client.db('externalLookupRequests');
+        dbDoingLookup.collection('doingALookup').find({lookingUp: true}).toArray(async function(err, requests) {
+            if(err) {h.fancylog(err, 'error');}
+
+            if(requests.length > 0) {
+                h.fancylog('already doing a lookup. Sleeping..', 'system');
                 client.close();
             }
             else {
-                h.fancylog('no requests to process. Sleeping..', 'system');
-                client.close();
+                // set lookingUp to true
+                // console.log(chalk.green('locking the lookup process with lookingUp: true'));
+                await dbDoingLookup.collection('doingALookup').updateOne( {}, { $set: { lookingUp: true } }, { upsert: true } );
+
+                const db = client.db('externalLookupRequests');
+                const lookupRequests = db.collection('rBucket').find({}).toArray(async function(err, requests) {
+                    if(err) {
+                        h.fancylog(err, 'error');
+                    }
+                    if(requests.length > 0) {
+                        h.fancylog('external api requests to process: ' + requests.length, 'system');
+                        // console.log('---------------------')
+                        // console.log(requests);
+                        // console.log('---------------------\n\n')
+                        // do something with the requests
+                        for (let i = 0; i < requests.length; i++) {
+                            console.log(chalk.magenta('request: '), requests[i]);
+                            await dispatcher(requests[i].instructionMap, requests[i].requestUrl, requests[i].requestPostData);
+                            // await new Promise(r => setTimeout(r, 1000));
+                            //if we're on the last request, set lookingUp to false
+                            if (i == requests.length - 1) {
+                                console.log(chalk.green('unlocking the lookup process with lookingUp: false'));
+                                await dbDoingLookup.collection('doingALookup').updateOne( {}, { $set: { lookingUp: false } }, { upsert: true } );
+                            }
+                        }
+
+                        client.close();
+                    }
+                    else {
+                        h.fancylog('no requests to process. Sleeping..', 'system');
+                        await dbDoingLookup.collection('doingALookup').updateOne( {}, { $set: { lookingUp: false } }, { upsert: true } );
+                        client.close();
+                    }
+                });
             }
         });
-
     });
 
 }
