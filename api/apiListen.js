@@ -84,32 +84,41 @@ app.listen(listenPort, () => {
                     });
 
                 } else {
-                    //if not, get it from moralis query and add it to the collection
-                    getAllPaginatedData(`https://deep-index.moralis.io/api/v2/${req.params.address}/erc20/transfers?chain=eth&limit=100&key=${moralisApiKey}`).then((result) => {
-                        console.log('finished getting ALL the great many TXS from Moralis.');
-                        console.log(result.length);
+                    let requestUrl = `https://deep-index.moralis.io/api/v2/${req.params.address}/erc20/transfers?chain=eth&limit=100&key=${moralisApiKey}`;
+                    const db2 = client.db('externalLookupRequests');
+                    const c2 = db2.collection('rBucket');
 
-                        // put them in the collection
-                        result.forEach(tx => {
-                            collection.insertOne({
+                    c2.insertOne({requestUrl: requestUrl, requestPostData: null, instructionMap: 1});
+                    console.log('sent request to to get data from external api.');
+                    res.send('update request sent')
+
+                    //rewriting this below 
+                    //if not, get it from moralis query and add it to the collection
+                    // getAllPaginatedData(`https://deep-index.moralis.io/api/v2/${req.params.address}/erc20/transfers?chain=eth&limit=100&key=${moralisApiKey}`).then((result) => {
+                    //     console.log('finished getting ALL the great many TXS from Moralis.');
+                    //     console.log(result.length);
+
+                    //     // put them in the collection
+                    //     result.forEach(tx => {
+                    //         collection.insertOne({
                               
-                              address: tx.address,
-                              transaction_hash: tx.transaction_hash,
-                              address: tx.address,
-                              block_timestamp: tx.block_timestamp,
-                              block_number: tx.block_number,
-                              block_hash: tx.block_hash,
-                              to_address: tx.to_address,
-                              from_address: tx.from_address,
-                              value: tx.value,
-                              transaction_index: tx.transaction_index,
-                              log_index: tx.log_index,
-                              from_address_friendlyName: tx.from_address_friendlyName,
-                              to_address_friendlyName: tx.to_address_friendlyName,
-                            });
-                        });
-                        res.send(result);
-                    });
+                    //           address: tx.address,
+                    //           transaction_hash: tx.transaction_hash,
+                    //           address: tx.address,
+                    //           block_timestamp: tx.block_timestamp,
+                    //           block_number: tx.block_number,
+                    //           block_hash: tx.block_hash,
+                    //           to_address: tx.to_address,
+                    //           from_address: tx.from_address,
+                    //           value: tx.value,
+                    //           transaction_index: tx.transaction_index,
+                    //           log_index: tx.log_index,
+                    //           from_address_friendlyName: tx.from_address_friendlyName,
+                    //           to_address_friendlyName: tx.to_address_friendlyName,
+                    //         });
+                    //     });
+                    //     res.send(result);
+                    // });
                 }
 
                 
@@ -569,21 +578,21 @@ app.listen(listenPort, () => {
 
 
         //I dont think this is used anymore...deprecated by pivotTablesAnalytics.js job 
-        app.get('/tokenInfo/:tokenAddress', cors(), async (req, res) => {
+        // app.get('/tokenInfo/:tokenAddress', cors(), async (req, res) => {
             
-            const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+req.params.tokenAddress;
-            // console.log('>>>>>> url: ', url);
-            axios.get(url ,{
-                headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json;charset=UTF-8",
-                "X-API-Key" : moralisApiKey
-                },
-            })
-            .then(({data}) => {
-                res.send(data);
-            })
-        });
+        //     const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+req.params.tokenAddress;
+        //     // console.log('>>>>>> url: ', url);
+        //     axios.get(url ,{
+        //         headers: {
+        //         Accept: "application/json",
+        //         "Content-Type": "application/json;charset=UTF-8",
+        //         "X-API-Key" : moralisApiKey
+        //         },
+        //     })
+        //     .then(({data}) => {
+        //         res.send(data);
+        //     })
+        // });
 
         //get transactions for a token by a holder address
         app.get('/txs/:collectionName/:filterAddress', cors(), async (req, res) => {

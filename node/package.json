@@ -8,7 +8,8 @@
     "javascript-time-ago": "^2.5.9",
     "mongodb": "^4.11.0",
     "ora": "^6.1.2",
-    "prompt-sync": "^4.2.0"
+    "prompt-sync": "^4.2.0",
+    "web3": "^1.8.1"
   },
   "type": "module",
   "name": "node",
