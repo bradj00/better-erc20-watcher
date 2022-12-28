@@ -119,7 +119,7 @@ async function checkLookupRequests()  {
                         client.close();
                     }
                     else {
-                        h.fancylog('no requests to process. Sleeping..', 'system');
+                        // h.fancylog('no requests to process. Sleeping..', 'system');
                         await dbDoingLookup.collection('doingALookup').updateOne( {}, { $set: { lookingUp: false } }, { upsert: true } );
                         client.close();
                     }
@@ -150,26 +150,68 @@ function dispatcher(instructionMap, url, postData){
     });
 }
 
+
+//dispatcher instruction map 1 
 function getAddressTXsforToken(url, postData){
 
     return new Promise((resolve, reject) => {
+        MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+            if (err) {
+                h.fancylog(err, 'error');
+            }
+            const dbStatus = client.db('systemStats');
+            const collectionStatus = dbStatus.collection('messages');
+            collectionStatus.updateOne( { name: 'erc20TransfersForSelectedAddy' }, { $set: { statusMsg: 'gathering TXs from Moralis', page: 0, maxPage: 1, timestamp: new Date().getTime() } }, { upsert: true } , function(err, result) {
+                client.close();
+            });
+        });
+
+
         getAllPaginatedData(url).then((result) => {
             console.log('finished getting ALL the great many TXS from Moralis.', result.length);
             
+            //to do: rewrite this into a function because we're going to be updating system status messages all over the place
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                }
+                const dbStatus = client.db('systemStats');
+                const collectionStatus = dbStatus.collection('messages');
+                collectionStatus.updateOne( { name: 'erc20TransfersForSelectedAddy' }, { $set: { statusMsg: 'complete', page: 0, maxPage: 0, timestamp: new Date().getTime() } }, { upsert: true } , function(err, result) {
+                    client.close();
+                });
+            });
+            //cleanup status message so UI does not constantly reload this data
+            setTimeout(()=>{
+                MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                    if (err) {
+                        h.fancylog(err, 'error');
+                    }
+                    const dbStatus = client.db('systemStats');
+                    const collectionStatus = dbStatus.collection('messages');
+                    collectionStatus.updateOne( { name: 'erc20TransfersForSelectedAddy' }, { $set: { statusMsg: 'idle', page: 0, maxPage: 0, timestamp: new Date().getTime() } }, { upsert: true } , function(err, result) {
+                        client.close();
+                    });
+                });
+            }, 3000);
+
             // put them in the collection
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
                     h.fancylog(err, 'error');
                 }
-                const db = client.db('pivotTables');
-                const collection = db.collection('addressTXsByToken');
-
+                
                 const db2 = client.db('externalLookupRequests');
-                const collection2 = db2.collection('rBucket');
-
-
+                const collectionBucket = db2.collection('rBucket');
+                
+                
+                const db = client.db('TokenTXsByAddress');
                 result.forEach(tx => {
-                    collection.insertOne({
+                    var collectionFrom = db.collection('a_'+tx.from_address);
+                    var collectionTo = db.collection('a_'+tx.to_address);
+                    
+                    // check if TX already exists (all fields exactly the same) (I couldnt find a way to do a compound index in mongo for this) 
+                    collectionFrom.find({
                         address: tx.address,
                         transaction_hash: tx.transaction_hash,
                         address: tx.address,
@@ -183,12 +225,68 @@ function getAddressTXsforToken(url, postData){
                         log_index: tx.log_index,
                         from_address_friendlyName: tx.from_address_friendlyName,
                         to_address_friendlyName: tx.to_address_friendlyName,
+                    }).toArray(async function(err, requests) {
+                        //if it doesnt exist, insert it
+                        if(requests.length == 0) {
+                            collectionFrom.insertOne({
+                                address: tx.address,
+                                transaction_hash: tx.transaction_hash,
+                                address: tx.address,
+                                block_timestamp: tx.block_timestamp,
+                                block_number: tx.block_number,
+                                block_hash: tx.block_hash,
+                                to_address: tx.to_address,
+                                from_address: tx.from_address,
+                                value: tx.value,
+                                transaction_index: tx.transaction_index,
+                                log_index: tx.log_index,
+                                from_address_friendlyName: tx.from_address_friendlyName,
+                                to_address_friendlyName: tx.to_address_friendlyName,
+                            });
+                        }
+                    });
+
+                    // check if TX already exists (all fields exactly the same) (I couldnt find a way to do a compound index in mongo for this) 
+                    collectionTo.find({
+                        address: tx.address,
+                        transaction_hash: tx.transaction_hash,
+                        address: tx.address,
+                        block_timestamp: tx.block_timestamp,
+                        block_number: tx.block_number,
+                        block_hash: tx.block_hash,
+                        to_address: tx.to_address,
+                        from_address: tx.from_address,
+                        value: tx.value,
+                        transaction_index: tx.transaction_index,
+                        log_index: tx.log_index,
+                        from_address_friendlyName: tx.from_address_friendlyName,
+                        to_address_friendlyName: tx.to_address_friendlyName,
+                    }).toArray(async function(err, requests) {
+                        //if it doesnt exist, insert it
+                        if(requests.length == 0) {
+                            collectionTo.insertOne({
+                                address: tx.address,
+                                transaction_hash: tx.transaction_hash,
+                                address: tx.address,
+                                block_timestamp: tx.block_timestamp,
+                                block_number: tx.block_number,
+                                block_hash: tx.block_hash,
+                                to_address: tx.to_address,
+                                from_address: tx.from_address,
+                                value: tx.value,
+                                transaction_index: tx.transaction_index,
+                                log_index: tx.log_index,
+                                from_address_friendlyName: tx.from_address_friendlyName,
+                                to_address_friendlyName: tx.to_address_friendlyName,
+                            });
+                        }
                     });
 
                     
+
                     if (result.indexOf(tx) === result.length - 1) {
                         //remove the document matching the URL from the collection, then close client
-                        collection2.deleteOne ({ requestUrl : url }, function(err, obj) {
+                        collectionBucket.deleteOne ({ requestUrl : url }, function(err, obj) {
                             if (err) console.log('ERROR deleting document: ', err);
                             console.log(chalk.green("cleaned up rBucket request (by requestUrl match)") );
                             // client.close();

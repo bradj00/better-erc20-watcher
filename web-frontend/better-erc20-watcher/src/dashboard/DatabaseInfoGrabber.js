@@ -96,8 +96,8 @@ const DatabaseInfoGrabber = () => {
         if (getUpdatedAddressTokenTxList && heldTokensSelectedAddress){
             console.log('getting fresh TX records for address: ', heldTokensSelectedAddress, )
             fetchAddressTokenTxList(heldTokensSelectedAddress, 1);
-            setselectedAddressTxList('loading');
-            setgetUpdatedAddressTokenTxList();
+            setselectedAddressTxList('loading'); //set the dataset to loading so the UI knows to show the spinner
+            setgetUpdatedAddressTokenTxList(); //clear the request flag
         }
     },[getUpdatedAddressTokenTxList]);
 
@@ -168,15 +168,28 @@ const DatabaseInfoGrabber = () => {
         .then(data => {
             console.log('system status: ', data);
             setSystemStatuses(data);
+
         })
     }
+
+    useEffect(()=>{
+        if (systemStatuses && heldTokensSelectedAddress){
+
+            //if back end is done fetching new data, reload it to the UI
+            if (systemStatuses && systemStatuses.erc20TransfersForSelectedAddy && systemStatuses.erc20TransfersForSelectedAddy.statusMsg == 'complete'){
+                console.log('OH BOY IT IS COMPLETE! ',systemStatuses.erc20TransfersForSelectedAddy.statusMsg)
+                fetchAddressTokenTxList(heldTokensSelectedAddress, 0);
+            }
+
+        }
+    },[systemStatuses])
 
     
 
     function fetchAddressTokenTxList(address, getFreshData) {
         // setclockCountsArrayForSelectedAddressTxList(); //clear it out
         console.log('fetching address token tx list for address: ', address)
-        fetch('http://10.0.3.2:4000/getAddressTXsforToken/'+address+'?getFreshData='+getFreshData)
+        fetch('http://10.0.3.2:4000/TokenTXsByAddress/'+address+'?getFreshData='+getFreshData)
         .then(response => response.json())
         .then(data => {
             console.log('address token tx list: ', data);
@@ -355,14 +368,14 @@ const DatabaseInfoGrabber = () => {
         //explicit call because we are watching this token for wallet and staking behavior too
         fetchMegaPriceUsd('0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e');
 
-        // setInterval(()=>{
-        //     fetchAllSystemStatuses();
-        // }, 1000);
+        setInterval(()=>{
+            fetchAllSystemStatuses();
+        }, 1000);
 
         setInterval(()=>{
             fetchChainDataHeartbeat();
             fetchLatestBlockFromChain();
-            fetchAllSystemStatuses();
+            // fetchAllSystemStatuses();
         }, 10000);
     },[])
 

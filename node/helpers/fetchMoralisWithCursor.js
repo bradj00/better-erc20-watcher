@@ -64,6 +64,18 @@ const getAllPaginatedData = async (url) => {
         if (nextCursor){
           // console.log('looking up page: '+nextCursor.substr(-5));
           console.log(nextCursor.substr(-5)+'\tgetting page: '+(allResults.length+100)/100 + ' of ' + Math.ceil(r.data.total/100))
+        
+          MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+            if (err) {
+                h.fancylog(err, 'error');
+            }
+            const dbStatus = client.db('systemStats');
+            const collectionStatus = dbStatus.collection('messages');
+            collectionStatus.updateOne( { name: 'erc20TransfersForSelectedAddy' }, { $set: { statusMsg: 'gathering TXs from Moralis', page: ((allResults.length+100)/100), maxPage: Math.ceil(r.data.total/100), timestamp: new Date().getTime() } }, { upsert: true } , function(err, result) {
+                client.close();
+            });
+          });
+        
         }
         const q = await getPaginatedData(url, nextCursor);
         if (q && q.data && q.data.data && q.data.data.cursor){         
@@ -99,7 +111,18 @@ const getAllPaginatedData = async (url) => {
         await new Promise(r => setTimeout(r, 1000));
     }
     if (r.data.total <= 100){ // if there's only one page of results
-      console.log('-------done')
+      MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+        if (err) {
+            h.fancylog(err, 'error');
+        }
+        const dbStatus = client.db('systemStats');
+        const collectionStatus = dbStatus.collection('messages');
+        collectionStatus.updateOne( { name: 'erc20TransfersForSelectedAddy' }, { $set: { statusMsg: 'gathering TXs from Moralis', page: 1, maxPage: 1, timestamp: new Date().getTime() } }, { upsert: true } , function(err, result) {
+            client.close();
+        });
+      });
+      
+
       await new Promise(r => setTimeout(r, 1000));
       resolve(allResults)
     }

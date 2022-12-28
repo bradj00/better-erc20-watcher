@@ -38,6 +38,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import CommunityTokenTr from './subcomponents/CommunityTokenTr';
 import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
 import TxTimeOfDayChart from './subcomponents/TxTimeOfDayChart.tsx';
+import LoadingTableSpinner from './subcomponents/LoadingTableSpinner.tsx';
 
 
 TimeAgo.addDefaultLocale(en);
@@ -339,6 +340,9 @@ function function66(e){
 }
 
 function determineWhichFNtoShow(tokenObj){
+  if (!tokenObj){
+    return (<td style={{color:'#aaa'}}>...</td>);
+  }
   // console.log('determineWhichFNtoShow: ', tokenObj)
   if (typeof tokenObj != 'object'){
     return (<td style={{color:'#aaa'}}>{getEllipsisTxt(tokenObj, 6)}</td>);
@@ -426,13 +430,13 @@ function determineWhichFNtoShow(tokenObj){
                           
                           
                           { // find the 'translator' service in the array of services
-                            systemStatuses? 
-                            commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax) > 0? 
-                            // if it's found, display "lookupIndex" / "lookupIndexMax"
-                            <> {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndex)} / {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax)} </>
+                            // systemStatuses? 
+                            // commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax) > 0? 
+                            // // if it's found, display "lookupIndex" / "lookupIndexMax"
+                            // <> {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndex)} / {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax)} </>
                           
-                            :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                            :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
+                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
+                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
                           }
                         </div>
                     </div>
@@ -776,7 +780,17 @@ function determineWhichFNtoShow(tokenObj){
                       <td>to</td>
                       <td>tx hash</td>
                     </tr>
-                    {selectedAddressTxList? 
+                    {
+                    systemStatuses?
+                    systemStatuses.erc20TransfersForSelectedAddy? 
+                    systemStatuses.erc20TransfersForSelectedAddy.statusMsg != "idle" ?
+                      <div style={{zIndex:'9999', backgroundColor:'rgba(0,0,0,0.6)', position:'absolute', width:'100%', height:'100%', display:'flex', justifyContent:'center', alignItems:'center'}}>
+                        {/* {systemStatuses.erc20TransfersForSelectedAddy.statusMsg} : {systemStatuses.erc20TransfersForSelectedAddy.page} / {systemStatuses.erc20TransfersForSelectedAddy.maxPage} */}
+                        <LoadingTableSpinner msg={ <>{systemStatuses.erc20TransfersForSelectedAddy.statusMsg} : {systemStatuses.erc20TransfersForSelectedAddy.page} / {systemStatuses.erc20TransfersForSelectedAddy.maxPage}</> }/>
+                      </div>
+                    : 
+                    
+                    selectedAddressTxList? 
                       Array.isArray(selectedAddressTxList)? 
                       selectedAddressTxList.sort((a,b) => (a.block_timestamp > b.block_timestamp) ? 1 : -1).reverse().map((tx, index) => {
                         // console.log('tx: ', tx)
@@ -791,8 +805,15 @@ function determineWhichFNtoShow(tokenObj){
                           </tr>
                         )
                       })
-                      : selectedAddressTxList == "loading"?
-                      <>loading...</>: <> </>
+                       
+                        
+                        : <></>
+                        : <></>
+                        : <></>
+                        
+                        
+                        
+                        
                     : <> </>
                   }
                     

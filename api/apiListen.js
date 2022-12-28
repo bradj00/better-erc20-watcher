@@ -60,32 +60,33 @@ app.listen(listenPort, () => {
 
         });
 
-        app.get('/getAddressTXsforToken/:address', cors(),(req, res) => { 
+        app.get('/TokenTXsByAddress/:address', cors(),(req, res) => { 
             const getFreshData = req.query.getFreshData;
             console.log('getFreshData: ', req.query.getFreshData);
+            if (!req.params.address) { res.send('no address provided'); return; }
+
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
                     h.fancylog(err, 'error');
                 }
-                const db = client.db('pivotTables');
-                const collection = db.collection('addressTXsByToken');
-                //column: address
-                //column: every other column is a token address
-
-                //check if address column exists in collection
-                const regex = new RegExp(req.params.address, 'i');
+                const db = client.db('TokenTXsByAddress');
                 
-                const addressExistsTo = await collection.findOne({to_address: regex});
-                const addressExistsFrom = await collection.findOne({from_address: regex});
+                const collectionExists = async (collectionName, db) => {
+                    const collections = await db.listCollections({name: collectionName}).toArray();
+                    return collections.length > 0;
+                };
+                
+                const regex = new RegExp("a_"+req.params.address, 'i');
+                if (await collectionExists(regex, db) && ( getFreshData != 1 )) {
+                    console.log('collection exists: ', regex);
+                    const collection = db.collection("a_"+req.params.address);
 
-                if ((addressExistsTo || addressExistsFrom) && (getFreshData != 1) ) {
-                    console.log('address exists in collection');
-                    collection.find({ $or: [ { from_address: regex }, { to_address: regex } ] }).toArray((err, docs)=> {                         
+                    collection.find({ $or: [ { from_address: req.params.address }, { to_address: req.params.address } ] }).toArray((err, docs)=> {                         
                         console.log('docs: ', docs.length);
                         res.send(docs)
                     });
-
-                } else {
+                }
+                else {
                     let requestUrl = `https://deep-index.moralis.io/api/v2/${req.params.address}/erc20/transfers?chain=eth&limit=100&key=${moralisApiKey}`;
                     const db2 = client.db('externalLookupRequests');
                     const c2 = db2.collection('rBucket');
@@ -93,34 +94,6 @@ app.listen(listenPort, () => {
                     c2.insertOne({requestUrl: requestUrl, requestPostData: null, instructionMap: 1});
                     console.log('sent request to to get data from external api.');
                     res.send('update request sent')
-
-                    //rewriting this below 
-                    //if not, get it from moralis query and add it to the collection
-                    // getAllPaginatedData(`https://deep-index.moralis.io/api/v2/${req.params.address}/erc20/transfers?chain=eth&limit=100&key=${moralisApiKey}`).then((result) => {
-                    //     console.log('finished getting ALL the great many TXS from Moralis.');
-                    //     console.log(result.length);
-
-                    //     // put them in the collection
-                    //     result.forEach(tx => {
-                    //         collection.insertOne({
-                              
-                    //           address: tx.address,
-                    //           transaction_hash: tx.transaction_hash,
-                    //           address: tx.address,
-                    //           block_timestamp: tx.block_timestamp,
-                    //           block_number: tx.block_number,
-                    //           block_hash: tx.block_hash,
-                    //           to_address: tx.to_address,
-                    //           from_address: tx.from_address,
-                    //           value: tx.value,
-                    //           transaction_index: tx.transaction_index,
-                    //           log_index: tx.log_index,
-                    //           from_address_friendlyName: tx.from_address_friendlyName,
-                    //           to_address_friendlyName: tx.to_address_friendlyName,
-                    //         });
-                    //     });
-                    //     res.send(result);
-                    // });
                 }
 
                 
@@ -376,14 +349,17 @@ app.listen(listenPort, () => {
                     h.fancylog(err, 'error');
                 }
                 const db = client.db('systemStats');
-                const collection = db.collection('systemStatuses');
+                const collection = db.collection('messages');
                 
                 // find all documents in the collection and return them as an an object together
                 const systemStatus = await collection.find({}).toArray();
-                //convert the array of objects into a single object.
-                // const systemStatusObj = systemStatus.reduce((acc, cur) => {
-                //     return {...acc, ...cur};
-                // }, {});
+                // convert the array of objects into a single object where each key "name" is the name of the object and the value is the object itself.
+                const systemStatusObj = systemStatus.reduce((obj, item) => {
+                    obj[item.name] = item;
+                    return obj;
+                }, {});
+
+                
 
 
 
@@ -392,8 +368,8 @@ app.listen(listenPort, () => {
                 // console.log('systemStatus: ', systemStatus);
                 //send the array to the frontend.
                 client.close();
-                res.send(systemStatus);
                 // res.send(systemStatus);
+                res.send(systemStatusObj);
             });
         });
 

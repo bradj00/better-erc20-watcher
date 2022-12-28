@@ -278,13 +278,13 @@ function function66(e){
                           
                           
                           { // find the 'translator' service in the array of services
-                            systemStatuses? 
-                            commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax) > 0? 
-                            // if it's found, display "lookupIndex" / "lookupIndexMax"
-                            <> {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndex)} / {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax)} </>
+                            // systemStatuses? 
+                            // commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax) > 0? 
+                            // // if it's found, display "lookupIndex" / "lookupIndexMax"
+                            // <> {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndex)} / {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax)} </>
                           
-                            :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                            :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
+                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
+                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
                           }
                         </div>
                     </div>
