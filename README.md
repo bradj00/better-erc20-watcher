@@ -1,7 +1,12 @@
 # better-erc20-watcher
-Watch ERC20 transactions live. Categorize on-chain actions and give friendly labels to addresses
+Watch ERC-20 transactions live. 
 
-**Coming soon:** Install instructions and pre-requisites to use this tool.
+Categorize on-chain actions and give friendly labels to addresses.
+
+Step into a tokenized community and rapidly gain analytical advantage.
+
+
+## Coming soon: Install instructions and pre-requisites to use this tool.
 
 
 using:
@@ -14,8 +19,6 @@ using:
 
 -React webUI frontend for better visualization and management
 
-<sub>( chainData.js ingestion engine fetching and caching blockchain token TXs to mongo )</sub>
-![chainData_action](https://user-images.githubusercontent.com/99688245/202078438-05a839b5-f258-4e94-b2d3-f0d78301fea8.gif)
 
 <sub>( Feature rich front-end UI with live data updates )</sub>
 ![image](https://user-images.githubusercontent.com/99688245/206964325-6d00b9ef-4e01-4d30-a739-32e213f47ccb.png)
@@ -24,6 +27,10 @@ using:
 
 <sub>( This will be good for stepping into a community and quickly seeing commonly held ERC20 tokens and patterns)</sub>
 ![image](https://user-images.githubusercontent.com/99688245/209859794-f68091ad-5a9d-496e-8f26-e6ca914ce4c1.png)
+
+
+<sub>( chainData.js ingestion engine fetching and caching blockchain token TXs to mongo )</sub>
+![chainData_action](https://user-images.githubusercontent.com/99688245/202078438-05a839b5-f258-4e94-b2d3-f0d78301fea8.gif)
 
 
 <sub>( translator.js service querying OpenSea api for human readable name and caching to mongo )</sub>
