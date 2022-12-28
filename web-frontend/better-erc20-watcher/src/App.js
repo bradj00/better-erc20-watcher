@@ -41,6 +41,8 @@ const [latestEthBlock, setlatestEthBlock] = useState();
 const [getUpdatedTokenBalance, setgetUpdatedTokenBalance] = useState();
 const [selectedAddressTxList, setselectedAddressTxList] = useState();
 const [clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList] = useState();
+const [getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList] = useState();
+const [fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance] = useState();
 
 
 const [MinAmountFilterValue, setMinAmountFilterValue] = useState(1);
@@ -101,6 +103,8 @@ const contextObj = {
   updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest,
   selectedAddressTxList, setselectedAddressTxList,
   clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList,
+  getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList,
+  fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance,
 
 
 }

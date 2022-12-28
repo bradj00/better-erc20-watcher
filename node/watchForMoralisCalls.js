@@ -25,6 +25,8 @@ const moralisApiKey = process.env.API_KEY;
 console.clear();
 console.log(chalk.cyan.underline.inverse('watchForMoralisCalls.js')+'\n');
 
+
+clearLookupLock();
 checkLookupRequests()
 .then((requests)=>{
     // console.log(requests);
@@ -66,6 +68,15 @@ function doingAlookup(){
     });
 }
 
+async function clearLookupLock(){
+    MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+        if (err) {h.fancylog(err, 'error');}
+        const dbDoingLookup = client.db('externalLookupRequests');
+        await dbDoingLookup.collection('doingALookup').updateOne( {}, { $set: { lookingUp: false } }, { upsert: true } );
+        client.close();
+    });
+}
+
 async function checkLookupRequests()  {
     MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
         if (err) {h.fancylog(err, 'error');}
@@ -75,7 +86,7 @@ async function checkLookupRequests()  {
             if(err) {h.fancylog(err, 'error');}
 
             if(requests.length > 0) {
-                h.fancylog('already doing a lookup. Sleeping..', 'system');
+                // h.fancylog('already doing a lookup. Sleeping..', 'system');
                 client.close();
             }
             else {

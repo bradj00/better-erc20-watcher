@@ -14,6 +14,7 @@ const DatabaseInfoGrabber = () => {
     const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
     const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
     const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
+    const {getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList} = useContext(GeneralContext); 
     
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
@@ -46,6 +47,7 @@ const DatabaseInfoGrabber = () => {
     const {updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest} = useContext(GeneralContext);
     const {selectedAddressTxList, setselectedAddressTxList} = useContext(GeneralContext);
     const {clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList} = useContext(GeneralContext);
+    const {fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance} = useContext(GeneralContext);
     
     useEffect(() => {
         if (updateCommitFriendlyNameRequest){
@@ -71,8 +73,8 @@ const DatabaseInfoGrabber = () => {
         if (heldTokensSelectedAddress){
             fetchSelectedAddressHeldTokens( heldTokensSelectedAddress )
             fetchFNforAddress( heldTokensSelectedAddress )
-            fetchInGameMegaBalance( heldTokensSelectedAddress )
-            fetchAddressTokenTxList(heldTokensSelectedAddress);
+            fetchInGameMegaBalance( heldTokensSelectedAddress, 0 )
+            fetchAddressTokenTxList(heldTokensSelectedAddress, 0);
         }
     },[heldTokensSelectedAddress]);
 
@@ -82,6 +84,22 @@ const DatabaseInfoGrabber = () => {
             setgetUpdatedTokenBalance();
         }
     },[getUpdatedTokenBalance]);
+
+    useEffect(() => {
+        if (fetchFreshStashedTokenBalance && heldTokensSelectedAddress){
+            fetchInGameMegaBalance( heldTokensSelectedAddress, 1 );
+            setfetchFreshStashedTokenBalance(false);
+        }
+    },[fetchFreshStashedTokenBalance]);
+
+    useEffect(() => {
+        if (getUpdatedAddressTokenTxList && heldTokensSelectedAddress){
+            console.log('getting fresh TX records for address: ', heldTokensSelectedAddress, )
+            fetchAddressTokenTxList(heldTokensSelectedAddress, 1);
+            setselectedAddressTxList('loading');
+            setgetUpdatedAddressTokenTxList();
+        }
+    },[getUpdatedAddressTokenTxList]);
 
     //pulls specifically fresh data from the Moralis API
     function fetchUpdatedTokenBalance(address) {
@@ -93,9 +111,10 @@ const DatabaseInfoGrabber = () => {
             setselectedAddressListOfTokens(data);
         })
     }
-    function fetchInGameMegaBalance(token) {
+
+    function fetchInGameMegaBalance(token, getFreshData) {
         console.log('fetching in-game mega balance for address: ', token)
-        fetch('http://10.0.3.2:4000/getStakedMegaBalances/'+token+'?getFresh=false')
+        fetch('http://10.0.3.2:4000/getStakedMegaBalances/'+token+'?getFreshData='+getFreshData)
         .then(response => response.json())
         .then(data => {
             console.log('['+token+'] in-game mega balance: ', data);
@@ -152,10 +171,12 @@ const DatabaseInfoGrabber = () => {
         })
     }
 
-    function fetchAddressTokenTxList(address) {
+    
+
+    function fetchAddressTokenTxList(address, getFreshData) {
         // setclockCountsArrayForSelectedAddressTxList(); //clear it out
         console.log('fetching address token tx list for address: ', address)
-        fetch('http://10.0.3.2:4000/getAddressTXsforToken/'+address+'/filler-filter-change-me-when-we-add-token-filtering-to-mongo')
+        fetch('http://10.0.3.2:4000/getAddressTXsforToken/'+address+'?getFreshData='+getFreshData)
         .then(response => response.json())
         .then(data => {
             console.log('address token tx list: ', data);
@@ -184,6 +205,7 @@ const DatabaseInfoGrabber = () => {
 
             setclockCountsArrayForSelectedAddressTxList(countsArray);
             setselectedAddressTxList(data);
+            // setselectedAddressTxList('loading');
             // setWatchedTokenList(data);
         })
     }

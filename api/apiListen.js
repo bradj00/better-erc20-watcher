@@ -60,7 +60,9 @@ app.listen(listenPort, () => {
 
         });
 
-        app.get('/getAddressTXsforToken/:address/:tokenAddress', cors(),(req, res) => { 
+        app.get('/getAddressTXsforToken/:address', cors(),(req, res) => { 
+            const getFreshData = req.query.getFreshData;
+            console.log('getFreshData: ', req.query.getFreshData);
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
                     h.fancylog(err, 'error');
@@ -76,7 +78,7 @@ app.listen(listenPort, () => {
                 const addressExistsTo = await collection.findOne({to_address: regex});
                 const addressExistsFrom = await collection.findOne({from_address: regex});
 
-                if (addressExistsTo || addressExistsFrom) {
+                if ((addressExistsTo || addressExistsFrom) && (getFreshData != 1) ) {
                     console.log('address exists in collection');
                     collection.find({ $or: [ { from_address: regex }, { to_address: regex } ] }).toArray((err, docs)=> {                         
                         console.log('docs: ', docs.length);
@@ -453,14 +455,14 @@ app.listen(listenPort, () => {
         app.get('/getStakedMegaBalances/:address', cors(), async (req, res1) => {
             const address = req.params.address;
             const slicedAddress = req.params.address.replace('0x', '');
-            const getFresh = req.query.getFresh;
-            console.log('getFresh: ', getFresh)
+            const getFreshData = req.query.getFreshData;
+            console.log('getFreshData: ', getFreshData)
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 const db = client.db('pivotTables');
                 const collection = db.collection('stakedBalances');
                 const stakedBalances = await collection.find({address: address}).toArray();
                 
-                if ((stakedBalances.length == 0) && getFresh==true) {
+                if ((stakedBalances.length == 0) || getFreshData==1) {
                     //fetch in-game balances
                     console.log('fetching................')
                     let payload = {"jsonrpc":"2.0","id":17,"method":"eth_call","params":[{"data":"0xf8b2cb4f000000000000000000000000"+slicedAddress,"to":"0x0d4a54716005d11f1e42c4d615ab8221f9a0d7e3"},"latest"]}

@@ -176,6 +176,9 @@ function DashboardContent() {
   
   const {selectedAddyInGameBalance, setselectedAddyInGameBalance} = useContext(GeneralContext);
   const {megaPriceUsd, setmegaPriceUsd} = useContext(GeneralContext);
+  const {getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList} = useContext(GeneralContext); 
+  const {fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance} = useContext(GeneralContext); 
+
   
   useEffect(() => {
     console.log('megaPriceUsd: ', megaPriceUsd);
@@ -184,6 +187,10 @@ function DashboardContent() {
   useEffect(() => {
     console.log('~~heldTokensSelectedAddressFNdisplayed: ', heldTokensSelectedAddressFNdisplayed);
   },[heldTokensSelectedAddressFNdisplayed]);
+  
+  useEffect(() => {
+    console.log('~~selectedAddressTxList: ', selectedAddressTxList);
+  },[selectedAddressTxList]);
 
   useEffect(() => {
     console.log('heldTokensSelectedAddressFN: ', heldTokensSelectedAddressFN);
@@ -332,6 +339,10 @@ function function66(e){
 }
 
 function determineWhichFNtoShow(tokenObj){
+  // console.log('determineWhichFNtoShow: ', tokenObj)
+  if (typeof tokenObj != 'object'){
+    return (<td style={{color:'#aaa'}}>{getEllipsisTxt(tokenObj, 6)}</td>);
+  }
   for (var key in tokenObj) {
     if (key !== 'ENS' && key !== '_id' && !tokenObj[key].startsWith("0x")) {
         return (<td style={{color:'#fff'}}>{tokenObj[key]}</td>);
@@ -339,7 +350,7 @@ function determineWhichFNtoShow(tokenObj){
   }
 
 
-  return (<td style={{color:'#aaa'}}>{getEllipsisTxt(tokenObj["address"], 4)}</td>);
+  return (<td style={{color:'#aaa'}}>{getEllipsisTxt(tokenObj["address"], 6)}</td>);
 }
 
 
@@ -537,12 +548,12 @@ function determineWhichFNtoShow(tokenObj){
               </div>
 
               {/* Staked/Deposited/Stashed tokens dashboard */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'50%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', }}>
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'34.5%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', }}>
                 {/* <div> */}
                   {/* <div style={{fontSize:'2vw'}}>Staked Balances</div>
                   <div>Display Staked/Deposited/Locked balances belonging to this address</div> */}
 
-                    <div onClick={()=>{console.log('fetching fresh stashed tokens balances..',)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div>
+                    <div onClick={()=>{console.log('fetching fresh stashed tokens balances..',); setfetchFreshStashedTokenBalance(true);  }} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div>
 
                     {selectedAddyInGameBalance?
                     <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
@@ -597,11 +608,11 @@ function determineWhichFNtoShow(tokenObj){
               {/* Community Held Tokens */}
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'79.5%', textAlign:'left', borderRadius:'5px', height:'66%', position:'absolute',top:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div style={{display:'flex', justifyContent:'center'}}>
-                  <div style={{borderRadius:'10px',overflowY:'scroll',display:'flex', justifyContent:'center',alignItems:'center', height:'100%', border:'0px solid #0f0',position:'absolute',top:'0',left:'0',width:'49.5%',}}>
+                  <div style={{borderRadius:'10px',overflowY:'scroll',display:'flex', justifyContent:'center',alignItems:'center', height:'100%', border:'0px solid #0f0',position:'absolute',top:'0',left:'0',width:'49.2%',}}>
                     
                     
                     <div onClick={()=>{console.log('clicked: ',heldTokensSelectedAddress);setselectedAddyInGameBalance(false); setgetUpdatedTokenBalance(heldTokensSelectedAddress)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div>
-                    <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
+                    <table style={{ width:'99.5%',  textAlign:'center', position:'absolute', top:'0', paddingRight:'0.1vw'}}>
                       <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
                         <td colspan="4">
                           &nbsp;Tokens Held By <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span> ({ heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,6) : <>...</>})
@@ -619,7 +630,7 @@ function determineWhichFNtoShow(tokenObj){
                     
                      
 
-
+                          
                       {selectedAddressListOfTokens? selectedAddressListOfTokens.length > 0? Object.keys(selectedAddressListOfTokens[0]).map((token, index) => {
                           // <CommunityTokenTr key={index} token={token} index={index} selectedAddressListOfTokens={selectedAddressListOfTokens} />
                           
@@ -630,7 +641,7 @@ function determineWhichFNtoShow(tokenObj){
                           }
 
                           //filter out tokens that have extendedValue < 1
-                          if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && selectedAddressListOfTokens[0][token].usdValue[0].usdValue && (selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue < 1 || selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue > 1000000000000)  ){
+                          if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && selectedAddressListOfTokens[0][token].usdValue[0].usdValue && (selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue < 0.001 || selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue > 1000000000000)  ){
                             return (<></>)
                           }
                           //filter out blacklisted
@@ -747,7 +758,7 @@ function determineWhichFNtoShow(tokenObj){
             
 
               {/* Address TX activity */}
-              <div style={{overflowY:'scroll', border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'49%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
+              <div style={{overflowY:'scroll', border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'65%', textAlign:'center', borderRadius:'10px', height:'33%', position:'absolute',bottom:'0vh',right:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                 <div>
                   
                   <table style={{ width:'100%',  textAlign:'center', position:'absolute',left:'0', top:'0', paddingRight:'0.1vw'}}>
@@ -755,28 +766,33 @@ function determineWhichFNtoShow(tokenObj){
                         <td colspan="4">
                           &nbsp;ERC-20 Transfers for <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span>
                         </td>
-                        <td>                    <div onClick={()=>{console.log('requesting updated data....',)}} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div></td>
+                        <td>                    <div onClick={()=>{  console.log('requesting updated data....',); setgetUpdatedAddressTokenTxList(true) }} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div></td>
                     </tr>
                     <tr style={{textAlign:'right', position:'sticky', top:'0', backgroundColor:'rgba(0,0,0,0.9)'}}>
                       <td>time</td>
+                      <td>token</td>
+                      <td>amount</td>
                       <td>from</td>
                       <td>to</td>
-                      <td>amount</td>
                       <td>tx hash</td>
                     </tr>
-                    {selectedAddressTxList? selectedAddressTxList.length > 0? selectedAddressTxList.map((tx, index) => {
-                      console.log('tx: ', tx)
-                      return (
-                        <tr style={{textAlign:'right'}}>
-                          <td>{timeAgo.format(new Date(tx.block_timestamp))}</td>
-                          <td>{determineWhichFNtoShow(tx.from_address_friendlyName)}</td>
-                          <td>{determineWhichFNtoShow(tx.to_address_friendlyName)}</td>
-                          <td>{parseFloat(tx.value / (10**18)).toFixed(2)}</td>
-                          <td><a target="_blank" href={"https://etherscan.io/tx/"+tx.transaction_hash}>{getEllipsisTxt(tx.transaction_hash, 6)} </a></td>
-                        </tr>
-                      )
-                    })
-                    : <> </>
+                    {selectedAddressTxList? 
+                      Array.isArray(selectedAddressTxList)? 
+                      selectedAddressTxList.sort((a,b) => (a.block_timestamp > b.block_timestamp) ? 1 : -1).reverse().map((tx, index) => {
+                        // console.log('tx: ', tx)
+                        return (
+                          <tr style={{textAlign:'right'}}>
+                            <td>{timeAgo.format(new Date(tx.block_timestamp))}</td>
+                            <td>{getEllipsisTxt(tx.address,3)}</td>
+                            <td>{parseFloat(tx.value / (10**18)).toFixed(2)}</td>
+                            <td>{determineWhichFNtoShow(tx.from_address_friendlyName)}</td>
+                            <td>{determineWhichFNtoShow(tx.to_address_friendlyName)}</td>
+                            <td><a target="_blank" href={"https://etherscan.io/tx/"+tx.transaction_hash}>{getEllipsisTxt(tx.transaction_hash, 3)} </a></td>
+                          </tr>
+                        )
+                      })
+                      : selectedAddressTxList == "loading"?
+                      <>loading...</>: <> </>
                     : <> </>
                   }
                     
