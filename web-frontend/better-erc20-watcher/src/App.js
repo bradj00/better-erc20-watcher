@@ -51,6 +51,7 @@ const [DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue] = useState()
 const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState();
 
 const [systemStatuses, setSystemStatuses] = useState();
+const [clickedToken, setclickedToken] = useState();
 
 const [updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest] = useState();
 const [RequestFriendlyLookup, setRequestFriendlyLookup] = useState();
@@ -105,7 +106,7 @@ const contextObj = {
   clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList,
   getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList,
   fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance,
-
+  clickedToken, setclickedToken,
 
 }
 

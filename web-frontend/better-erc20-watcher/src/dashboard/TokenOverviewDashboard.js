@@ -34,6 +34,8 @@ import {commaNumber} from './helpers/h.js';
 import ConnectionStatusBanner from './ConnectionStatusBanner';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import tokenImage from './images/token_image.png';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -112,12 +114,13 @@ function DashboardContent() {
     setOpen(!open);
   };
   const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
-
+  const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
   const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
   const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
+  const {clickedToken, setclickedToken} = useContext(GeneralContext);
   
   const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
   const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
@@ -128,12 +131,16 @@ function DashboardContent() {
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
   const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
+  const [showTokenSelector, setshowTokenSelector] = React.useState(false);
   const [searchInput, setsearchInput] = useState("")
   const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
   const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
   const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
   const timeAgo = new TimeAgo('en-US'); 
 
+  useEffect(() => {
+    console.log('showTokenSelector: ', showTokenSelector)
+  },[showTokenSelector]);
   useEffect(() => {
 
   },[DisplayMinAmountFilterValue]);
@@ -185,6 +192,21 @@ function DashboardContent() {
       setsearchInput("") // clear the search field when we open the search bar
     }
   },[clickedSearchBar])
+
+
+
+  function updateSelectedToken (token){
+
+    console.log('clicked: ',token, token); 
+    setviewingTokenAddress(token.tokenAddress.address); 
+    setclickedDetailsAddress(null);
+    setclickedDetailsAddressFN(null);
+    document.title = "👁️ "+token.tokenAddress.name;
+    setclickedTokenSymbol(token.tokenAddress.symbol);
+    setclickedToken(token); 
+    setfilteredtxDataInflow(); 
+    setfilteredtxDataOutflow(); 
+}
 
 
   // clipboard copy method cannot be used without HTTPS and I haven't written my API for https yet. This hack is temp.
@@ -248,19 +270,21 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
           </div> */}
 
 
-              <div style={{position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
+              <div style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
                 
                 
-                <div className="hoverWatchedTokenSelector" style={{zIndex:'9999', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'1vh', display:'flex', justifyContent:'center', textAlign:'center', position:'absolute', left:'19%', top:'0%',width:'15%',height:'100%'}} onClick={()=>{ console.log('clicked to clear filter') }}>
+                <div onClick={()=>{setshowTokenSelector(!showTokenSelector) }} className="hoverWatchedTokenSelector" style={{zIndex:'9999', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'1vh', display:'flex', justifyContent:'center', textAlign:'center', position:'absolute', left:'19%', width:'15%',height:'80%'}} >
                   {
                     viewingTokenAddress? 
-                      <div style={{zIndex:'10000', cursor:'pointer', }} onClick={() => { CopyToClipboard(viewingTokenAddress) }}>
-                        
-                        <div style={{fontSize:'1.5vw', zIndex:'1', position:'absolute', width:'100%', left:'0', top:'0',}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
-                        {    clickedTokenSymbol? <>${clickedTokenSymbol}</> : '...'}
+                      <div style={{zIndex:'10000', cursor:'pointer', }} >
+                        <div style={{display:'flex', justifyContent:'center', alignItems:'center', position:'absolute', top:'0.3vh', left:'0.5vw', border:'0px solid #f00', width:'17%'}}>
+                          <img src={clickedToken && clickedToken.tokenAddress.logo? clickedToken.tokenAddress.logo : tokenImage } style={{width:'90%'}} />
+                        </div>
+                        <div style={{fontSize:'1.5vw', zIndex:'1', position:'absolute', width:'100%', left:'0', top:'-10%',}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
+                        {    clickedToken? <>${clickedToken.tokenAddress.symbol}</> : '...'}
                         </div>
 
-                        <div style={{fontSize:'1vw', color:'#999',fontSize:'2vh',  bottom:'0', width:'100%', left:'0',position:'absolute',}}  >
+                        <div style={{fontSize:'1vw', color:'#999',fontSize:'2vh',  bottom:'-10%', width:'100%', left:'0',position:'absolute',}}  >
                         {getEllipsisTxt(viewingTokenAddress, 6)}
                         </div>
 
@@ -268,6 +292,36 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
                     : 
                       <></>
                   }
+
+                  
+
+
+                </div>
+
+                { showTokenSelector  ?
+                  <div style={{width:'15%', height:'20vh', top:'6vh', backgroundColor:'rgba(0,0,0,1)', left:'19vw', paddingTop:'1vh', position:'absolute'}}>
+                    {watchedTokenList.map((token, index) => (
+                        token? token.tokenAddress?
+                            <div style={{cursor:'pointer', zIndex:'10000', position:'relative', }} onClick={()=>{ updateSelectedToken(token) }}>
+                                <div  style={{padding:'0.6vw',backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(215,215,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} >
+                                  <img src={token.tokenAddress.logo? token.tokenAddress.logo : tokenImage } style={{marginLeft:token.tokenAddress.logo?'0':'-0.5vh', height:token.tokenAddress.logo?'3vh':'4vh'}} />{token.tokenAddress.logo?<>&nbsp;&nbsp;</>: <>&nbsp;</>}
+                                  {token.tokenAddress.symbol}
+                                </div>
+                                {/* <div style={{border:'0px solid #0f0', textAlign:'left', fontSize:'1.3vh', left:'3vw', bottom:'-2%', position:'absolute',color:'#999',fontStyle:'italic', width:'100%',}}>
+                                    re-indexing database in progress
+                                </div> */}
+
+                            </div> 
+                        : <div style={{marginBottom:'1vh'}} key={index}></div> : <div key={index}></div>
+                        
+                    ))}
+                  </div>: <></>
+                  }
+                
+
+
+                <div className="hoverWatchedTokenClippy" onClick={() => { CopyToClipboard(viewingTokenAddress) }} style={{zIndex:'10000', position:'absolute', left:'34.5vw'}}>
+                  <ContentCopyIcon style={{fontSize:'1vw'}}/>
                 </div>
 
 

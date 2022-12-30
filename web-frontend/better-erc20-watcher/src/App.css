@@ -324,7 +324,17 @@ tr:nth-child(odd) {
   user-select: none;
 }
 .hoverWatchedTokenSelector:hover {
-  background-color: rgba(20,20,40,0.4);
+  background-color: rgba(35,35,35,0.4);
+  cursor:pointer;
+  user-select: none;
+}
+.hoverWatchedTokenClippy {
+  color: rgba(255,255,255,0.4);
+  cursor:pointer;
+  user-select: none;
+}
+.hoverWatchedTokenClippy:hover {
+  color: rgba(255,255,255,1);
   cursor:pointer;
   user-select: none;
 }
