@@ -3,7 +3,7 @@ Watch ERC-20 transactions live.
 
 Categorize on-chain actions and give friendly labels to addresses.
 
-Step into a tokenized community and rapidly gain analytical advantage.
+Step into a tokenized community and rapidly gain analytical insight.
 
 
 ## Coming soon: Install instructions and pre-requisites to use this tool.
