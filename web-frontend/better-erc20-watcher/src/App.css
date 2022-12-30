@@ -317,3 +317,14 @@ tr:nth-child(odd) {
   border-radius: 0.5vh;
   grid-column: span 2;
 }
+
+.hoverWatchedTokenSelector {
+  background-color: rgba(20,20,20,1);
+  cursor:pointer;
+  user-select: none;
+}
+.hoverWatchedTokenSelector:hover {
+  background-color: rgba(20,20,40,0.4);
+  cursor:pointer;
+  user-select: none;
+}

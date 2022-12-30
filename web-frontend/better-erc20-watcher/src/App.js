@@ -118,7 +118,7 @@ return (
   <>
     <GeneralContext.Provider value={contextObj} >
       <div style={{display:'hidden', overflow:'hidden', border:'0px solid #0f0'}}>
-          <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
+          {/* <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/> */}
           {displayPanel == 'watchingTokens'? <TokenOverviewDashboard />: <></>}
           {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
           {displayPanel == 'tokenSummary'? <TokenHoldersDashboard />: <></>}

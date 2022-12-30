@@ -155,8 +155,24 @@ export default function Orders() {
     // 
   }
 
+  function determineRowColor(row){
+    if (row == null || row == undefined){return 'rgba(0, 0, 0, 1)'}
+    // if ( typeof row.to_address_FriendlyName === 'object' && row.to_address_FriendlyName == null ) { return 'rgba(0, 0, 0, 1)'}
+    // if ( typeof row.from_address_FriendlyName === 'object' && row.from_address_FriendlyName == null ) { return 'rgba(0, 0, 0, 1)'}
+    if (  row.from_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+      return 'rgba(0, 70, 0, 0.6)'
+    } 
+    else if (  row.to_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+      return 'rgba(70, 0, 0, 0.6)'
+    } 
+    else return 'rgba(0, 0, 0, 0.1)'
+  
+   
+  }
 
+  
   const displayAddressFN = (clickedDetailsAddressFN) => {
+    if (clickedDetailsAddressFN === null || clickedDetailsAddressFN == undefined) {return 'null'}
     let firstAddress;
     Object.keys(clickedDetailsAddressFN).map(key => {
       if (key !== '_id' && key !== 'ENS' && key !== 'address' && ( typeof clickedDetailsAddressFN[key] === 'string' && !clickedDetailsAddressFN[key].startsWith('0x') ) ) {
@@ -215,7 +231,8 @@ export default function Orders() {
               // console.log('from: ', row.from_address_friendlyName, 'to: ', row.to_address_friendlyName)
               return(
                 
-                <TableRow className={rowAge > 100? "rowHover": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
+                // <TableRow className={rowAge > 100? "rowHover": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
+                <TableRow className={rowAge > 100? "rowHover": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? determineRowColor(row) :'rgba(0,0,0,0)'}} key={index}>
                   <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
                   {/* <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell> */}
                   <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>

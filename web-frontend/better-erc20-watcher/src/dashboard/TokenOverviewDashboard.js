@@ -32,8 +32,8 @@ import en from 'javascript-time-ago/locale/en';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import {commaNumber} from './helpers/h.js';
 import ConnectionStatusBanner from './ConnectionStatusBanner';
-
-
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -111,6 +111,8 @@ function DashboardContent() {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
+
   const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
   const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
@@ -226,13 +228,9 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
 
-        {/* <AppBar position="absolute" open={open}> */}
-          {/* <Toolbar
-            sx={{
-              pr: '24px', // keep right padding when drawer closed
-            }}
-          > */}
-          <div style={{fontSize:'1.5vh', position:'absolute', right:'15vw', top:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', backgroundColor:'rgba(0,0,0,0.4)',width:'13vw', height:'6.5vh'}}>
+
+          
+          {/* <div style={{fontSize:'1.5vh', position:'absolute', right:'15vw', top:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', backgroundColor:'rgba(0,0,0,0.4)',width:'13vw', height:'6.5vh'}}>
             <div style={{}}>
               <div  style={{position:'absolute', left:'0', top:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
                 Filter Amount
@@ -247,27 +245,34 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
                 Reset
               </div>
             </div>
-          </div>
+          </div> */}
 
 
-              <div style={{position:'absolute', height:'7vh', width:'83.5vw',paddingLeft:'0.5vw', paddingRigth:'0.5vw', right:'0', border:'1px solid #f0f', display:'flex', justifyContent:'left', alignItems:'center', top:'0',}}>
-              <div style={{zIndex:'9999', }} onClick={()=>{ console.log('clicked to clear filter') }}>
-                {
-                  viewingTokenAddress? 
-                    <div style={{zIndex:'10000'}} onClick={() => { console.log('asldfkjdsflkdsfj'); CopyToClipboard(viewingTokenAddress) }}>
-                      <div style={{zIndex:'1',paddingRight:'2vw',marginTop:'-3vh'}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
-                      {    clickedTokenSymbol? <>${clickedTokenSymbol}</> : '...'}
-                      </div>
-                      <div style={{color:'#999',fontSize:'2vh', bottom:'0.1vh', position:'absolute',}}  >
-                      {getEllipsisTxt(viewingTokenAddress, 6)}
-                      </div>
-                    </div>
-                  : 
-                    <></>
-                }
-              </div>
+              <div style={{position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
                 
-                <div style={{color:'#999', width:'30%',display:'flex', border:'1px solid #ff0', position:'absolute', top:'25%', left:'13%'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
+                
+                <div className="hoverWatchedTokenSelector" style={{zIndex:'9999', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'1vh', display:'flex', justifyContent:'center', textAlign:'center', position:'absolute', left:'19%', top:'0%',width:'15%',height:'100%'}} onClick={()=>{ console.log('clicked to clear filter') }}>
+                  {
+                    viewingTokenAddress? 
+                      <div style={{zIndex:'10000', cursor:'pointer', }} onClick={() => { CopyToClipboard(viewingTokenAddress) }}>
+                        
+                        <div style={{fontSize:'1.5vw', zIndex:'1', position:'absolute', width:'100%', left:'0', top:'0',}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
+                        {    clickedTokenSymbol? <>${clickedTokenSymbol}</> : '...'}
+                        </div>
+
+                        <div style={{fontSize:'1vw', color:'#999',fontSize:'2vh',  bottom:'0', width:'100%', left:'0',position:'absolute',}}  >
+                        {getEllipsisTxt(viewingTokenAddress, 6)}
+                        </div>
+
+                      </div>
+                    : 
+                      <></>
+                  }
+                </div>
+
+
+                
+                <div style={{color:'#999', width:'30%',display:'flex', border:'0px solid #ff0', position:'absolute', top:'25%', left:'0%'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
                 {viewingTokenAddress? <SearchIcon />:<></>}
                 
                 {
@@ -276,7 +281,7 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
                   
                     <div style={{zIndex:'9999', }} id="searchBox" >
                       <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
-                        <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'5vh', width:'20vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
+                        <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'20vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
                       </form>
                     </div>
                   
@@ -291,97 +296,30 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
           
                 } 
                 </div>
-              </div>
-            {/* </Typography> */}
+                <div style={{border:'0px solid #0ff', position:'absolute',top:'5%',}}>
+                  <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
+                </div>
 
-              <div style={{position:'absolute', right: '1vw', top:'1vh',zIndex:'9999',}}>
+                <div onClick={()=>{ setAudioEnabled(!audioEnabled) }}  style={{zIndex:'10000', cursor:'pointer', border:'0px solid #0ff', right:'5%', top:'20%', position:'absolute',}}>
+                  {audioEnabled? <NotificationsActiveIcon style={{fontSize:'1.5vw'}}/> : <NotificationsOffIcon style={{fontSize:'1.5vw'}}/>}
+                </div>
+
+
+              </div>
+
+
+              {/* <div style={{position:'absolute', right: '1vw', top:'1vh',zIndex:'9999',}}>
                 <AudioToggle />
-              </div>
+              </div> */}
 
-          {/* </Toolbar> */}
-        {/* </AppBar> */}
-                
-        {/* <Drawer variant="permanent" open={open}> */}
-          <div style={{width:'16.5vw'}}>
-          <Toolbar sx={{display: 'flex',alignItems: 'center',justifyContent: 'flex-end',px: [1],}} />
-          <Divider />
           
-
-
-          <List style={{overflow:'hidden'}} component="nav">
-            <MainList />
-            <SecondaryList />
-          </List>
+          {/* it went here WALRUS  */}
           
-          <div style={{border:'0px solid #0aa', color:'#999', position:'absolute',bottom:'0%', width:'16.5vw', height:'20vh', display:'flex', justifyContent:'center', alignItems:'center'}}>
-                  
-                  <div className={chainDataHeartbeatDiff? chainDataHeartbeatDiff > 5000? "deadHeartbeat":"goodHeartbeat":""} style={{position:'absolute', width:'100%',height:'100%', fontSize:'3vh', zIndex:'9999',  display:'flex', justifyContent:'center', alignItems:'center',  backgroundColor:chainDataHeartbeatDiff? chainDataHeartbeatDiff > 1000?'rgba(150,30,30,1)': 'rgba(0,150,0,0.4)':'rgba(150,150,0,0.8)',}}>
-                      {chainDataHeartbeatDiff? chainDataHeartbeatDiff > 5000?  <>stale data</>: <>up to date</>: <>fetching data</>}
-                      {/* {chainDataHeartbeatDiff? chainDataHeartbeatDiff:<></>} */}
-
-                  </div>
-                  
-                  <div style={{position:'absolute', top:'2%',  }}>
-                    Services Health:
-                  </div>
-                  <div style={{width:'95%', textAlign:'left', }}>
-                    <div style={{position:'relative', left:'2%'}}>
-                      Latest Block: 
-                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
-                        {latestEthBlock? <a target="blank_" href={("https://etherscan.io/block/"+latestEthBlock.block)}> {commaNumber(latestEthBlock.block)} </a>:<>...</>}
-                      </div>
-                    </div>
-
-                    <div style={{position:'relative', left:'2%'}}>
-                      TX Ingestion: 
-                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}>
-                         <CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                      </div>
-                    </div>
-
-                    <div style={{position:'relative', left:'2%'}}>
-                      Address Translator: 
-                        <div style={{float:'right', position:'absolute', top:'0', right:'5%', color:'#aa0'}}> 
-                          
-                          
-                          { // find the 'translator' service in the array of services
-                            // systemStatuses? 
-                            // commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax) > 0? 
-                            // // if it's found, display "lookupIndex" / "lookupIndexMax"
-                            // <> {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndex)} / {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax)} </>
-                          
-                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                          }
-                        </div>
-                    </div>
-
-                    <div style={{position:'relative', left:'2%'}}>
-                      API: 
-                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
-                        <CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                      </div>
-                    </div>
-                  </div>
-          </div>
-          {/* </Drawer> */}
-          </div>
-        <Box
-          component="main"
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
-          }}
-        >
+       
           <Toolbar />
-          <Container maxWidth="xl" sx={{ mt: 4, mb: 1 }}>
+          <div style={{position:'absolute', width:"100%", height:'100%',display:'flex',justifyContent:'center',}}>
             
-            <div style={{position:'absolute', width:'80vw', left:'18vw', top:'10vh', border:'0px solid #ff0'}}>
+            <div style={{position:'absolute', width:'80%', top:'10vh', border:'0px solid #ff0'}}>
               
               <div style={{position:'absolute', width:'100%', display:'flex',}}>
                 <div style={{position:'absolute', left:'0', width:'75%', height:'25vh',padding:'1.5vw', border:'0px solid #f0f'}}>
@@ -400,9 +338,18 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
             </div>
             
            
-          </Container>
+            </div>
         </Box>
-      </Box>
+      {/* </Box> */}
+      
+
+      
+
+
+      {/* <List style={{overflow:'hidden'}} component="nav">
+        <MainList />
+        <SecondaryList />
+      </List> */}
     </ThemeProvider>
       </div>
   );
