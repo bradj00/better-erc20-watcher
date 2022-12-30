@@ -57,7 +57,12 @@ const Topbanner = () => {
     const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
     const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
     const [showTokenSelector, setshowTokenSelector] = React.useState(false);
+    
     const [searchInput, setsearchInput] = useState("")
+    const {searchInputLookup, setsearchInputLookup} = useContext(GeneralContext);
+    const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
+
+
     const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
     const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
     const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
@@ -81,6 +86,7 @@ const Topbanner = () => {
 };
   /////////////////////////////////////////////////
   const displayAddressFN = (clickedDetailsAddressFN) => {
+    if (!clickedDetailsAddressFN) return;
     let firstAddress;
     Object.keys(clickedDetailsAddressFN).map(key => {
       if (key !== '_id' && key !== 'address' && typeof clickedDetailsAddressFN[key] === 'string' && !clickedDetailsAddressFN[key].startsWith('0x') ) {
@@ -107,6 +113,19 @@ const Topbanner = () => {
         setfilteredtxDataOutflow(); 
     }
     
+    useEffect(() => {
+        const timer = setTimeout(() => {
+          console.log("Executing function after 1 second of not typing in input field");
+          setsearchInputLookup(searchInput);
+          if (searchInput.length == 0) {
+            setFriendlyLookupResponse(null);
+          }
+        }, 500);
+      
+        return () => clearTimeout(timer);
+      }, [searchInput]);
+
+
     return (
     <div style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
                 
@@ -164,29 +183,45 @@ const Topbanner = () => {
 
 
 
-    <div style={{color:'#999', width:'30%',display:'flex', border:'0px solid #ff0', position:'absolute', top:'25%', left:'0%'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
-    {viewingTokenAddress? <SearchIcon />:<></>}
+    <div style={{color:'#999', width:'30%',display:'flex', border:'0px solid #ff0', position:'absolute', top:'25%', left:'0%'}} >
+    <div onClick={()=>{setclickedSearchBar(!clickedSearchBar);}} style={{cursor:'pointer', zIndex:'10000'}}>
+        {viewingTokenAddress? <SearchIcon />:<></>}
+    </div>
 
     {
         (clickedDetailsAddressFN || clickedSearchBar)?
         clickedSearchBar?
         
-        <div style={{zIndex:'9999', }} id="searchBox" >
-            <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
-            <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'20vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
-            </form>
+            <div style={{zIndex:'9999', }} id="searchBox" >
+                <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
+                <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'15vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
+                </form>
+            {friendlyLookupResponse?
+            
+            <div onClick={()=>{setclickedDetailsAddress(friendlyLookupResponse.address); setclickedDetailsAddressFN(displayAddressFN(friendlyLookupResponse)); setclickedSearchBar(false) }} style={{border:'0px solid #0ff', position:'absolute',top:'100%',width:'15vw', cursor:'pointer', backgroundColor:'rgba(10,10,10,1)', padding:'1vh', height:'12vh', border:'1px solid rgba(30,30,30,1)'}}>
+                {displayAddressFN(friendlyLookupResponse)}
+            </div>
+        :<></>
+        }
+
         </div>
         
         :
         <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-        {displayAddressFN(clickedDetailsAddressFN)}
+            {displayAddressFN(friendlyLookupResponse)? displayAddressFN(friendlyLookupResponse)
+            :
+            <div style={{zIndex:'9999', color:'#999', position:'absolute', left:'15%', }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+                {viewingTokenAddress? <>(click to search)</>:<></>}
+            </div>
+            }
         </div>
         :
         <div style={{zIndex:'9999', color:'#999', position:'absolute', left:'15%', }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-        {viewingTokenAddress? <>(click to search)</>:<></>}
+            {viewingTokenAddress? <>(click to search)</>:<></>}
         </div>
 
     } 
+
     </div>
     <div style={{border:'0px solid #0ff', position:'absolute',top:'5%',}}>
         <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>

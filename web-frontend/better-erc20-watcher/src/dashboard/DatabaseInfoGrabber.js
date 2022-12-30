@@ -21,7 +21,7 @@ const DatabaseInfoGrabber = () => {
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext); 
     const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
     const {chainDataHeartbeatDiff, setchainDataHeartbeatDiff} = useContext(GeneralContext);
-    
+    const {searchInputLookup, setsearchInputLookup} = useContext(GeneralContext);
     const {selectedAddyInGameBalance, setselectedAddyInGameBalance} = useContext(GeneralContext);
     
     // explicit context variables needed because we are watching staking and deposit behavior for these addresses
@@ -50,13 +50,21 @@ const DatabaseInfoGrabber = () => {
     const {fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance} = useContext(GeneralContext);
     
     useEffect(() => {
+        if (searchInputLookup){
+            console.log('~~~~ searchInputLookup: ', searchInputLookup);
+            fetchFriendlyNameLookup(searchInputLookup)
+        }
+    },[searchInputLookup]);
+
+    useEffect(() => {
         if (updateCommitFriendlyNameRequest){
-            console.log('~~~~ updateCommitFriendlyNameRequest: ', updateCommitFriendlyNameRequest);
+            // console.log('~~~~ updateCommitFriendlyNameRequest: ', updateCommitFriendlyNameRequest);
             updateAFriendlyName(updateCommitFriendlyNameRequest.address, updateCommitFriendlyNameRequest.friendlyName)
         }
     },[updateCommitFriendlyNameRequest]);
+
     useEffect(() => {
-        console.log('MinAmountFilterValue,MaxAmountFilterValue: ', MinAmountFilterValue,MaxAmountFilterValue)
+        // console.log('MinAmountFilterValue,MaxAmountFilterValue: ', MinAmountFilterValue,MaxAmountFilterValue)
         if (MinAmountFilterValue !=1 && MaxAmountFilterValue != 1){
             fetchTransactions( viewingTokenAddress , MinAmountFilterValue, MaxAmountFilterValue)
         }
@@ -64,7 +72,7 @@ const DatabaseInfoGrabber = () => {
     
     useEffect(() => {
         if (communityHeldListFromSelectedAddy){
-            console.log('~~~~ communityHeldListFromSelectedAddy: ', communityHeldListFromSelectedAddy);
+            // console.log('~~~~ communityHeldListFromSelectedAddy: ', communityHeldListFromSelectedAddy);
             fetchCommonlyHeldToken(communityHeldListFromSelectedAddy)
         }
     },[communityHeldListFromSelectedAddy]);
