@@ -5,6 +5,7 @@ import AddressSummaryDashboard from './dashboard/AddressSummaryDashboard.js';
 import DatabaseInfoGrabber from './dashboard/DatabaseInfoGrabber.js';
 import React, {useContext, useEffect, useState} from 'react';
 import ConnectionStatusBanner from './dashboard/ConnectionStatusBanner.jsx';
+import Topbanner from './dashboard/Topbanner.jsx';
 
 
 
@@ -118,8 +119,9 @@ useEffect(() => {
 return (
   <>
     <GeneralContext.Provider value={contextObj} >
-      <div style={{display:'hidden', overflow:'hidden', border:'0px solid #0f0'}}>
+      <div style={{display:'hidden', overflow:'hidden',display:'flex', alignItems:'center',  border:'0px solid #0f0'}}>
           {/* <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/> */}
+          <Topbanner />
           {displayPanel == 'watchingTokens'? <TokenOverviewDashboard />: <></>}
           {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
           {displayPanel == 'tokenSummary'? <TokenHoldersDashboard />: <></>}

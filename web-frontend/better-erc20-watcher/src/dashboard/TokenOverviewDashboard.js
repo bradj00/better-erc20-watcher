@@ -166,14 +166,14 @@ function DashboardContent() {
 
 
 
-  function updateSelectedToken (){
-    // setviewingTokenAddress(); 
-    setclickedDetailsAddress(null);
-    setclickedDetailsAddressFN(null);
+  // function updateSelectedToken (){
+  //   // setviewingTokenAddress(); 
+  //   setclickedDetailsAddress(null);
+  //   setclickedDetailsAddressFN(null);
   
-    setfilteredtxDataInflow(); 
-    setfilteredtxDataOutflow();
-  }
+  //   setfilteredtxDataInflow(); 
+  //   setfilteredtxDataOutflow();
+  // }
   
   useEffect(()=>{
     if (searchInput){
@@ -270,96 +270,7 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
           </div> */}
 
 
-              <div style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
-                
-                
-                <div onClick={()=>{setshowTokenSelector(!showTokenSelector) }} className="hoverWatchedTokenSelector" style={{zIndex:'9999', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'1vh', display:'flex', justifyContent:'center', textAlign:'center', position:'absolute', left:'19%', width:'15%',height:'80%'}} >
-                  {
-                    viewingTokenAddress? 
-                      <div style={{zIndex:'10000', cursor:'pointer', }} >
-                        <div style={{display:'flex', justifyContent:'center', alignItems:'center', position:'absolute', top:'0.3vh', left:'0.5vw', border:'0px solid #f00', width:'17%'}}>
-                          <img src={clickedToken && clickedToken.tokenAddress.logo? clickedToken.tokenAddress.logo : tokenImage } style={{width:'90%'}} />
-                        </div>
-                        <div style={{fontSize:'1.5vw', zIndex:'1', position:'absolute', width:'100%', left:'0', top:'-10%',}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
-                        {    clickedToken? <>${clickedToken.tokenAddress.symbol}</> : '...'}
-                        </div>
-
-                        <div style={{fontSize:'1vw', color:'#999',fontSize:'2vh',  bottom:'-10%', width:'100%', left:'0',position:'absolute',}}  >
-                        {getEllipsisTxt(viewingTokenAddress, 6)}
-                        </div>
-
-                      </div>
-                    : 
-                      <></>
-                  }
-
-                  
-
-
-                </div>
-
-                { showTokenSelector  ?
-                  <div style={{width:'15%', height:'20vh', top:'6vh', backgroundColor:'rgba(0,0,0,1)', left:'19vw', paddingTop:'1vh', position:'absolute'}}>
-                    {watchedTokenList.map((token, index) => (
-                        token? token.tokenAddress?
-                            <div style={{cursor:'pointer', zIndex:'10000', position:'relative', }} onClick={()=>{ updateSelectedToken(token) }}>
-                                <div  style={{padding:'0.6vw',backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(215,215,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} >
-                                  <img src={token.tokenAddress.logo? token.tokenAddress.logo : tokenImage } style={{marginLeft:token.tokenAddress.logo?'0':'-0.5vh', height:token.tokenAddress.logo?'3vh':'4vh'}} />{token.tokenAddress.logo?<>&nbsp;&nbsp;</>: <>&nbsp;</>}
-                                  {token.tokenAddress.symbol}
-                                </div>
-                                {/* <div style={{border:'0px solid #0f0', textAlign:'left', fontSize:'1.3vh', left:'3vw', bottom:'-2%', position:'absolute',color:'#999',fontStyle:'italic', width:'100%',}}>
-                                    re-indexing database in progress
-                                </div> */}
-
-                            </div> 
-                        : <div style={{marginBottom:'1vh'}} key={index}></div> : <div key={index}></div>
-                        
-                    ))}
-                  </div>: <></>
-                  }
-                
-
-
-                <div className="hoverWatchedTokenClippy" onClick={() => { CopyToClipboard(viewingTokenAddress) }} style={{zIndex:'10000', position:'absolute', left:'34.5vw'}}>
-                  <ContentCopyIcon style={{fontSize:'1vw'}}/>
-                </div>
-
-
-                
-                <div style={{color:'#999', width:'30%',display:'flex', border:'0px solid #ff0', position:'absolute', top:'25%', left:'0%'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
-                {viewingTokenAddress? <SearchIcon />:<></>}
-                
-                {
-                  (clickedDetailsAddressFN || clickedSearchBar)?
-                    clickedSearchBar?
-                  
-                    <div style={{zIndex:'9999', }} id="searchBox" >
-                      <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
-                        <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'20vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
-                      </form>
-                    </div>
-                  
-                    :
-                    <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-                    {displayAddressFN(clickedDetailsAddressFN)}
-                    </div>
-                  :
-                  <div style={{zIndex:'9999', color:'#999', position:'absolute', left:'15%', }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-                    {viewingTokenAddress? <>(click to search)</>:<></>}
-                  </div>
-          
-                } 
-                </div>
-                <div style={{border:'0px solid #0ff', position:'absolute',top:'5%',}}>
-                  <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
-                </div>
-
-                <div onClick={()=>{ setAudioEnabled(!audioEnabled) }}  style={{zIndex:'10000', cursor:'pointer', border:'0px solid #0ff', right:'5%', top:'20%', position:'absolute',}}>
-                  {audioEnabled? <NotificationsActiveIcon style={{fontSize:'1.5vw'}}/> : <NotificationsOffIcon style={{fontSize:'1.5vw'}}/>}
-                </div>
-
-
-              </div>
+             
 
 
               {/* <div style={{position:'absolute', right: '1vw', top:'1vh',zIndex:'9999',}}>

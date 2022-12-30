@@ -39,7 +39,7 @@ import CommunityTokenTr from './subcomponents/CommunityTokenTr';
 import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
 import TxTimeOfDayChart from './subcomponents/TxTimeOfDayChart.tsx';
 import LoadingTableSpinner from './subcomponents/LoadingTableSpinner.tsx';
-
+import ethLogo from './images/eth-logo.png';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -359,121 +359,16 @@ function determineWhichFNtoShow(tokenObj){
 
 
   return (
-    <div style={{overflow:'hidden'}}>
+    <div style={{overflow:'hidden', position:'absolute', width:'100%', height:'95%', display:'flex', justifyContent:'center', alignItems:'center', top:'1.5vh', border:'0px solid #ff0'}}>
     <ThemeProvider theme={mdTheme}>
-      <Box sx={{ display: 'flex' }}>
+      {/* <Box sx={{ display: 'flex' }}> */}
         <CssBaseline />
 
-        <AppBar position="absolute" open={open}>
-          <Toolbar
-            sx={{
-              pr: '24px', 
-            }}
-          >
-            <IconButton color="inherit">
-                <div style={{position:'fixed', right: '4vw', top:'2vh',zIndex:'9999',}}>
-                  <AudioToggle />
-                </div>
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        
-        <Drawer variant="permanent" open={open}>
-          <Toolbar
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              px: [1],
-            }}
-          >
-            {/* <IconButton onClick={toggleDrawer}>
-              <ChevronLeftIcon />
-            </IconButton> */}
-          </Toolbar>
 
 
-          <Divider />
-          <List style={{overflow:'hidden'}} component="nav">
-         
-
-          </List>
-          <div style={{border:'0px solid #0aa', color:'#999', position:'absolute',bottom:'0%', width:'100%', height:'20vh', display:'flex', justifyContent:'center', alignItems:'center'}}>
-                  
-                  <div className={chainDataHeartbeatDiff? chainDataHeartbeatDiff > 5000? "deadHeartbeat":"goodHeartbeat":""} style={{position:'absolute', width:'100%',height:'100%', fontSize:'3vh', zIndex:'9999',  display:'flex', justifyContent:'center', alignItems:'center',  backgroundColor:chainDataHeartbeatDiff? chainDataHeartbeatDiff > 1000?'rgba(150,30,30,1)': 'rgba(0,150,0,0.4)':'rgba(150,150,0,0.8)',}}>
-                      {chainDataHeartbeatDiff? chainDataHeartbeatDiff > 5000?  <>stale data</>: <>up to date</>: <>fetching data</>}
-                      {/* {chainDataHeartbeatDiff? chainDataHeartbeatDiff:<></>} */}
-
-                  </div>
-                  
-                  <div style={{position:'absolute', top:'2%',  }}>
-                    Services Health:
-                  </div>
-                  <div style={{width:'95%', textAlign:'left', }}>
-                    <div style={{position:'relative', left:'2%'}}>
-                      Latest Block: 
-                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
-                        {latestEthBlock? <a target="blank_" href={("https://etherscan.io/block/"+latestEthBlock.block)}> {commaNumber(latestEthBlock.block)} </a>:<>...</>}
-                      </div>
-                    </div>
-
-                    <div style={{position:'relative', left:'2%'}}>
-                      TX Ingestion: 
-                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}>
-                         <CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                      </div>
-                    </div>
-
-                    <div style={{position:'relative', left:'2%'}}>
-                      Address Translator: 
-                        <div style={{float:'right', position:'absolute', top:'0', right:'5%', color:'#aa0'}}> 
-                          
-                          
-                          { // find the 'translator' service in the array of services
-                            // systemStatuses? 
-                            // commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax) > 0? 
-                            // // if it's found, display "lookupIndex" / "lookupIndexMax"
-                            // <> {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndex)} / {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax)} </>
-                          
-                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                          }
-                        </div>
-                    </div>
-
-                    <div style={{position:'relative', left:'2%'}}>
-                      API: 
-                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
-                        <CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                      </div>
-                    </div>
-                  </div>
-          </div>
-
-        </Drawer>
-        <Box
-          component="main"
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
-          }}
-        >
-          <Toolbar />
-          <Container maxWidth="xl" sx={{ mt: 4, mb: 1 }}>
-            <div style={{border:'0px solid #0f0', width:'82.5%', left:'17vw',top:'7.5vh', zIndex:'9999', height:'92%', position:'absolute',}}>
-              
-              {/* address header  */}
-              {/* <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'center', borderRadius:'10px', height:'10%', position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
-                <div style={{position:'absolute', top:'5%'}}>
-                  <div style={{fontSize:'1.5vw'}}> <a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>  </div>
-                  <div style={{fontSize:'1vw'}}> <span style={{color:'rgba(255,150,18,1)'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span>  </div>
-                </div>
-              </div> */}
+          
+            <div style={{border:'0px solid #0f0', width:'95%', top:'7.5vh', zIndex:'9999', height:'92%', position:'absolute',}}>
+     
 
               {/* aliases dashboard*/}
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'10px', height:'20%', position:'absolute',top:'0%',display:'flex', justifyContent:'center',alignItems:'center'}}>
@@ -487,7 +382,7 @@ function determineWhichFNtoShow(tokenObj){
                     <table style={{ width:'100%',  textAlign:'center', position:'absolute', top:'-2vh', paddingRight:'0.1vw'}}>
                       <tr style={{textAlign:'left', backgroundColor:'rgba(0,0,0,0.3)',position:'sticky', }}>
                         <td colspan="4">
-                          &nbsp;Ids of <span style={{color:'rgba(255,150,18,1)',fontSize:'1.75vh'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span> (<a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>)
+                          &nbsp;IDs of <span style={{color:'rgba(255,150,18,1)',fontSize:'1.75vh'}}>{heldTokensSelectedAddressFNdisplayed? heldTokensSelectedAddressFNdisplayed.startsWith('0x') && heldTokensSelectedAddressFNdisplayed.length === 42? getEllipsisTxt(heldTokensSelectedAddressFNdisplayed,6):heldTokensSelectedAddressFNdisplayed: <>...</>}</span> (<a href={"https://etherscan.io/address/"+heldTokensSelectedAddress} target="blank_">{heldTokensSelectedAddress? getEllipsisTxt(heldTokensSelectedAddress,7): <>...</>}</a>)
                         </td>
                       </tr>
                       <tr style={{backgroundColor:'rgba(0,0,0,0.9)',position:'sticky', top:'0'}}>
@@ -528,23 +423,9 @@ function determineWhichFNtoShow(tokenObj){
                 </div>
               </div>
 
-              {/* misc stats */}
-              {/* <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'29.5%', textAlign:'center', borderRadius:'10px', height:'32%', position:'absolute',top:'0%',left:'16.9vw', display:'flex', justifyContent:'center',alignItems:'center'}}>
-                <div>
-                  <div>Misc Stats</div>
-                  <div>wallet age:</div>
-                  <div>...</div>
-                </div>
-              </div> */}
 
               {/* Token Heuristic Inflow/Outflow */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'10px', height:'33%', position:'absolute',top:'33.5%',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
-                {/* <div>
-                  <div>Heuristic Inflow/Outflow</div>
-                  <div>Common Senders To this Address:</div>
-                  <div>Common Receivers from this Address:</div>
-                  <div>Initially funded from: (Binance, clickable address, etc)</div>
-                </div> */}
+              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'20%', textAlign:'left', borderRadius:'10px', height:'38vh', position:'absolute',top:'19.8vh',left:'0vw', display:'flex', justifyContent:'center',alignItems:'center', paddingLeft:'1vw'}}>
                   <div style={{position:'absolute', left:'0', top:'0',width:'100%', height:'100%', border:'0px solid #0f0'}}>
                     <TxTimeOfDayChart selectedAddressTxList={selectedAddressTxList} clockCountsArrayForSelectedAddressTxList={clockCountsArrayForSelectedAddressTxList}/>
                   </div>
@@ -717,28 +598,6 @@ function determineWhichFNtoShow(tokenObj){
                           (a, b) => b[communityHeldListFromSelectedAddy]? a[communityHeldListFromSelectedAddy]? b[communityHeldListFromSelectedAddy].metadata.balance - a[communityHeldListFromSelectedAddy].metadata.balance : 0: 0).map((token, index) => {
                           return(<CommunityTokenTr key={index} token={token} index={index} />)
                           
-  //                           // console.log('Address that shares common token: ', token.address, communityHeldListFromSelected)   
-  //                         // if (selectedAddressListOfTokens[0][token.address]){ console.log('~~~~~~~~~~',selectedAddressListOfTokens[0][token.address])  }
-  //                           console.log('token: ', token)
- 
-  //                         //this needs to be paginated on the API side and infinitescrolled here or else it wont be performant for large lists 
-  //                         return (  
-  //                            token.address?
-  //                            <tr onClick={()=>{ console.log('clicked: ',token.address); setheldTokensSelectedAddress(token.address) }} style={{cursor:'pointer', backgroundColor:'rgba(200,150,10,0.4)'}}>
-  //                              {determineWhichFNtoShow(token.friendlyName)}
-  //                              <td><a target="_blank" href={"https://etherscan.io/address/"+token.address}>{getEllipsisTxt(token.address,4)}</a></td>
-  //                              <td style={{textAlign:'right'}}>
-  //                               {token[communityHeldListFromSelectedAddy]?
-  //                                commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals)).toFixed(4))
-  //                                : <></>}
-  //                              </td>
-                                
-  //                              <td style={{textAlign:'right'}}>
-  //                                 $ {clickedTokenUsdQuote?token[communityHeldListFromSelectedAddy]? commaNumber(parseFloat((token[communityHeldListFromSelectedAddy].metadata.balance)/ (10 ** token[communityHeldListFromSelectedAddy].metadata.decimals) * clickedTokenUsdQuote).toFixed(2)): <></>: <></>}
-  //                              </td>
-  //                            </tr>
-  //                            : <> </>
-  // )
                          })
                          : <> </>
                          : <> </>
@@ -752,10 +611,6 @@ function determineWhichFNtoShow(tokenObj){
                   
                   
 
-
-                  {/* Token Balances For this Address */}
-                  {/* <div>When clicking a balance, show on right: Other holders of this token from your watchedToken collections</div>
-                  <div>Show Staked Token locations (locked in contract somewhere)</div> */}
                 </div>
               </div>
 
@@ -773,6 +628,7 @@ function determineWhichFNtoShow(tokenObj){
                         <td>                    <div onClick={()=>{  console.log('requesting updated data....',); setgetUpdatedAddressTokenTxList(true) }} className="hover" title="refresh token balances" style={{zIndex:'10000', position:'absolute',right:'0.5%', top:'0.3%'}}><RotateRightIcon /> </div></td>
                     </tr>
                     <tr style={{textAlign:'right', position:'sticky', top:'0', backgroundColor:'rgba(0,0,0,0.9)'}}>
+                      <td style={{textAlign:'center'}}>chain</td>
                       <td>time</td>
                       <td>token</td>
                       <td>amount</td>
@@ -796,6 +652,7 @@ function determineWhichFNtoShow(tokenObj){
                         // console.log('tx: ', tx)
                         return (
                           <tr style={{textAlign:'right'}}>
+                            <td style={{textAlign:'center', display:'flex',justifyContent:'center',}}><img src={ethLogo? ethLogo : <></> } style={{marginTop:'5%', width:'1vw'}} /></td>
                             <td>{timeAgo.format(new Date(tx.block_timestamp))}</td>
                             <td>{getEllipsisTxt(tx.address,3)}</td>
                             <td>{parseFloat(tx.value / (10**18)).toFixed(2)}</td>
@@ -824,9 +681,9 @@ function determineWhichFNtoShow(tokenObj){
               </div>
 
             </div>
-          </Container>
-        </Box>
-      </Box>
+          
+        {/* </Box> */}
+      
     </ThemeProvider>
       </div>
   );

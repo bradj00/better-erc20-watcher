@@ -6,7 +6,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
-
+import ethLogo from './images/eth-logo.png';
 
 import FilterListIcon from '@mui/icons-material/FilterList';
 import EditIcon from '@mui/icons-material/Edit';
@@ -200,22 +200,24 @@ export default function Orders() {
      
 
       <div  style={{overflowY:'scroll', width:'100%', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
+        <div style={{position:'absolute', top:'-1vh',left:'7%',width:'40%',border:'0px solid #0f0'}}>
+          <div title="click an address to filter TXs" className={rowClickMode!='filter'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('filter') }} style={{position:'absolute', zIndex:'9999', left:'15%',   padding:'0.5vh'}}> 
+            <FilterListIcon style={{fontSize:'1.5vw',}}/>
+          </div>
+          <div title="click an address to edit friendly-name" className={rowClickMode!='edit'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('edit') }} style={{position:'absolute',  zIndex:'9999', left:'22%', padding:'0.5vh'}}> 
+            <EditIcon style={{fontSize:'1.5vw',}}/>
+          </div>
+          <div title="click an address to view its summary" className={rowClickMode!='summary'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('summary') }} style={{position:'absolute',  zIndex:'9999', left:'29%', padding:'0.5vh'}}> 
+            <PersonIcon style={{fontSize:'1.5vw',}}/>
+          </div>
+        </div>
         <Table size="small" >
           <TableHead style={{position:'sticky',top:'0',backgroundColor:'rgba(50,50,60,1)'}}>
+            
+            
+
             <TableRow>
-            <div style={{position:'absolute', width:'40%',border:'0px solid #0f0'}}>
-              <div className={rowClickMode!='filter'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('filter') }} style={{position:'absolute', zIndex:'9999', left:'15%',   padding:'0.5vh'}}> 
-                <FilterListIcon style={{fontSize:'1.5vw',}}/>
-              </div>
-              <div className={rowClickMode!='edit'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('edit') }} style={{position:'absolute',  zIndex:'9999', left:'22%', padding:'0.5vh'}}> 
-                <EditIcon style={{fontSize:'1.5vw',}}/>
-              </div>
-              <div className={rowClickMode!='summary'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('summary') }} style={{position:'absolute',  zIndex:'9999', left:'29%', padding:'0.5vh'}}> 
-                <PersonIcon style={{fontSize:'1.5vw',}}/>
-              </div>
-            </div>
-            </TableRow>
-            <TableRow>
+              <TableCell >chain</TableCell>
               <TableCell align="left">amount</TableCell>
               <TableCell>age</TableCell>
               <TableCell>from</TableCell>
@@ -233,6 +235,7 @@ export default function Orders() {
                 
                 // <TableRow className={rowAge > 100? "rowHover": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
                 <TableRow className={rowAge > 100? "rowHover": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? determineRowColor(row) :'rgba(0,0,0,0)'}} key={index}>
+                  <TableCell align="left" style={{ fontSize:'1vw', }}> <img src={ethLogo? ethLogo : <></>} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} ></img> </TableCell> 
                   <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
                   {/* <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell> */}
                   <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
