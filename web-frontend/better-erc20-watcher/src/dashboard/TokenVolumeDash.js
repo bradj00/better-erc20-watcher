@@ -12,7 +12,7 @@ function preventDefault(event) {
   event.preventDefault();
 }
 
-export default function Deposits() {
+export default function TokenVolumeDash() {
   const {totalVolume, setTotalVolume} = useContext(GeneralContext);
   const timeAgo = new TimeAgo('en-US'); 
 
@@ -27,9 +27,11 @@ export default function Deposits() {
     <React.Fragment>
       <Title><span style={{ fontSize:'3vh'}}>{clickedDetailsAddressFN? clickedDetailsAddressFN == 'Uniswap v3 Pool'? <>DEX Volume</> : <>Token Volume</>: <>Token Volume</>}</span></Title>
       
-      <Typography component="p" variant="h4" >
+      {/* <Typography component="p" variant="h4" > */}
+        <div style={{fontSize:'2vw'}}>
         {totalVolume?  commaNumber(parseInt(totalVolume)) : '...'}
-      </Typography>
+        </div>
+      {/* </Typography> */}
 {/*       
       <br></br>
       <br></br> */}

@@ -19,7 +19,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
 import Chart from './Chart';
-import Deposits from './Deposits';
+import Deposits from './TokenVolumeDash';
 import Orders from './Orders';
 import { GeneralContext } from '../App';
 import AudioToggle from './subcomponents/AudioToggle';
@@ -784,9 +784,9 @@ function determineWhichFNtoShow(tokenObj){
                     systemStatuses?
                     systemStatuses.erc20TransfersForSelectedAddy? 
                     systemStatuses.erc20TransfersForSelectedAddy.statusMsg != "idle" ?
-                      <div style={{zIndex:'9999', backgroundColor:'rgba(0,0,0,0.6)', position:'absolute', width:'100%', height:'100%', display:'flex', justifyContent:'center', alignItems:'center'}}>
+                      <div style={{zIndex:'9999', backgroundColor:'rgba(0,0,0,0.6)', padding:'2vw', position:'absolute', width:'100%', height:'100%', display:'flex', justifyContent:'center', alignItems:'center'}}>
                         {/* {systemStatuses.erc20TransfersForSelectedAddy.statusMsg} : {systemStatuses.erc20TransfersForSelectedAddy.page} / {systemStatuses.erc20TransfersForSelectedAddy.maxPage} */}
-                        <LoadingTableSpinner msg={ <>{systemStatuses.erc20TransfersForSelectedAddy.statusMsg} : {systemStatuses.erc20TransfersForSelectedAddy.page} / {systemStatuses.erc20TransfersForSelectedAddy.maxPage}</> }/>
+                        <LoadingTableSpinner msg={ <>&nbsp; {systemStatuses.erc20TransfersForSelectedAddy.statusMsg} : {systemStatuses.erc20TransfersForSelectedAddy.page} / {systemStatuses.erc20TransfersForSelectedAddy.maxPage}</> }/>
                       </div>
                     : 
                     

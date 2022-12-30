@@ -19,7 +19,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
 import Chart from './Chart';
-import Deposits from './Deposits';
+import Deposits from './TokenVolumeDash';
 import Orders from './Orders';
 import { GeneralContext } from '../App';
 import AudioToggle from './subcomponents/AudioToggle';

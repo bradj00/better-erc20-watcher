@@ -33,47 +33,6 @@ const formatter = buildFormatter(engStrings)
 TimeAgo.addDefaultLocale(en)
 
 
-// Generate Order Data
-function createData(id, date, name, shipTo, paymentMethod, amount) {
-  return { id, date, name, shipTo, paymentMethod, amount };
-}
-
-const rows = [
-  createData(
-    0,
-    '16 Mar, 2019',
-    'Elvis Presley',
-    'Tupelo, MS',
-    'VISA ⠀•••• 3719',
-    312.44,
-  ),
-  createData(
-    1,
-    '16 Mar, 2019',
-    'Paul McCartney',
-    'London, UK',
-    'VISA ⠀•••• 2574',
-    866.99,
-  ),
-  createData(2, '16 Mar, 2019', 'Tom Scholz', 'Boston, MA', 'MC ⠀•••• 1253', 100.81),
-  createData(
-    3,
-    '16 Mar, 2019',
-    'Michael Jackson',
-    'Gary, IN',
-    'AMEX ⠀•••• 2000',
-    654.39,
-  ),
-  createData(
-    4,
-    '15 Mar, 2019',
-    'Bruce Springsteen',
-    'Long Branch, NJ',
-    'VISA ⠀•••• 5919',
-    212.79,
-  ),
-];
-
 function preventDefault(event) {
   event.preventDefault();
 }
@@ -218,24 +177,28 @@ export default function Orders() {
 
 
   return (
-    <React.Fragment>
+    <>
+    {/* <React.Fragment> */}
       <Title>Transactions</Title>
       
-      
-      <div className={rowClickMode!='filter'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('filter') }} style={{position:'absolute', top:'39vh', zIndex:'9999', left:'27%',   padding:'1vh'}}> 
-        <FilterListIcon style={{fontSize:'1.5vw',}}/>
-      </div>
-      <div className={rowClickMode!='edit'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('edit') }} style={{position:'absolute', top:'39vh', zIndex:'9999', left:'29%', padding:'1vh'}}> 
-        <EditIcon style={{fontSize:'1.5vw',}}/>
-      </div>
-      <div className={rowClickMode!='summary'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('summary') }} style={{position:'absolute', top:'39vh', zIndex:'9999', left:'31%', padding:'1vh'}}> 
-        <PersonIcon style={{fontSize:'1.5vw',}}/>
-      </div>
+     
 
-
-      <div  style={{overflowY:'scroll', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
+      <div  style={{overflowY:'scroll', width:'100%', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
         <Table size="small" >
           <TableHead style={{position:'sticky',top:'0',backgroundColor:'rgba(50,50,60,1)'}}>
+            <TableRow>
+            <div style={{position:'absolute', width:'40%',border:'0px solid #0f0'}}>
+              <div className={rowClickMode!='filter'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('filter') }} style={{position:'absolute', zIndex:'9999', left:'15%',   padding:'0.5vh'}}> 
+                <FilterListIcon style={{fontSize:'1.5vw',}}/>
+              </div>
+              <div className={rowClickMode!='edit'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('edit') }} style={{position:'absolute',  zIndex:'9999', left:'22%', padding:'0.5vh'}}> 
+                <EditIcon style={{fontSize:'1.5vw',}}/>
+              </div>
+              <div className={rowClickMode!='summary'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('summary') }} style={{position:'absolute',  zIndex:'9999', left:'29%', padding:'0.5vh'}}> 
+                <PersonIcon style={{fontSize:'1.5vw',}}/>
+              </div>
+            </div>
+            </TableRow>
             <TableRow>
               <TableCell align="left">amount</TableCell>
               <TableCell>age</TableCell>
@@ -290,6 +253,7 @@ export default function Orders() {
       <Link color="primary" href="#" onClick={ ()=>{ setexpandTxView(!expandTxView) } } sx={{ mt: 3 }}>
         {!expandTxView? "See more":"See less"}
       </Link>
-    </React.Fragment>
+    {/* </React.Fragment> */}
+    </>
   );
 }

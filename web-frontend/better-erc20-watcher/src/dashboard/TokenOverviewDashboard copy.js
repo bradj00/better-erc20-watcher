@@ -19,7 +19,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
 import Chart from './Chart';
-import Deposits from './TokenVolumeDash';
+import Deposits from './Deposits';
 import Orders from './Orders';
 import { GeneralContext } from '../App';
 import AudioToggle from './subcomponents/AudioToggle';
@@ -206,6 +206,20 @@ function function66(e){
   console.log("function66:", e)
 }
 
+const displayAddressFN = (clickedDetailsAddressFN) => {
+  let firstAddress;
+  Object.keys(clickedDetailsAddressFN).map(key => {
+    if (key !== '_id' && key !== 'address' && typeof clickedDetailsAddressFN[key] === 'string' && !clickedDetailsAddressFN[key].startsWith('0x') ) {
+      firstAddress = clickedDetailsAddressFN[key];
+      return;
+    } else if (key === 'address') {
+      firstAddress = getEllipsisTxt(clickedDetailsAddressFN[key], 6);
+      return;
+    }
+  });
+  return firstAddress;
+}
+
   return (
     <div style={{overflow:'hidden'}}>
     <ThemeProvider theme={mdTheme}>
@@ -215,17 +229,101 @@ function function66(e){
         <AppBar position="absolute" open={open}>
           <Toolbar
             sx={{
-              pr: '24px', 
+              pr: '24px', // keep right padding when drawer closed
             }}
           >
+          <div style={{fontSize:'1.5vh', position:'absolute', right:'15vw', top:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', backgroundColor:'rgba(0,0,0,0.4)',width:'13vw', height:'6.5vh'}}>
+            <div style={{}}>
+              <div  style={{position:'absolute', left:'0', top:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
+                Filter Amount
+              </div>
+
+              <div style={{ bottom:'0',}}>
+                <input type="number" value={DisplayMinAmountFilterValue} onChange={(e) => setMinAmountFilterValue(e.target.value)} style={{width:'5vw',marginRight:'1vw', height:'2.5vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="Min" />
+                <input type="number" value={DisplayMaxAmountFilterValue} onChange={(e) => setMaxAmountFilterValue(e.target.value)} style={{width:'5vw', height:'2.5vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="Max" />
+              </div>
+
+              <div className="filterResetHover" onClick={() =>{setMaxAmountFilterValue(); setMinAmountFilterValue();setDisplayMaxAmountFilterValue(0); setDisplayMinAmountFilterValue(0) }} style={{position:'absolute', left:'0', bottom:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
+                Reset
+              </div>
+            </div>
+          </div>
+
+
+            {/* <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={toggleDrawer}
+              sx={{
+                marginRight: '36px',
+                ...(open && { display: 'none' }),
+              }}
+            >    
+              <MenuIcon />
+            </IconButton> */}
+            <Typography
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+              sx={{ flexGrow: 1 }}
+              // onClick={() => {updateSelectedToken(); }}
+              style={{cursor:'pointer'}}
+            >
+              <div style={{position:'absolute', height:'100%', width:'50%', display:'flex', justifyContent:'left', alignItems:'center', top:'0',  border:'0px solid #0f0'}}>
+              <div style={{zIndex:'9999', }} onClick={()=>{ console.log('clicked to clear filter') }}>
+                {
+                  viewingTokenAddress? 
+                    <div style={{zIndex:'10000'}} onClick={() => { console.log('asldfkjdsflkdsfj'); CopyToClipboard(viewingTokenAddress) }}>
+                      <div style={{zIndex:'1',paddingRight:'2vw',marginTop:'-3vh'}} onClick={() => {updateSelectedToken();setclickedSearchBar(false) }}>
+                      {    clickedTokenSymbol? <>${clickedTokenSymbol}</> : '...'}
+                      </div>
+                      <div style={{color:'#999',fontSize:'2vh', bottom:'0.1vh', position:'absolute',}}  >
+                      {getEllipsisTxt(viewingTokenAddress, 6)}
+                      </div>
+                    </div>
+                  : 
+                    <></>
+                }
+              </div>
+                
+                <div style={{color:'#999', width:'60%',display:'flex', border:'0px solid #ff0', position:'absolute', right:'0'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
+                {viewingTokenAddress? <SearchIcon />:<></>}
+                
+                {
+                  (clickedDetailsAddressFN || clickedSearchBar)?
+                    clickedSearchBar?
+                  
+                    <div style={{zIndex:'9999', }} id="searchBox" >
+                      <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
+                        <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'5vh', width:'20vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
+                      </form>
+                    </div>
+                  
+                    :
+                    <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+                    {displayAddressFN(clickedDetailsAddressFN)}
+                    </div>
+                  :
+                  <div style={{zIndex:'9999', color:'#999' }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+                    {viewingTokenAddress? <>(click to search)</>:<></>}
+                  </div>
+          
+                } 
+                </div>
+              </div>
+            </Typography>
             <IconButton color="inherit">
-                <div style={{position:'fixed', right: '4vw', top:'2vh',zIndex:'9999',}}>
+                <div style={{position:'absolute', left: '-4vw', top:'0vh',zIndex:'9999',}}>
                   <AudioToggle />
                 </div>
+              {/* <Badge badgeContent={4} color="secondary"> */}
+                {/* <NotificationsIcon /> */}
+              {/* </Badge> */}
             </IconButton>
           </Toolbar>
         </AppBar>
-        
         <Drawer variant="permanent" open={open}>
           <Toolbar
             sx={{
@@ -243,7 +341,13 @@ function function66(e){
 
           <Divider />
           <List style={{overflow:'hidden'}} component="nav">
-         
+            {/* {mainListItems} */}
+            <MainList />
+            {/* <Divider sx={{ my: 1 }} /> */}
+            {/* {secondaryListItems} */}
+            <SecondaryList />
+
+
 
           </List>
           <div style={{border:'0px solid #0aa', color:'#999', position:'absolute',bottom:'0%', width:'100%', height:'20vh', display:'flex', justifyContent:'center', alignItems:'center'}}>
@@ -313,18 +417,69 @@ function function66(e){
         >
           <Toolbar />
           <Container maxWidth="xl" sx={{ mt: 4, mb: 1 }}>
-            <div style={{border:'0px solid #0f0', width:'82.5%', left:'17vw',top:'7.5vh', zIndex:'9999', height:'92%', position:'absolute',}}>
-              
-              {/* address header  */}
-              <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'100%',height:'99%', textAlign:'center', borderRadius:'20px',  position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
-                <div style={{position:'absolute', }}>
-                  <div style={{fontSize:'1.5vw'}}>Token Holders list with Friendly Names labeled</div>
-                </div>
-              </div>
+            <Grid container spacing={3}>
+              {/* Chart */}
+              <Grid item xs={12} md={8} lg={9}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: 240,
+                  }}
+                >
+                  <Chart />
+                  {/* <div style={{border:'1px solid #0f0', height:'100%',width:'100%', display:'flex', justifyContent:'center', alignItems:'center'}}>
+                    Chart goes here
+                    
+                    
+
+                  </div> */}
+                </Paper>
+              </Grid>
+              {/* Recent Deposits */}
+              <Grid item xs={12} md={4} lg={3}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: 240,
+                  }}
+                >
+                  <div style={{border:'0px solid #0f0',position:'relative', display:'flex',justifyContent:'center',height:'200%', }}><Deposits /></div>
+                </Paper>
+              </Grid>
+
+              {/* Recent TXs */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                  <Orders />
+                </Paper>
+              </Grid>
+
+              {/* <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant="h6" gutterBottom component="div">
+                    Orders
+                  </Typography>
+                  
+                  <Box sx={{ pt: 3 }}>
+                    
+                  </Box>
+                </Paper>
+              </Grid> */}
 
 
 
-            </div>
+
+
+
+
+
+
+            </Grid>
+            <Copyright sx={{ pt: 4 }} />
           </Container>
         </Box>
       </Box>

@@ -19,7 +19,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
 import Chart from './Chart';
-import Deposits from './Deposits';
+import TokenVolumeDash from './TokenVolumeDash';
 import Orders from './Orders';
 import { GeneralContext } from '../App';
 import AudioToggle from './subcomponents/AudioToggle';
@@ -226,12 +226,12 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
 
-        <AppBar position="absolute" open={open}>
-          <Toolbar
+        {/* <AppBar position="absolute" open={open}> */}
+          {/* <Toolbar
             sx={{
               pr: '24px', // keep right padding when drawer closed
             }}
-          >
+          > */}
           <div style={{fontSize:'1.5vh', position:'absolute', right:'15vw', top:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', backgroundColor:'rgba(0,0,0,0.4)',width:'13vw', height:'6.5vh'}}>
             <div style={{}}>
               <div  style={{position:'absolute', left:'0', top:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
@@ -250,28 +250,7 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
           </div>
 
 
-            {/* <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={toggleDrawer}
-              sx={{
-                marginRight: '36px',
-                ...(open && { display: 'none' }),
-              }}
-            >    
-              <MenuIcon />
-            </IconButton> */}
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={{ flexGrow: 1 }}
-              // onClick={() => {updateSelectedToken(); }}
-              style={{cursor:'pointer'}}
-            >
-              <div style={{position:'absolute', height:'100%', width:'50%', display:'flex', justifyContent:'left', alignItems:'center', top:'0',  border:'0px solid #0f0'}}>
+              <div style={{position:'absolute', height:'7vh', width:'83.5vw',paddingLeft:'0.5vw', paddingRigth:'0.5vw', right:'0', border:'1px solid #f0f', display:'flex', justifyContent:'left', alignItems:'center', top:'0',}}>
               <div style={{zIndex:'9999', }} onClick={()=>{ console.log('clicked to clear filter') }}>
                 {
                   viewingTokenAddress? 
@@ -288,7 +267,7 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
                 }
               </div>
                 
-                <div style={{color:'#999', width:'60%',display:'flex', border:'0px solid #ff0', position:'absolute', right:'0'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
+                <div style={{color:'#999', width:'30%',display:'flex', border:'1px solid #ff0', position:'absolute', top:'25%', left:'13%'}} onClick={() => {setclickedSearchBar(!clickedSearchBar) }}>
                 {viewingTokenAddress? <SearchIcon />:<></>}
                 
                 {
@@ -306,51 +285,35 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
                     {displayAddressFN(clickedDetailsAddressFN)}
                     </div>
                   :
-                  <div style={{zIndex:'9999', color:'#999' }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+                  <div style={{zIndex:'9999', color:'#999', position:'absolute', left:'15%', }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
                     {viewingTokenAddress? <>(click to search)</>:<></>}
                   </div>
           
                 } 
                 </div>
               </div>
-            </Typography>
-            <IconButton color="inherit">
-                <div style={{position:'absolute', left: '-4vw', top:'0vh',zIndex:'9999',}}>
-                  <AudioToggle />
-                </div>
-              {/* <Badge badgeContent={4} color="secondary"> */}
-                {/* <NotificationsIcon /> */}
-              {/* </Badge> */}
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <Drawer variant="permanent" open={open}>
-          <Toolbar
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              px: [1],
-            }}
-          >
-            {/* <IconButton onClick={toggleDrawer}>
-              <ChevronLeftIcon />
-            </IconButton> */}
-          </Toolbar>
+            {/* </Typography> */}
 
+              <div style={{position:'absolute', right: '1vw', top:'1vh',zIndex:'9999',}}>
+                <AudioToggle />
+              </div>
 
+          {/* </Toolbar> */}
+        {/* </AppBar> */}
+                
+        {/* <Drawer variant="permanent" open={open}> */}
+          <div style={{width:'16.5vw'}}>
+          <Toolbar sx={{display: 'flex',alignItems: 'center',justifyContent: 'flex-end',px: [1],}} />
           <Divider />
+          
+
+
           <List style={{overflow:'hidden'}} component="nav">
-            {/* {mainListItems} */}
             <MainList />
-            {/* <Divider sx={{ my: 1 }} /> */}
-            {/* {secondaryListItems} */}
             <SecondaryList />
-
-
-
           </List>
-          <div style={{border:'0px solid #0aa', color:'#999', position:'absolute',bottom:'0%', width:'100%', height:'20vh', display:'flex', justifyContent:'center', alignItems:'center'}}>
+          
+          <div style={{border:'0px solid #0aa', color:'#999', position:'absolute',bottom:'0%', width:'16.5vw', height:'20vh', display:'flex', justifyContent:'center', alignItems:'center'}}>
                   
                   <div className={chainDataHeartbeatDiff? chainDataHeartbeatDiff > 5000? "deadHeartbeat":"goodHeartbeat":""} style={{position:'absolute', width:'100%',height:'100%', fontSize:'3vh', zIndex:'9999',  display:'flex', justifyContent:'center', alignItems:'center',  backgroundColor:chainDataHeartbeatDiff? chainDataHeartbeatDiff > 1000?'rgba(150,30,30,1)': 'rgba(0,150,0,0.4)':'rgba(150,150,0,0.8)',}}>
                       {chainDataHeartbeatDiff? chainDataHeartbeatDiff > 5000?  <>stale data</>: <>up to date</>: <>fetching data</>}
@@ -401,8 +364,8 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
                     </div>
                   </div>
           </div>
-
-        </Drawer>
+          {/* </Drawer> */}
+          </div>
         <Box
           component="main"
           sx={{
@@ -417,69 +380,26 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
         >
           <Toolbar />
           <Container maxWidth="xl" sx={{ mt: 4, mb: 1 }}>
-            <Grid container spacing={3}>
-              {/* Chart */}
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
+            
+            <div style={{position:'absolute', width:'80vw', left:'18vw', top:'10vh', border:'0px solid #ff0'}}>
+              
+              <div style={{position:'absolute', width:'100%', display:'flex',}}>
+                <div style={{position:'absolute', left:'0', width:'75%', height:'25vh',padding:'1.5vw', border:'0px solid #f0f'}}>
                   <Chart />
-                  {/* <div style={{border:'1px solid #0f0', height:'100%',width:'100%', display:'flex', justifyContent:'center', alignItems:'center'}}>
-                    Chart goes here
-                    
-                    
+                </div>
 
-                  </div> */}
-                </Paper>
-              </Grid>
-              {/* Recent Deposits */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 240,
-                  }}
-                >
-                  <div style={{border:'0px solid #0f0',position:'relative', display:'flex',justifyContent:'center',height:'200%', }}><Deposits /></div>
-                </Paper>
-              </Grid>
+                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', width:'25%', height:'25vh',padding:'1.5vw', border:'0px solid #f0f'}}>
+                  <TokenVolumeDash />
+                </div>
+              </div>
 
-              {/* Recent TXs */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders />
-                </Paper>
-              </Grid>
+              <div style={{position:'absolute', width:'100%', top:'35vh',}}>
+                <Orders />
+              </div>
 
-              {/* <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant="h6" gutterBottom component="div">
-                    Orders
-                  </Typography>
-                  
-                  <Box sx={{ pt: 3 }}>
-                    
-                  </Box>
-                </Paper>
-              </Grid> */}
-
-
-
-
-
-
-
-
-
-            </Grid>
-            <Copyright sx={{ pt: 4 }} />
+            </div>
+            
+           
           </Container>
         </Box>
       </Box>

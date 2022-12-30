@@ -117,7 +117,7 @@ useEffect(() => {
 return (
   <>
     <GeneralContext.Provider value={contextObj} >
-      <div style={{overflow:'hidden', border:'0px solid #0f0'}}>
+      <div style={{display:'hidden', overflow:'hidden', border:'0px solid #0f0'}}>
           <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
           {displayPanel == 'watchingTokens'? <TokenOverviewDashboard />: <></>}
           {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
