@@ -26,7 +26,8 @@ using:
 <sub>( Address Summary stats, includes held tokens common to the existing database of watched addresses )</sub>
 
 <sub>( This will be good for stepping into a community and quickly seeing commonly held ERC20 tokens and patterns)</sub>
-![image](https://user-images.githubusercontent.com/99688245/209859794-f68091ad-5a9d-496e-8f26-e6ca914ce4c1.png)
+![image](https://user-images.githubusercontent.com/99688245/210153389-c6a58887-6301-4255-813e-dffc3c79a5c2.png)
+
 
 
 <sub>( chainData.js ingestion engine fetching and caching blockchain token TXs to mongo )</sub>
