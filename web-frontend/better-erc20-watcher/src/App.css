@@ -338,3 +338,13 @@ tr:nth-child(odd) {
   cursor:pointer;
   user-select: none;
 }
+.PoolLinkHover {
+  color: rgba(255,255,255,0.4);
+  cursor:pointer;
+  user-select: none;
+}
+.PoolLinkHover:hover {
+  color: rgba(200,200,255,1);
+  cursor:pointer;
+  user-select: none;
+}

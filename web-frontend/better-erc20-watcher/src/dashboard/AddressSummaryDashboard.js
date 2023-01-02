@@ -40,7 +40,7 @@ import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
 import TxTimeOfDayChart from './subcomponents/TxTimeOfDayChart.tsx';
 import LoadingTableSpinner from './subcomponents/LoadingTableSpinner.tsx';
 import ethLogo from './images/eth-logo.png';
-
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 TimeAgo.addDefaultLocale(en);
 
 
@@ -542,7 +542,7 @@ function determineWhichFNtoShow(tokenObj){
                               <tr style={{backgroundColor: token && communityHeldListFromSelectedAddy? token.toLowerCase() == communityHeldListFromSelectedAddy.toLowerCase()? "rgba(200,150,10,0.5)":"":"", cursor:'pointer'}} onClick={()=>{ setcommunityHeldListFromSelectedAddy(selectedAddressListOfTokens[0][token].metadata.token_address); setclickedTokenUsdQuote(selectedAddressListOfTokens[0][token].usdValue[0].usdValue.usdPrice) }}>
                                 {/* selectedAddressListOfTokens */}
                                 <td>
-                                <button 
+                                <div 
                                   style={{height:'2vh'}}
                                   onClick={() => {
                                     const confirmBox = window.confirm(
@@ -552,7 +552,8 @@ function determineWhichFNtoShow(tokenObj){
                                       setupdateBlacklistRequest(selectedAddressListOfTokens[0][token].metadata.token_address);
                                     }
                                   }}>
-                                </button>
+                                    <VisibilityOffIcon style={{color:'rgba(255,255,255,0.4)'}}/>
+                                </div>
 
                                 </td>
                                 <td><a href={`https://etherscan.io/token/${selectedAddressListOfTokens[0][token].metadata.token_address}?a=${heldTokensSelectedAddress}`} target="_blank" rel="noopener noreferrer">{getEllipsisTxt(selectedAddressListOfTokens[0][token].metadata.token_address, 4)}</a></td>

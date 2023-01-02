@@ -36,7 +36,7 @@ import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import tokenImage from './images/token_image.png';
-
+import LinkIcon from '@mui/icons-material/Link';
 TimeAgo.addDefaultLocale(en);
 
 
@@ -137,6 +137,10 @@ function DashboardContent() {
   const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
   const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
   const timeAgo = new TimeAgo('en-US'); 
+  
+  const [fakeData, setfakeData] = React.useState([{poolName: 'UniSwap v3 Pool', heldAmount: 'held: 600,241', linkedPair:'MATIC',priceUsd:'$0.21'}, {poolName: 'XT.com', linkedPair: 'WBTC', heldAmount:'held: 26,402',priceUsd:'$0.18'}, {poolName: 'Pancake Swap', heldAmount: 'held: 147,062', linkedPair:'USDC',priceUsd:'$0.24'}]);
+
+
 
   useEffect(() => {
     console.log('showTokenSelector: ', showTokenSelector)
@@ -244,6 +248,20 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
   return firstAddress;
 }
 
+
+function determineExchangeColorMockup(poolName){
+  if (poolName === 'UniSwap v3 Pool'){
+    return '1px solid #FF007A'
+  } else if (poolName === 'XT.com'){
+    return '1px solid #00FF7A'
+  } else if (poolName === 'Pancake Swap'){
+    return '1px solid #007AFF'
+  } else {
+    return '#000000'
+  }
+}
+
+
   return (
     <div style={{overflow:'hidden'}}>
     <ThemeProvider theme={mdTheme}>
@@ -283,17 +301,52 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
        
           <Toolbar />
           <div style={{position:'absolute', width:"100%", height:'100%',display:'flex',justifyContent:'center',}}>
+            <div style={{border:'0px solid #0f0', position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'85vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'10vh', }}>
+              <div style={{position:'absolute', top:'1%', left:' 5%', color:'#aaa', fontSize:'1vw', }}>
+                Detected Exchanges
+              </div>
+              
+              {/* map of fake data array that show like placeholder cards */}
+              <div style={{position:'absolute', top:'8%',  width:'95%', color:'#fff', fontSize:'1vw', }}>
+                {fakeData.map((item, index) => {
+                  return (
+                    <div style={{padding:'0.5vw', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup(item.poolName), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                      <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                        {item.poolName}
+                      </div>
+                      <div style={{position:'relative', top: '0%', left:' 10%', color:'#fff', fontSize:'0.75vw', }}>
+                        {item.heldAmount}
+                      </div>
+                      <div style={{position:'absolute', top:'30%',  right:' 10%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
+                        {item.priceUsd}
+                      </div>
+                      <div style={{position:'absolute', bottom:'-10%',  right:'25%', color:'rgba(255,255,255,0.4)', fontStyle:'italic', fontSize:'0.75vw', }}>
+                      <LinkIcon />
+                      </div>
+                      <div style={{position:'absolute', bottom:'0',  right:'5%', color:'rgba(255,255,255,0.4)', fontStyle:'italic', fontSize:'0.75vw', }}>
+                        {item.linkedPair}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
             
-            <div style={{position:'absolute', width:'80%', top:'10vh', border:'0px solid #ff0'}}>
+            <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
               
               <div style={{position:'absolute', width:'100%', display:'flex',}}>
                 <div style={{position:'absolute', left:'0', width:'75%', height:'25vh',padding:'1.5vw', border:'0px solid #f0f'}}>
                   <Chart />
                 </div>
 
-                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', width:'25%', height:'25vh',padding:'1.5vw', border:'0px solid #f0f'}}>
+                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', textAlign:'center', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'0vh', width:'25%', height:'10vh',alignItems:'center', border:'0px solid #f0f'}}>
+                  Holders: 42,069<br></br>
+                  (draw line chart over bar chart for total holders)
+                </div>
+                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'11vh',width:'25%', height:'25vh',padding:'1.5vw', border:'0px solid #f0f'}}>
                   <TokenVolumeDash />
                 </div>
+                
               </div>
 
               <div style={{position:'absolute', width:'100%', top:'35vh',}}>

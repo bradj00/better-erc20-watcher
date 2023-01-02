@@ -36,85 +36,83 @@ export default function TokenVolumeDash() {
       <br></br>
       <br></br> */}
       {/* 2 divs here that span 50% each side by side */}
-      <div style={{border:'0px solid #0f0', width:'100%',bottom:'3.5vh', height:'50%', position:'absolute', display:'flex', justifyContent:'center',alignItems:'center'}}>
+      <div style={{border:'0px solid #0f0',  width:'100%',bottom:'3.5vh', height:'50%', position:'absolute', display:'flex', justifyContent:'center',alignItems:'center'}}>
         
-      {clickedDetailsAddressFN? clickedDetailsAddressFN == 'Uniswap v3 Pool'?
-      <>
-        <div style={{width:'100%', marginTop:'6vh',}}>
-          <div style={{border:'0px solid #0f0', width:'50%',color:'#0f0',fontSize:'1.5vh'}}>
-            Buys
-            <div style={{fontSize:'2vh'}}>
-              {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+        {clickedDetailsAddressFN? clickedDetailsAddressFN == 'Uniswap v3 Pool'?
+        <>
+          <div style={{width:'70%', marginTop:'0vh',}}>
+            <div style={{border:'0px solid #0f0', width:'40%',color:'#0f0',fontSize:'1.5vh'}}>
+              Buys
+              <div style={{fontSize:'2vh'}}>
+                {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+              </div>
+            </div>
+            <div style={{border:'0px solid #f00', width:'40%',color:'#f00',fontSize:'1.5vh'}}>
+              Sells
+              <div style={{fontSize:'2vh'}}>
+                {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+              </div>
             </div>
           </div>
-          <div style={{border:'0px solid #f00', width:'50%',color:'#f00',fontSize:'1.5vh'}}>
-            Sells
-            <div style={{fontSize:'2vh'}}>
-              {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+          <div style={{marginTop:'0vh',}}>
+            <div style={{border:'0px solid #ff0', color:'#0ff',fontSize:'1.5vh'}}>
+              +Liquidity
+              <div style={{fontSize:'2vh'}}>
+                {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+              </div>
             </div>
+            <div style={{border:'0px solid #f00', color:'#f80',fontSize:'1.5vh'}}>
+              -Liquidity
+              <div style={{fontSize:'2vh'}}>
+                {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+              </div>
+            </div>
+          </div>
+        </>
+        :
+        <>
+        <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
+          In-Flow
+          <div style={{fontSize:'2vh'}}>
+            {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
           </div>
         </div>
-        <div style={{marginTop:'6vh',}}>
-          <div style={{border:'0px solid #0f0', width:'100%',color:'#0ff',fontSize:'1.5vh'}}>
-            +Liquidity
-            <div style={{fontSize:'2vh'}}>
-              {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
-            </div>
-          </div>
-          <div style={{border:'0px solid #f00', width:'100%',color:'#f80',fontSize:'1.5vh'}}>
-            -Liquidity
-            <div style={{fontSize:'2vh'}}>
-              {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
-            </div>
+
+        <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
+          Out-Flow
+          <div style={{fontSize:'2vh'}}>
+            {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
           </div>
         </div>
-      </>
-      :
-      <>
-      <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
-        In-Flow
-        <div style={{fontSize:'2vh'}}>
-          {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+        </>
+        :
+        <>
+        <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
+          In-Flow
+          <div style={{fontSize:'2vh'}}>
+            {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
+          </div>
         </div>
+
+        <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
+          Out-Flow
+          <div style={{fontSize:'2vh'}}>
+            {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
+          </div>
+        </div>
+        </>
+        }
+
       </div>
 
-      <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
-        Out-Flow
-        <div style={{fontSize:'2vh'}}>
-          {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
-        </div>
-      </div>
-      </>
-      :
-      <>
-      <div style={{border:'0px solid #f00', width:'50%',color:'#0f0',fontSize:'2.5vh'}}>
-        In-Flow
-        <div style={{fontSize:'2vh'}}>
-          {filteredtxDataInflow? commaNumber(parseInt(filteredtxDataInflow)) : '...'}
-        </div>
-      </div>
 
-      <div style={{border:'0px solid #0f0', width:'50%',color:'#f00',fontSize:'2.5vh'}}>
-        Out-Flow
-        <div style={{fontSize:'2vh'}}>
-          {filteredtxDataOutflow? commaNumber(parseInt(filteredtxDataOutflow)) : '...'}
-        </div>
-      </div>
-      </>
-      }
 
-      </div>
-      <div style={{border:'0px solid #0f0',position:'absolute', width:'100%',bottom:'-6%'}}>
-        <Typography color="text.secondary" sx={{ flex: 1 }}  onClick={()=>{console.log(txData)}}>
+      <div style={{border:'0px solid #0f0',position:'absolute', width:'100%',top:'75%'}}>
+        <div onClick={()=>{console.log(txData)}}>
           past {txData?txData[0]? txData[0].block_timestamp? (timeAgo.format(  new Date(txData[txData.length-1].block_timestamp), 'mini'  )) : <></>: <></>: <></>}
-        </Typography>
+        </div>
       </div>
-      <div>
-        
-        {/* <Link color="primary" href="#" variant="body2" onClick={preventDefault}>
-          View balance
-        </Link> */}
-      </div>
+
     </React.Fragment>
     </div>
   );

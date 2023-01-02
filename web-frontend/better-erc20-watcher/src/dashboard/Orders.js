@@ -7,7 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from './Title';
 import ethLogo from './images/eth-logo.png';
-
+import PoolIcon from '@mui/icons-material/Pool';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import EditIcon from '@mui/icons-material/Edit';
 import PersonIcon from '@mui/icons-material/Person';
@@ -166,8 +166,29 @@ export default function Orders() {
       return 'rgba(70, 0, 0, 0.6)'
     } 
     else return 'rgba(0, 0, 0, 0.1)'
+  }
+
+  function determineShowPoolLink(row){
+    if (row == null || row == undefined){return false}
+    if (  row.from_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+      return true
+    } 
+    else if (  row.to_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+      return true
+    } 
+    else return false
   
    
+  }
+  function getUniSwapPoolAddy(row){
+    if (row == null || row == undefined){return false}
+    if (  row.from_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+      return row.from_address
+    } 
+    else if (  row.to_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+      return row.to_address
+    } 
+    else return false
   }
 
   
@@ -199,7 +220,7 @@ export default function Orders() {
       
      
 
-      <div  style={{overflowY:'scroll', width:'100%', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
+      <div  style={{border:'1px solid rgba(255,255,255,0.2)', padding:'0.2vw', overflowY:'scroll', width:'100%', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
         <div style={{position:'absolute', top:'-1vh',left:'7%',width:'40%',border:'0px solid #0f0'}}>
           <div title="click an address to filter TXs" className={rowClickMode!='filter'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('filter') }} style={{position:'absolute', zIndex:'9999', left:'15%',   padding:'0.5vh'}}> 
             <FilterListIcon style={{fontSize:'1.5vw',}}/>
@@ -241,7 +262,7 @@ export default function Orders() {
                   <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
                   <TableCell style={{fontSize:'1vw',color: "#aaa"}}  onClick={ ()=>{processTableClicked(row, 'from')} }>     {(row.from_address_friendlyName == undefined) ? getEllipsisTxt(row.from_address, 6): displayAddressFN(row.from_address_friendlyName)}</TableCell>
                   <TableCell style={{fontSize:'1vw',color: "#aaa"}}      onClick={ ()=>{processTableClicked(row, 'to') }}>   {(row.to_address_friendlyName== undefined) ? getEllipsisTxt(row.to_address, 6): displayAddressFN(row.to_address_friendlyName)} </TableCell>
-                  <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a></TableCell>
+                  <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a> {determineShowPoolLink(row)? <div title="explore pool on UniSwap"  style={{float:'right', right:'0', top:'0'}}> <a target="_blank" className="PoolLinkHover" href={`https://info.uniswap.org/#/pools/`+getUniSwapPoolAddy(row)}> <PoolIcon /> </a> </div> : <></>} </TableCell>
                 </TableRow>
                 
               )})
@@ -255,7 +276,7 @@ export default function Orders() {
             
             return(
 
-              <TableRow className={rowAge > 100? "": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
+              <TableRow className={rowAge > 100? "": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? determineRowColor(row) :'rgba(0,0,0,0)'}} key={index}>
                 <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
                 <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
                 <TableCell style={{fontSize:'1vw',color: "white"}}  onClick={ ()=>{processTableClicked(row, 'from') } }>{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && key !== 'address'&& key !== 'ENS' && !value.startsWith('0x')) ? Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))? Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))[1] : getEllipsisTxt(row.from_address_friendlyName.address,6): getEllipsisTxt(row.from_address_friendlyName.address,6)}</TableCell>
