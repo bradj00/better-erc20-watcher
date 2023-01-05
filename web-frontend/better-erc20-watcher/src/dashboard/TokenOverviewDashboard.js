@@ -136,6 +136,12 @@ function DashboardContent() {
   const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
   const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
   const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
+  const {detectedLPs, setdetectedLPs} = useContext(GeneralContext); 
+  
+  
+  
+  
+  
   const timeAgo = new TimeAgo('en-US'); 
   
   const [fakeData, setfakeData] = React.useState([{poolName: 'UniSwap v3 Pool', heldAmount: 'held: 600,241', linkedPair:'MATIC',priceUsd:'$0.21'}, {poolName: 'XT.com', linkedPair: 'WBTC', heldAmount:'held: 26,402',priceUsd:'$0.18'}, {poolName: 'Pancake Swap', heldAmount: 'held: 147,062', linkedPair:'USDC',priceUsd:'$0.24'}]);
@@ -143,11 +149,24 @@ function DashboardContent() {
 
 
   useEffect(() => {
+    if (detectedLPs) {
+      console.log('detectedLPs: ', detectedLPs)
+    }
+  },[detectedLPs]);
+
+
+  useEffect(() => {
+    console.log('systemStatuses: ', showTokenSelector)
+  },[systemStatuses]);
+
+  useEffect(() => {
     console.log('showTokenSelector: ', showTokenSelector)
   },[showTokenSelector]);
+  
   useEffect(() => {
 
   },[DisplayMinAmountFilterValue]);
+
   useEffect(() => {
 
   },[DisplayMaxAmountFilterValue]);
@@ -250,13 +269,18 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
 
 
 function determineExchangeColorMockup(poolName){
-  if (poolName === 'UniSwap v3 Pool'){
+  if (poolName === 'Uniswap'){
     return '1px solid #FF007A'
   } else if (poolName === 'XT.com'){
     return '1px solid #00FF7A'
-  } else if (poolName === 'Pancake Swap'){
+  } 
+  else if (poolName === 'Binance'){
+    return '1px solid #00FF7A'
+  }
+  else if (poolName === 'Pancake Swap'){
     return '1px solid #007AFF'
-  } else {
+  }
+   else {
     return '#000000'
   }
 }
@@ -301,37 +325,107 @@ function determineExchangeColorMockup(poolName){
        
           <Toolbar />
           <div style={{position:'absolute', width:"100%", height:'100%',display:'flex',justifyContent:'center',}}>
-            <div style={{border:'0px solid #0f0', position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'85vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'10vh', }}>
-              <div style={{position:'absolute', top:'1%', left:' 5%', color:'#aaa', fontSize:'1vw', }}>
-                Detected Exchanges
-              </div>
+            <div style={{position:'absolute', top:'8vh', left:' 5%', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
+              Detected DEXs
+            </div>
+            
+            <div style={{overflowY:'scroll', overflowX:'hidden', border:'1px solid rgba(100,100,100,0.4)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'47vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'11vh', }}>
               
               {/* map of fake data array that show like placeholder cards */}
-              <div style={{position:'absolute', top:'8%',  width:'95%', color:'#fff', fontSize:'1vw', }}>
-                {fakeData.map((item, index) => {
+              <div style={{position:'absolute', top:'5%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
+                {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
                   return (
-                    <div style={{padding:'0.5vw', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup(item.poolName), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                    <div style={{padding:'0.5vw', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
                       <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
-                        {item.poolName}
+                        {/* {item.name.slice(0,7)} */}
+                        Uniswap
                       </div>
                       <div style={{position:'relative', top: '0%', left:' 10%', color:'#fff', fontSize:'0.75vw', }}>
-                        {item.heldAmount}
+                        {/* {item.heldAmount} */}
+                        600,241
                       </div>
-                      <div style={{position:'absolute', top:'30%',  right:' 10%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
-                        {item.priceUsd}
+                      <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
+                        {/* {item.priceUsd} */}
+                        $0.21
                       </div>
-                      <div style={{position:'absolute', bottom:'-10%',  right:'25%', color:'rgba(255,255,255,0.4)', fontStyle:'italic', fontSize:'0.75vw', }}>
+                      <div title="exit liquidity" style={{display:'flex', position:'absolute', top:'2.5vh',fontSize:'0.85vw',  right:'25%', color:'#aaa', fontStyle:'italic',  }}>
+                      <div>4.6</div>
                       <LinkIcon />
+                      <div>WBTC</div>
                       </div>
-                      <div style={{position:'absolute', bottom:'0',  right:'5%', color:'rgba(255,255,255,0.4)', fontStyle:'italic', fontSize:'0.75vw', }}>
-                        {item.linkedPair}
+                      <div style={{position:'absolute', right:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'0',color:'#666'}}>
+                        {getEllipsisTxt(item["Pool Address"],6)}
                       </div>
                     </div>
                   )
-                })}
+                })
+                : null : null}
               </div>
             </div>
             
+
+
+            <div style={{position:'absolute', top:'62vh', left:' 5%', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
+              Central Exchanges
+            </div>
+            <div style={{overflowY:'scroll', overflowX:'hidden', border:'1px solid rgba(100,100,100,0.4)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'30vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'65vh', }}>
+              
+              {/* map of fake data array that show like placeholder cards */}
+              <div style={{position:'absolute', top:'5%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
+                {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
+                  return (
+                    <>
+                    <div style={{padding:'0.5vw', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('XT.com'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                      <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                        {/* {item.name.slice(0,7)} */}
+                        XT.com
+                      </div>
+                      <div style={{position:'relative', top: '0%', left:' 10%', color:'#fff', fontSize:'0.75vw', }}>
+                        {/* {item.heldAmount} */}
+                        600,241
+                      </div>
+                      <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
+                        {/* {item.priceUsd} */}
+                        $0.19
+                      </div>
+                      <div title="exit liquidity" style={{display:'flex', position:'absolute', top:'2.5vh',fontSize:'0.85vw',  right:'25%', color:'#aaa', fontStyle:'italic',  }}>
+                      {/* <div></div>
+                      <LinkIcon />
+                      <div></div> */}
+                      </div>
+                      <div style={{position:'absolute', right:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'0',color:'#666'}}>
+                        {getEllipsisTxt(item["Pool Address"],6)}
+                      </div>
+                    </div>
+                    <div style={{padding:'0.5vw', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Binance'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                      <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                        {/* {item.name.slice(0,7)} */}
+                        Binance
+                      </div>
+                      <div style={{position:'relative', top: '0%', left:' 10%', color:'#fff', fontSize:'0.75vw', }}>
+                        {/* {item.heldAmount} */}
+                        126,400
+                      </div>
+                      <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
+                        {/* {item.priceUsd} */}
+                        $0.183
+                      </div>
+                      <div title="exit liquidity" style={{display:'flex', position:'absolute', top:'2.5vh',fontSize:'0.85vw',  right:'25%', color:'#aaa', fontStyle:'italic',  }}>
+                      {/* <div></div>
+                      <LinkIcon />
+                      <div></div> */}
+                      </div>
+                      <div style={{position:'absolute', right:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'0',color:'#666'}}>
+                        {getEllipsisTxt(item["Pool Address"],6)}
+                      </div>
+                    </div>
+                    </>
+                  )
+                })
+                : null : null}
+              </div>
+            </div>
+
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
               
               <div style={{position:'absolute', width:'100%', display:'flex',}}>
@@ -339,11 +433,11 @@ function determineExchangeColorMockup(poolName){
                   <Chart />
                 </div>
 
-                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', textAlign:'center', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'0vh', width:'25%', height:'10vh',alignItems:'center', border:'0px solid #f0f'}}>
+                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', textAlign:'center', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'0vh', width:'25%', height:'10vh',alignItems:'center', border:'1px solid rgba(100,100,100,0.4)',}}>
                   Holders: 42,069<br></br>
                   (draw line chart over bar chart for total holders)
                 </div>
-                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'11vh',width:'25%', height:'25vh',padding:'1.5vw', border:'0px solid #f0f'}}>
+                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'11vh',width:'25%', height:'25vh',padding:'1.5vw', border:'1px solid rgba(100,100,100,0.4)',}}>
                   <TokenVolumeDash />
                 </div>
                 

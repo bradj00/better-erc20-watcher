@@ -205,7 +205,8 @@ useEffect(()=>{
 
   return (
     <React.Fragment>
-      <Title>Displayed Txs</Title>
+      {/* <Title>Displayed Txs</Title> */}
+      <div style={{fontSize:'1.25vw', color:'rgba(150,220,255,0.9)'}}>Displayed Txs</div> 
       <ResponsiveContainer>
         <BarChart 
           width={150} 

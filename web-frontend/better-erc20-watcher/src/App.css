@@ -81,7 +81,7 @@ a:hover {
 }
 
 ::-webkit-scrollbar {
-  width: 0.5vw;
+  width: 0vw;
   background-color: #888;
   border-radius: 25px;
 }

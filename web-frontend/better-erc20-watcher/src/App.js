@@ -54,6 +54,7 @@ const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState()
 const [systemStatuses, setSystemStatuses] = useState();
 const [clickedToken, setclickedToken] = useState();
 const [searchInputLookup, setsearchInputLookup] = useState();
+const [detectedLPs, setdetectedLPs] = useState();
 
 const [updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest] = useState();
 const [RequestFriendlyLookup, setRequestFriendlyLookup] = useState();
@@ -110,6 +111,7 @@ const contextObj = {
   fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance,
   clickedToken, setclickedToken,
   searchInputLookup, setsearchInputLookup,
+  detectedLPs, setdetectedLPs,
 }
 
 

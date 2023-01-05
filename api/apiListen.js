@@ -86,7 +86,7 @@ app.listen(listenPort, () => {
                         res.send(docs)
                     });
                 }
-                else {
+                else { 
                     let requestUrl = `https://deep-index.moralis.io/api/v2/${req.params.address}/erc20/transfers?chain=eth&limit=100&key=${moralisApiKey}`;
                     const db2 = client.db('externalLookupRequests');
                     const c2 = db2.collection('rBucket');
@@ -501,6 +501,58 @@ app.listen(listenPort, () => {
             });
         });
         
+        app.get('/detectedLiquidityPools/:watchedToken', cors(), async (req, res) => {
+            // get all liquidity positions from db "uniswap-v3-position-managers" collection "a_"+0xC36442b4a4522E871399CD717aBDD847Ab11FE88 (uniswap position manager contract)
+            // where watchedToken.symbol exists as a key value in the columns object (MEGA Address: exists as a key in the columns object) 
+            if (!req.params.watchedToken) { res.send('no token address provided'); return; }
+            
+            console.log('the token: ', req.params.watchedToken);
+            ////////////////////////////
+            //temp direct external api lookup until we re-write the lookup requests to match how we changed it to a lookup request in the db
+            // WALRUS
+            //
+            ////////////////////////////
+            
+            const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+req.params.watchedToken;
+            
+            // console.log('>>>>>> url: ', url);
+            axios.get(url ,{
+                headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                "X-API-Key" : moralisApiKey
+                },
+            })
+            .then(({data}) => {
+                // console.log('data: ', data[0].symbol);
+                // res.send(data[0].symbol);
+
+                //mongo lookup 
+                MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+                    const db = client.db('uniswap-v3-position-managers');
+                    const collection = db.collection('a_0xC36442b4a4522E871399CD717aBDD847Ab11FE88');
+                    let keyName = data[0].symbol+" Address";
+                    console.log('keyname is: >'+keyName);
+                    // collection.find({keyName : {$exists: true}}).toArray(function(err, docs) {
+                    collection.find({[keyName]:  {$eq: req.params.watchedToken}}).toArray(function(err, docs) {
+                        // console.log('docs: ', docs);
+                        // forEach document, if there is no 'ownerOf' column, add it to an array to request from the external api
+                    
+           
+                        
+                        res.send({uniswap_v3_pools:docs, someOtherPools:[]}); //send it regardless. next time it will be cached and show up
+                        client.close();
+                    });
+                });
+
+
+            })
+            ////////////////////////////
+            ////////////////////////////
+
+            //then..
+        
+        });
         
         app.get('/txs/:collectionName', cors(), async (req, res) => {
             // console.log('query: ', req.params.collectionName, req.query);

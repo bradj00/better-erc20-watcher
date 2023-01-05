@@ -15,6 +15,7 @@ const DatabaseInfoGrabber = () => {
     const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
     const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
     const {getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList} = useContext(GeneralContext); 
+    const {detectedLPs, setdetectedLPs} = useContext(GeneralContext); 
     
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
@@ -174,7 +175,7 @@ const DatabaseInfoGrabber = () => {
         fetch('http://10.0.3.2:4000/system/systemStatus')
         .then(response => response.json())
         .then(data => {
-            console.log('system status: ', data);
+            // console.log('system status: ', data);
             setSystemStatuses(data);
 
         })
@@ -238,6 +239,29 @@ const DatabaseInfoGrabber = () => {
 
             
             setWatchedTokenList(data);
+            // setWatchedTokenList(data);
+        })
+    }
+    function fetchDetectedLiquidityPools(watchedToken) {
+        console.log('fetching detected liquidity pools for token: ', watchedToken)
+        fetch('http://10.0.3.2:4000/detectedLiquidityPools/'+watchedToken)
+        .then(response => response.json())
+        .then(data => {
+            let temp = {uniswap_v3_pools:{}};
+            console.log('detected pools (and position NFTs) : ', data);
+
+            if (data && data.uniswap_v3_pools.length > 0) {
+                data.uniswap_v3_pools.map((pool) => {
+                if (!temp.uniswap_v3_pools[pool["Pool Address"]]) {
+                  temp.uniswap_v3_pools[pool["Pool Address"]] = [];
+                }
+                temp.uniswap_v3_pools[pool["Pool Address"]].push(pool)
+              })
+            //   console.log('~~~temp: ', temp)
+              setdetectedLPs(temp);
+            }
+
+            
             // setWatchedTokenList(data);
         })
     }
@@ -338,6 +362,12 @@ const DatabaseInfoGrabber = () => {
             fetchTransactions(watchedTokenList[1].address, MinAmountFilterValue, MaxAmountFilterValue);
         }
     },[watchedTokenList]);
+    
+    useEffect(() => {
+        if (detectedLPs){
+            console.log('detected liquidity providers: ', detectedLPs);
+        }
+    },[detectedLPs]);
 
 
     useEffect(() => {
@@ -391,6 +421,9 @@ const DatabaseInfoGrabber = () => {
     useEffect(() => {
         if (viewingTokenAddress){
             console.log('watching new token: ', viewingTokenAddress);
+            setdetectedLPs();
+            fetchDetectedLiquidityPools(viewingTokenAddress);
+
             //clear thisInterval
             clearInterval(intervalQ);
 
