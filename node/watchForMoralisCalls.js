@@ -105,7 +105,7 @@ async function checkLookupRequests()  {
                         // console.log(requests);
                         // console.log('---------------------\n\n')
                         // do something with the requests
-                        for (let i = 0; i < requests.length; i++) {
+                        for (let i = 0; i < requests.length; i++) { 
                             console.log(chalk.magenta('request: '), requests[i]);
                             await dispatcher(requests[i].instructionMap, requests[i].requestUrl, requests[i].requestPostData);
                             // await new Promise(r => setTimeout(r, 1000));
@@ -140,8 +140,10 @@ function dispatcher(instructionMap, url, postData){
                 getAddressTXsforToken(url, postData)
                 .then((result)=>{ resolve() });
                 break;
-            case 2:
-                console.log('fulfilling data lookup request: '+chalk.cyan('/updateTokenBalances/:address'));
+            case 2: 
+                console.log('fulfilling data lookup request: '+chalk.cyan('/detectedLiquidityPools/:watchedToken'));
+                getownerOfForLPTokenArray(url, postData)
+                .then((result)=>{ resolve() });
                 break;
             default:
                 console.log(chalk.cyan('default instruction'));
@@ -299,6 +301,116 @@ function getAddressTXsforToken(url, postData){
     });
 }
 
+//dispatcher instruction map 2
+async function getownerOfForLPTokenArray(url, postData){
+    return new Promise(async (resolve, reject) => {
+        console.log('looking up array of LPTokens to determine ownerOf values');
+        
+        for (var i = 0; i < postData.length; i++) {
+            console.log('checking: ', postData[i], ' for ownerOf')
+            await checkContractTokenIdForOwnerOf(postData[i])
+            await new Promise(r => setTimeout(r, 1000));
+
+            if (i === postData.length - 1) {
+                MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                    if (err) {
+                        h.fancylog(err, 'error');
+                    }
+                    
+                    const db = client.db('externalLookupRequests');
+                    const collectionBucket = db.collection('rBucket');
+                    //remove the document matching the URL from the collection, then close client
+                    collectionBucket.deleteOne ({ requestUrl : 'coolio URL blah blah' }, function(err, obj) {
+                        if (err) console.log('ERROR deleting document: ', err);
+                        console.log(chalk.green("cleaned up rBucket request (by requestUrl match)") );
+                        // client.close();
+                        resolve();
+                    });
+                
+                });
+            }
+        }
+
+        
+    });
+}
+
+
+async function checkContractTokenIdForOwnerOf(tokenId){
+    return new Promise(async (resolve, reject) => {
+        tokenId = parseInt(tokenId);
+        console.log('>\tchecking tokenId: ',tokenId);
+        const options = {
+            method: 'POST',
+            url: 'https://deep-index.moralis.io/api/v2/0xC36442b4a4522E871399CD717aBDD847Ab11FE88/function',
+            params: {chain: 'eth', function_name: 'ownerOf'},
+            headers: {
+              accept: 'application/json',
+              'content-type': 'application/json',
+              'X-API-Key': moralisApiKey
+            },
+            data: {abi: uniswapv3Abi, params: {tokenId: tokenId}}
+          };
+          
+          axios
+            .request(options)
+            .then(function (response) {
+                console.log('tokenId: '+tokenId+'\towner: '+response.data);
+
+                MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                    if (err) {
+                        console.log('fat mongo error: '+err);
+                    }
+                    //lookup friendly name for owner address
+                    const dbStatus = client.db('friendlyNames');
+                    const collection = dbStatus.collection("lookup");
+                    const regex = new RegExp(response.data, 'i');
+                    collection.find({address : regex}).toArray(async function(err, requests) {
+                        let finalOwnerOf = {};
+                        if(requests.length == 0) {
+                            console.log('\t->no friendly name found for: '+response.data);
+                            finalOwnerOf = {
+                                ownerOf: response.data,
+                                friendlyName: response.data
+                            }
+                        } else {
+                            console.log('\t->friendly name found.');
+                            // console.log(requests[0]);
+                            // console.log('-----------------')
+                            finalOwnerOf = {
+                                ownerOf: response.data,
+                                friendlyName: requests[0]
+                            }
+                        }
+
+                        
+
+                        // upsert the ownerOf value into the db
+                        const v3db          = client.db('uniswap-v3-position-managers');
+                        const v3collection  = v3db.collection("a_0xC36442b4a4522E871399CD717aBDD847Ab11FE88");
+                        await v3collection.updateOne( { tokenId: tokenId }, { $set: { ownerOf: finalOwnerOf } }, { upsert: true }  );
+                        console.log('updated ownerOf for tokenId: '+tokenId+' to: '+finalOwnerOf.ownerOf+' ('+finalOwnerOf.friendlyName+')');
+                        client.close();
+                        resolve();
+
+
+                    });
+                    
+
+                    
+                });
+                
+
+
+            })
+            .catch(function (error) {
+              if (error && error.response && error.response.data) {
+                console.error(error.response.data); // { message: 'Returned error: execution reverted' }
+              }
+            });
+    });
+}
+
 
 
 async function performLookups(requests) {
@@ -315,3 +427,105 @@ async function performLookups(requests) {
         throttle += 1000;
     });
 }
+
+
+
+
+
+const uniswapv3Abi = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+
+
+
+	{
+		"inputs": [],
+		"name": "name",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "ownerOf",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "symbol",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "tokenURI",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]

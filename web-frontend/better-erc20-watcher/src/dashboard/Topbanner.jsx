@@ -114,6 +114,12 @@ const Topbanner = () => {
     }
     
     useEffect(() => {
+        if (friendlyLookupResponse){
+            console.log('~!~! friendlyLookupResponse: ',friendlyLookupResponse);
+        }
+    },[friendlyLookupResponse]);
+
+    useEffect(() => {
         const timer = setTimeout(() => {
           console.log("Executing function after 1 second of not typing in input field");
           setsearchInputLookup(searchInput);
@@ -130,7 +136,7 @@ const Topbanner = () => {
     <div style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
                 
                 
-    <div onClick={()=>{setshowTokenSelector(!showTokenSelector) }} className="hoverWatchedTokenSelector" style={{zIndex:'9999', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'1vh', display:'flex', justifyContent:'center', textAlign:'center', position:'absolute', left:'19%', width:'15%',height:'80%'}} >
+    <div onClick={()=>{setshowTokenSelector(!showTokenSelector) }} className="hoverWatchedTokenSelector" style={{zIndex:'10000', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'1vh', display:'flex', justifyContent:'center', textAlign:'center', position:'absolute', left:'19%', width:'15%',height:'80%'}} >
         {
         viewingTokenAddress? 
             <div style={{zIndex:'10000', cursor:'pointer', }} >
@@ -156,7 +162,7 @@ const Topbanner = () => {
     </div>
 
     { showTokenSelector  ?
-        <div style={{width:'15%', height:'20vh', top:'6vh', backgroundColor:'rgba(0,0,0,1)', left:'19vw', paddingTop:'1vh', position:'absolute'}}>
+        <div style={{zIndex:'9999', width:'15%', height:'20vh', top:'5.5vh', border:'1px solid rgba(255,255,255,0.2)', borderTop:'0px solid #000', backgroundColor:'rgba(0,0,5,0.99)', left:'19vw', paddingTop:'1vh', position:'absolute'}}>
         {watchedTokenList.map((token, index) => (
             token? token.tokenAddress?
                 <div style={{cursor:'pointer', zIndex:'10000', position:'relative', }} onClick={()=>{ updateSelectedToken(token); setshowTokenSelector(false) }}>
@@ -194,16 +200,25 @@ const Topbanner = () => {
         
             <div style={{zIndex:'9999', }} id="searchBox" >
                 <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
-                <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'15vw', display:'flex',textAlign:'center', border:'1px solid #fff', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
+                <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'15vw', display:'flex',textAlign:'center', border:'1px solid rgba(255,255,255,0.4)', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
                 </form>
+            <div style={{border:'2px dashed rgba(255,255,255,0.4)', position:'absolute',top:'100%',width:'15vw', cursor:'pointer', backgroundColor:'rgba(10,10,10,1)', padding:'1vh', height:'12vh', }}>
             {friendlyLookupResponse?
-            
-            <div onClick={()=>{setclickedDetailsAddress(friendlyLookupResponse.address); setclickedDetailsAddressFN(displayAddressFN(friendlyLookupResponse)); setclickedSearchBar(false) }} style={{border:'0px solid #0ff', position:'absolute',top:'100%',width:'15vw', cursor:'pointer', backgroundColor:'rgba(10,10,10,1)', padding:'1vh', height:'12vh', border:'1px solid rgba(30,30,30,1)'}}>
-                {displayAddressFN(friendlyLookupResponse)}
-            </div>
+            friendlyLookupResponse.map((nameItem, index)=>{
+                return(
+                    <div style={{display:'flex', width:'100%', border:'0px solid #0f0'}}>
+                    <div key={index} style={{color:'rgba(220,220,255,1)', width:'100%', float:'left'}} onClick={()=>{setclickedDetailsAddress(nameItem.address); setclickedDetailsAddressFN(displayAddressFN(nameItem)); setclickedSearchBar(false) }} >
+                        {displayAddressFN(nameItem)}
+                    </div>
+                    <div style={{float:'right',}}>
+                        {getEllipsisTxt(nameItem.address, 4)}
+                    </div>
+                    </div>
+                )
+            })
         :<></>
         }
-
+        </div>
         </div>
         
         :

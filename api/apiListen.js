@@ -92,7 +92,7 @@ app.listen(listenPort, () => {
                     const c2 = db2.collection('rBucket');
 
                     c2.insertOne({requestUrl: requestUrl, requestPostData: null, instructionMap: 1});
-                    console.log('sent request to to get data from external api.');
+                    console.log('_-_---sent request to get data from external api.');
                     res.send('update request sent')
                 }
 
@@ -537,11 +537,30 @@ app.listen(listenPort, () => {
                     collection.find({[keyName]:  {$eq: req.params.watchedToken}}).toArray(function(err, docs) {
                         // console.log('docs: ', docs);
                         // forEach document, if there is no 'ownerOf' column, add it to an array to request from the external api
-                    
+                        let requestArr = [];
+                        docs.forEach((doc, index) => {
+                            if (!doc.ownerOf) {
+                                requestArr.push(doc['Token ID']);
+                            }
+                            if (index == docs.length - 1) { 
+                                // console.log('requestArr: ', requestArr);
+                                // put the requestArr into db 'externalLookupRequests' and collection 'rBucket' 
+                                let requestUrl = `coolio URL blah blah`; 
+                                const db2 = client.db('externalLookupRequests');
+                                const c2 = db2.collection('rBucket');
+                                if (requestArr.length > 0) {
+                                    c2.insertOne({requestUrl: requestUrl, requestPostData: requestArr, instructionMap: 2});
+                                    console.log('---------')
+                                    console.log(requestArr)
+                                    console.log('created request to get data from external api. Next time it will be cached and show up');
+                                }
+                                // each liquidityPoolStats is a v3 pool addy with token stats
+                                // client.close();
+                                res.send({uniswap_v3_pools:docs, someOtherPools:[], liquidityPoolStats: {'0xdb6897039084a2f8fb2b719716ba7a734f84aa66': {nativeHeld:620123, counterHeld:4.3}  }}); //send it regardless. next time it will be cached and show up
+                            }
+                        });
            
                         
-                        res.send({uniswap_v3_pools:docs, someOtherPools:[]}); //send it regardless. next time it will be cached and show up
-                        client.close();
                     });
                 });
 
@@ -572,7 +591,7 @@ app.listen(listenPort, () => {
                     });
                 }
                 else if (pageNumber == 'chart') {
-                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(5000).toArray(function(err, result) {    
+                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(10000).toArray(function(err, result) {    
                         client.close();
                         res.send({totalPages: 1, result: condenseArray(result, filterMin, filterMax)})                    
                         // res.send({totalPages: 1, result: result}) 
@@ -649,17 +668,31 @@ app.listen(listenPort, () => {
 
                 console.log('looking up: ', req.params.theAddress);
                 const collection = db.collection('lookup'); 
+                const regex = new RegExp(`${req.params.theAddress}`, `i`);
+                console.log('REGEX: ', regex);
         
-                //we have to use a more expensive regex here because sometimes the address comes in not checksummed from Moralis. I could cast them all to lowercase but this seems better.
-                const regex = new RegExp(`^${req.params.theAddress}$`, `i`);
-                collection.find({address: regex }).toArray(function(err, result) {
-                    if (err) {
-                        console.log('error: ', err);
-                    }
-                    console.log('~~Friendly Name: ', result);
-                    client.close();
-                    res.send(result)
-                });
+                //if req.params.theAddress starts with 0x and has 42 characters, it's an address. Otherwise, it's a name
+                if (req.params.theAddress.startsWith('0x') && req.params.theAddress.length == 42) {
+                    collection.find({address: regex }).toArray(function(err, result) {
+                        if (err) {
+                            console.log('error: ', err);
+                        }
+                        console.log('~~Friendly Name: ', result);
+                        client.close();
+                        res.send(result)
+                    });
+                }
+                else {
+                    
+                    collection.find({$or: [{manuallyDefined: regex }, {OpenSea: regex}, {ENS: regex}, {MegaWorld: regex}] }).toArray(function(err, result) {
+                        if (err) {
+                            console.log('error: ', err);
+                        }
+                        console.log('__Friendly Name: ', result);
+                        client.close();
+                        res.send(result)
+                    });
+                }
             });
         });
 

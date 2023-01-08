@@ -301,7 +301,7 @@ const DatabaseInfoGrabber = () => {
         .then(data => {
             console.log('looked up friendly name for address: ', address, 'result: ', data)
             if (data && data[0] && data[0]){
-                setFriendlyLookupResponse(data[0])
+                setFriendlyLookupResponse(data)
             }else {
                 setFriendlyLookupResponse('no friendly name found')
             }

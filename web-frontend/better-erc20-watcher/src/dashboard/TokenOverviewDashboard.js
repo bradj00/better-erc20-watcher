@@ -267,6 +267,49 @@ const displayAddressFN = (clickedDetailsAddressFN) => {
   return firstAddress;
 }
 
+function determineExitPair(poolAddressObj, nativeSymbol){
+  let exitPair;
+  Object.keys(poolAddressObj).map(key => {
+    if ((key.includes('Address')) && (!key.includes('Pool')) && (poolAddressObj[key] !== nativeSymbol)) 
+    {
+      exitPair = key;
+      exitPair = exitPair.slice(0, -7);
+    }
+  });
+  return exitPair;
+
+}
+
+function filterToUniqueLPProviders(LpArray) {
+  // gets count of UNIQUE LP providers
+  let uniqueLpProviders    = [];
+  let uniqueLpProvidersFN  = [];
+  let uniqueLpProvidersObj = {};
+  LpArray.map((lp) => {
+    if (!uniqueLpProvidersObj[lp.ownerOf.ownerOf]) {
+      uniqueLpProvidersObj[lp.ownerOf.ownerOf] = true;
+      uniqueLpProviders.push(lp.ownerOf.ownerOf);
+      uniqueLpProvidersFN.push(lp.ownerOf.friendlyName);
+    }
+  });
+  
+  return uniqueLpProviders.length;
+
+}
+function filterToUniqueLPProvidersFN(LpArray) {
+  // gets count of UNIQUE LP providers' Friendly Names
+  let uniqueLpProvidersFN  = [];
+  let uniqueLpProvidersObj = {};
+  LpArray.map((lp) => {
+    if (!uniqueLpProvidersObj[lp.ownerOf.ownerOf]) {
+      uniqueLpProvidersObj[lp.ownerOf.ownerOf] = true;
+      uniqueLpProvidersFN.push(lp.ownerOf.friendlyName);
+    }
+  });
+
+  return uniqueLpProvidersFN;
+
+}
 
 function determineExchangeColorMockup(poolName){
   if (poolName === 'Uniswap'){
@@ -335,26 +378,35 @@ function determineExchangeColorMockup(poolName){
               <div style={{position:'absolute', top:'5%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
                 {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
                   return (
-                    <div style={{padding:'0.5vw', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                    <div style={{padding:'0.5vw',height:'14vh', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
                       <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
-                        {/* {item.name.slice(0,7)} */}
-                        Uniswap
+                        Uniswap v3
                       </div>
-                      <div style={{position:'relative', top: '0%', left:' 10%', color:'#fff', fontSize:'0.75vw', }}>
-                        {/* {item.heldAmount} */}
-                        600,241
+                      <div style={{position:'absolute', bottom: '1%', left:'3%', color:'#666', fontSize:'0.75vw', fontStyle:'italic' }}>
+                        {filterToUniqueLPProviders(detectedLPs.uniswap_v3_pools[item])} providers
                       </div>
                       <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
-                        {/* {item.priceUsd} */}
                         $0.21
                       </div>
-                      <div title="exit liquidity" style={{display:'flex', position:'absolute', top:'2.5vh',fontSize:'0.85vw',  right:'25%', color:'#aaa', fontStyle:'italic',  }}>
-                      <div>4.6</div>
-                      <LinkIcon />
-                      <div>WBTC</div>
+                      <div title="exit liquidity" style={{display:'flex', position:'absolute', top:'35%',fontSize:'0.85vw',  left:'1%', color:'#aaa', fontStyle:'italic',  }}>
+                        <div>
+                          4.6
+                        </div>
+                        <LinkIcon style={{marginLeft:'0.35vw'}}/>
+                        <div>{determineExitPair(detectedLPs.uniswap_v3_pools[item][0], clickedTokenSymbol? clickedTokenSymbol : 'nullll')}</div>
                       </div>
-                      <div style={{position:'absolute', right:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'0',color:'#666'}}>
-                        {getEllipsisTxt(item["Pool Address"],6)}
+                      <div style={{position:'absolute', left:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'30%',color:'#666'}}>
+                        {getEllipsisTxt(item,6)}
+                      </div>
+                      <div style={{position:'relative', border:'0px solid #0f0', height:'78%', backgroundColor:'rgba(255,0,155,0.2)', borderRadius:'0.5vw', padding:'0.2vw', overflowY:'scroll', width:'55%',float:'right',}}>
+                        {filterToUniqueLPProvidersFN(detectedLPs.uniswap_v3_pools[item]).map((friendlyNameObj,index) => {
+                            return (
+                              <div style={{position:'relative', bottom:'0%', textAlign:'right', lineHeight:'1.5vh', right:'3%', color:'#fff', fontSize:'0.75vw', }}>
+                                {displayAddressFN(friendlyNameObj)}
+                              </div>
+                            )
+                          })
+                        }
                       </div>
                     </div>
                   )
