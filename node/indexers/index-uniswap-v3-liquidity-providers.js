@@ -22,14 +22,16 @@ const dbNameFN = process.env.DB_NAME_FN;
 const listenPort = process.env.API_LISTEN_PORT; 
 const moralisApiKey = process.env.API_KEY;
 
+const maxMissingTokenIds = 25; // number of reverts before we decide the max token id has been reached (uniswap v3 doesnt seem to give this to us directly)
 
 console.clear();
 
 //connect to mongodb and check database "uniswap-v3-position-managers" and collection "a_"+contractAddress
 // if it doesn't exist, create it
+let revertedCounter = 0;
 checkLatestCachedToken()
     .then(async (result) => {
-        console.log('all done!!!!')
+        // console.log('all done!!!!')
     })
     .catch((err) => {
         console.log('there was error: ' + err);
@@ -64,6 +66,8 @@ async function checkLatestCachedToken(){
                     console.log("last token in collection is "+result[0].tokenId);
                     //keep going up until we hit a token that doesn't exist
                     checkContractForTokenId(result[0].tokenId+1)
+                    .then(async (result) => {                       
+                    });
                 }
 
                 client.close();
@@ -76,6 +80,7 @@ async function checkLatestCachedToken(){
 
 async function checkContractForTokenId(tokenId){
     return new Promise(async (resolve, reject) => {
+        
         console.log('checking tokenId: '+tokenId);
         const options = {
             method: 'POST',
@@ -92,6 +97,7 @@ async function checkContractForTokenId(tokenId){
           axios
             .request(options)
             .then(function (response) {
+                revertedCounter = 0;
                 let temp = response.data.slice(29);
                 // console.log(temp);
                 // console.log('----------------- ')
@@ -132,19 +138,33 @@ async function checkContractForTokenId(tokenId){
                         client.close();
                         //wait 150 ms before checking the next tokenId
                         await new Promise(r => setTimeout(r, 100));
-                        checkContractForTokenId(tokenId+1);
-                        resolve();
+                        // if (revertedCounter > 5) {
+                        //     console.log('reverted '+maxMissingTokenIds+' times in a row, stopping');
+                        //     resolve('finished');
+                        // }else {
+                            checkContractForTokenId(tokenId+1);
+                            resolve();
+                        // }
                     });
                 });
                 
 
 
             })
-            .catch(function (error) {
+            .catch(async function (error) {
               if (error && error.response && error.response.data) {
-                console.error(error.response.data); // { message: 'Returned error: execution reverted' }
+                console.error('[ '+chalk.cyan(revertedCounter)+' ]',error.response.data); // { message: 'Returned error: execution reverted' }
+                revertedCounter += 1;
               }
-              if (tokenId < 500000){checkContractForTokenId(tokenId+1);}
+              if (revertedCounter < maxMissingTokenIds){checkContractForTokenId(tokenId+1);}
+              else {
+                    console.log('\n\n[ '+chalk.cyan(revertedCounter)+' ] reverted '+maxMissingTokenIds+' times in a row, assuming max token id has been reached.  Sleeping '+chalk.cyan('24 HOURS')+'.');
+                    resolve('finished');
+                    //wait 5 seconds
+                    await new Promise(r => setTimeout(r, 60000 * 60 * 24)); //wait 24 hours. If we need it sooner it should be detected from a contract event and called manually
+                    revertedCounter = 0;
+                    checkLatestCachedToken();
+              }
             });
     });
 }

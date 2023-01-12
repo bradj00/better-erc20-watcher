@@ -206,10 +206,11 @@ useEffect(()=>{
   return (
     <React.Fragment>
       {/* <Title>Displayed Txs</Title> */}
-      <div style={{fontSize:'1.25vw', color:'rgba(150,220,255,0.9)'}}>Displayed Txs</div> 
+      <div style={{fontSize:'1.25vw', color:'rgba(150,220,255,0.9)', position:'absolute', top:'-5.5vh',left:'1vw',}}>TXs and Unique Accounts</div> 
+      
       <ResponsiveContainer>
         <BarChart 
-          width={150} 
+          width={120} 
           height={40} 
           data={clickedDetailsAddress? filteredtxDataDual : formattedTxDataChart}
           // data={filteredtxDataChart? filteredtxDataChart : <></>}
@@ -252,10 +253,10 @@ useEffect(()=>{
       </ResponsiveContainer>
       <div style={{position:'relative', border:'0px solid #0f0',color:'#222'}}>
 
-        <div className="hoverResetTimeFilter" style={{color:'#000', fontSize:'1vh', position:'absolute', left:'0',borderRadius:'0.5vh', height:'2.5vh',width:'3vw', zIndex:'9999', display:'flex', justifyContent:'center', alignItems:'center', cursor:'pointer'}}>
+        {/* <div className="hoverResetTimeFilter" style={{color:'#000', fontSize:'1vh', position:'absolute', left:'0',borderRadius:'0.5vh', height:'2.5vh',width:'3vw', zIndex:'9999', display:'flex', justifyContent:'center', alignItems:'center', cursor:'pointer'}}>
           Reset
-        </div>
-        <ReactSlider
+        </div> */}
+        {/* <ReactSlider
             className="timeFilter-slider"
             thumbClassName="timeFilter-thumb"
             trackClassName="timeFilter-track"
@@ -284,7 +285,7 @@ useEffect(()=>{
                 
               // settimeFilter( filterFromIndex(formattedTxData.reverse(), value) ); 
             }}
-        />
+        /> */}
 
       </div>
     </React.Fragment>

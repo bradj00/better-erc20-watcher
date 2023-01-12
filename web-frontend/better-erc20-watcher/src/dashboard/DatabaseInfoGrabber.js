@@ -11,6 +11,7 @@ const DatabaseInfoGrabber = () => {
     const [intervalQ, setintervalQ] = useState(null)
     const {txData, settxData} = useContext(GeneralContext);
     const {txDataChart, settxDataChart} = useContext(GeneralContext); 
+    const {txDataChartOverTime, settxDataChartOverTime} = useContext(GeneralContext); 
     const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
     const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
     const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
@@ -452,6 +453,11 @@ const DatabaseInfoGrabber = () => {
         let checkedMaxValue = 0;
         if (dataChart && dataChart.result){
             settxDataChart(dataChart.result);
+
+            
+            
+            settxDataChartOverTime(dataChart.resultOT);
+            console.log('~~~~~ dataChart: ', dataChart);
         }
     },[dataChart])
 

@@ -592,8 +592,20 @@ app.listen(listenPort, () => {
                 }
                 else if (pageNumber == 'chart') {
                     collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(10000).toArray(function(err, result) {    
-                        client.close();
-                        res.send({totalPages: 1, result: condenseArray(result, filterMin, filterMax)})                    
+                        const db = client.db('watchedTokens-addresses-over-time');
+                        const collectionOT = db.collection("a_"+req.params.collectionName);
+                        collectionOT.find({}).toArray(function(err, resultOT) {
+                            //sort resultOT by date field ascending
+                            const sorted = resultOT.sort(function(a, b) {
+                                return new Date(a.date) - new Date(b.date);
+                            });
+
+
+                            client.close();
+                            res.send({totalPages: 1, result: condenseArray(result, filterMin, filterMax), resultOT: sorted})                    
+
+                        });
+                        
                         // res.send({totalPages: 1, result: result}) 
                     });
                 }

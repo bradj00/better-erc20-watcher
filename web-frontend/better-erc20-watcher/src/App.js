@@ -44,6 +44,7 @@ const [selectedAddressTxList, setselectedAddressTxList] = useState();
 const [clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList] = useState();
 const [getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList] = useState();
 const [fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance] = useState();
+const [txDataChartOverTime, settxDataChartOverTime] = useState();
 
 
 const [MinAmountFilterValue, setMinAmountFilterValue] = useState(1);
@@ -112,6 +113,7 @@ const contextObj = {
   clickedToken, setclickedToken,
   searchInputLookup, setsearchInputLookup,
   detectedLPs, setdetectedLPs,
+  txDataChartOverTime, settxDataChartOverTime,
 }
 
 

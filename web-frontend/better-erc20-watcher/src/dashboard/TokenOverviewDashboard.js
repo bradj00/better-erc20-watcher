@@ -37,6 +37,8 @@ import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import tokenImage from './images/token_image.png';
 import LinkIcon from '@mui/icons-material/Link';
+import ChartAddysOverTime from './ChartAddysOverTime';
+
 TimeAgo.addDefaultLocale(en);
 
 
@@ -137,8 +139,8 @@ function DashboardContent() {
   const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
   const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
   const {detectedLPs, setdetectedLPs} = useContext(GeneralContext); 
-  
-  
+  const {txDataChart, settxDataChart} = useContext(GeneralContext);
+  const {txDataChartOverTime, settxDataChartOverTime} = useContext(GeneralContext); 
   
   
   
@@ -153,6 +155,8 @@ function DashboardContent() {
       console.log('detectedLPs: ', detectedLPs)
     }
   },[detectedLPs]);
+
+  
 
 
   useEffect(() => {
@@ -481,8 +485,11 @@ function determineExchangeColorMockup(poolName){
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
               
               <div style={{position:'absolute', width:'100%', display:'flex',}}>
-                <div style={{position:'absolute', left:'0', width:'75%', height:'25vh',padding:'1.5vw', border:'0px solid #f0f'}}>
+                <div style={{position:'absolute', left:'-1vw',top:'2.98vh', width:'60vw', height:'35.02vh',padding:'1.5vw', border:'0px solid #f0f'}}>
                   <Chart />
+                </div>
+                <div style={{position:'absolute', left:'-1vw', top:'-3vh',zIndex:'10000', width:'75%', height:'30vh',padding:'1.5vw', border:'0px solid #f0f'}}>
+                  <ChartAddysOverTime data={txDataChartOverTime}/> 
                 </div>
 
                 <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', textAlign:'center', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'0vh', width:'25%', height:'10vh',alignItems:'center', border:'1px solid rgba(100,100,100,0.4)',}}>
