@@ -1,6 +1,8 @@
 // this builds and maintains an index of all liquidity providers that are stored in the 
 // tokenUri of each token in the Uniswap Positions Manager contract
 // Moralis doesn't index it so we have to do it manually for our purpose
+
+
 import ethers from 'ethers';
 
 import axios from 'axios';
@@ -158,10 +160,10 @@ async function checkContractForTokenId(tokenId){
               }
               if (revertedCounter < maxMissingTokenIds){checkContractForTokenId(tokenId+1);}
               else {
-                    console.log('\n\n[ '+chalk.cyan(revertedCounter)+' ] reverted '+maxMissingTokenIds+' times in a row, assuming max token id has been reached.  Sleeping '+chalk.cyan('24 HOURS')+'.');
+                    console.log('\n\n[ '+chalk.cyan(revertedCounter)+' ] reverted '+maxMissingTokenIds+' times in a row, assuming max token id has been reached.  Sleeping '+chalk.cyan('1 HOUR')+'.');
                     resolve('finished');
                     //wait 5 seconds
-                    await new Promise(r => setTimeout(r, 60000 * 60 * 24)); //wait 24 hours. If we need it sooner it should be detected from a contract event and called manually
+                    await new Promise(r => setTimeout(r, 60000 * 60 * 1)); //wait 1 hour. If we need it sooner it should be detected from a contract event and called manually
                     revertedCounter = 0;
                     checkLatestCachedToken();
               }

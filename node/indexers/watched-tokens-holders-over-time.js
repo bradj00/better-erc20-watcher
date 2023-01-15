@@ -1,4 +1,5 @@
 // generate and maintain the pivot table for the number of cumulative holders of each watched token over time
+
 import * as MongoClientQ from 'mongodb';
 import * as dotenv from 'dotenv';
 import chalk from 'chalk';
@@ -11,7 +12,7 @@ const mongoUrl = process.env.MONGO_CONNECT_STRING;
 const MongoClient = MongoClientQ.MongoClient;
 
 
-console.clear();
+// console.clear();
 main()
 
 
@@ -75,12 +76,12 @@ function main(){
                         //block_timestamp looks like this: 2023-01-05T05:02:23.000Z
                         // if the block_timestamp is a different day than the previous one, console log the running tally of unique addresses
                         if (txs[q-1] && txs[q].block_timestamp.split('T')[0] != txs[q-1].block_timestamp.split('T')[0]){
-                            console.log(txs[q].block_timestamp.split('T')[0],'unique addresses: '+uniqueAddresses.length);
+                            // console.log(txs[q].block_timestamp.split('T')[0],'unique addresses: '+uniqueAddresses.length);
                             //put this data into the pivot table
                             if (result[i]){
                             const dbOverTime = client.db('watchedTokens-addresses-over-time');
                             const collection2 = dbOverTime.collection(result[i]);
-                            console.log('result[i]: ',result[i])
+                            // console.log('result[i]: ',result[i])
                             collection2.insertOne({ date: txs[q].block_timestamp.split('T')[0], uniqueAddresses: uniqueAddresses.length }, function(err, res) {
                                 // if (err) throw err;
                                 // console.log("1 document inserted");

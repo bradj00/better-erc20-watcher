@@ -310,6 +310,11 @@ function DashboardContent() {
       // console.log('latestEthBlock: ', latestEthBlock)
     }
   },[latestEthBlock]);
+  useEffect(()=>{
+    if (selectedAddressListOfTokens){
+      console.log('-----------____ selectedAddressListOfTokens: ', selectedAddressListOfTokens)
+    }
+  },[selectedAddressListOfTokens]);
 
   useEffect(()=>{
     if (clickedSearchBar){
@@ -537,7 +542,9 @@ function determineWhichFNtoShow(tokenObj){
                           else {
                             return (
                               selectedAddressListOfTokens[0][token].metadata?
-                              selectedAddressListOfTokens[0][token]?selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0]? selectedAddressListOfTokens[0][token].usdValue[0].usdValue?
+                              selectedAddressListOfTokens[0][token]?
+                              selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0]?
+                              selectedAddressListOfTokens[0][token].usdValue[0].usdValue?
                               
                               <tr style={{backgroundColor: token && communityHeldListFromSelectedAddy? token.toLowerCase() == communityHeldListFromSelectedAddy.toLowerCase()? "rgba(200,150,10,0.5)":"":"", cursor:'pointer'}} onClick={()=>{ setcommunityHeldListFromSelectedAddy(selectedAddressListOfTokens[0][token].metadata.token_address); setclickedTokenUsdQuote(selectedAddressListOfTokens[0][token].usdValue[0].usdValue.usdPrice) }}>
                                 {/* selectedAddressListOfTokens */}
@@ -569,8 +576,8 @@ function determineWhichFNtoShow(tokenObj){
                             )
                           }
                         })
-                        : <> </>
-                        : <> </>
+                        : <>h </>
+                        : <>i </>
                       }
                       
                       

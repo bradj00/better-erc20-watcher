@@ -318,7 +318,7 @@ function function66(e){
               {/* address header  */}
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'100%',height:'99%', textAlign:'center', borderRadius:'20px',  position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div style={{position:'absolute', }}>
-                  <div style={{fontSize:'1.5vw'}}>Token Holders list with Friendly Names labeled</div>
+                  <div style={{fontSize:'1.5vw'}}>Manage and define rules to label chain actions here</div>
                 </div>
               </div>
 

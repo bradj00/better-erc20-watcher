@@ -198,7 +198,7 @@ const Topbanner = () => {
         (clickedDetailsAddressFN || clickedSearchBar)?
         clickedSearchBar?
         
-            <div style={{zIndex:'9999', }} id="searchBox" >
+            <div style={{zIndex:'10000', }} id="searchBox" >
                 <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
                 <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'15vw', display:'flex',textAlign:'center', border:'1px solid rgba(255,255,255,0.4)', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
                 </form>

@@ -348,3 +348,14 @@ tr:nth-child(odd) {
   cursor:pointer;
   user-select: none;
 }
+
+.hoverOpacity {
+  color: rgba(255,255,255,0.4);
+  cursor:pointer;
+  user-select: none;
+}
+.hoverOpacity:hover {
+  color: rgba(255,255,255,1);
+  cursor:pointer;
+  user-select: none;
+}

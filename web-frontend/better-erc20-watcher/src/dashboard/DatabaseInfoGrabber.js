@@ -118,7 +118,9 @@ const DatabaseInfoGrabber = () => {
         .then(response => response.json())
         .then(data => {
             console.log('['+address+'] token balances: ', data);
-            setselectedAddressListOfTokens(data);
+            // setselectedAddressListOfTokens(data);
+            fetchSelectedAddressHeldTokens(address);
+
         })
     }
 

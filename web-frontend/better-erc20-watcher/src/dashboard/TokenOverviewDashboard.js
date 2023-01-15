@@ -142,6 +142,7 @@ function DashboardContent() {
   const {txDataChart, settxDataChart} = useContext(GeneralContext);
   const {txDataChartOverTime, settxDataChartOverTime} = useContext(GeneralContext); 
   
+  const [toggleShowLPDiv, settoggleShowLPDiv] = React.useState(false);
   
   
   const timeAgo = new TimeAgo('en-US'); 
@@ -379,15 +380,15 @@ function determineExchangeColorMockup(poolName){
             <div style={{overflowY:'scroll', overflowX:'hidden', border:'1px solid rgba(100,100,100,0.4)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'47vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'11vh', }}>
               
               {/* map of fake data array that show like placeholder cards */}
-              <div style={{position:'absolute', top:'5%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
+              <div style={{position:'absolute',  top:'5%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
                 {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
                   return (
-                    <div style={{padding:'0.5vw',height:'14vh', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                    <div style={{padding:'0.5vw', height:'20vh', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
                       <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
                         Uniswap v3
                       </div>
-                      <div style={{position:'absolute', bottom: '1%', left:'3%', color:'#666', fontSize:'0.75vw', fontStyle:'italic' }}>
-                        {filterToUniqueLPProviders(detectedLPs.uniswap_v3_pools[item])} providers
+                      <div onClick={()=>{ settoggleShowLPDiv(true) }} className="hoverOpacity" style={{ position:'absolute', bottom: '1%', left:'3%', fontSize:'0.75vw', fontStyle:'italic' }}>
+                        {filterToUniqueLPProviders(detectedLPs.uniswap_v3_pools[item])} providers ({detectedLPs.uniswap_v3_pools[item].length})
                       </div>
                       <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
                         $0.21
@@ -402,7 +403,7 @@ function determineExchangeColorMockup(poolName){
                       <div style={{position:'absolute', left:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'30%',color:'#666'}}>
                         {getEllipsisTxt(item,6)}
                       </div>
-                      <div style={{position:'relative', border:'0px solid #0f0', height:'78%', backgroundColor:'rgba(255,0,155,0.2)', borderRadius:'0.5vw', padding:'0.2vw', overflowY:'scroll', width:'55%',float:'right',}}>
+                      <div style={{ position:'relative', border:'0px solid #0f0', height:'78%', backgroundColor:'rgba(255,0,155,0.2)', borderRadius:'0.5vw', padding:'0.2vw', overflowY:'scroll', width:'55%',float:'right',}}>
                         {filterToUniqueLPProvidersFN(detectedLPs.uniswap_v3_pools[item]).map((friendlyNameObj,index) => {
                             return (
                               <div style={{position:'relative', bottom:'0%', textAlign:'right', lineHeight:'1.5vh', right:'3%', color:'#fff', fontSize:'0.75vw', }}>
@@ -485,10 +486,10 @@ function determineExchangeColorMockup(poolName){
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
               
               <div style={{position:'absolute', width:'100%', display:'flex',}}>
-                <div style={{position:'absolute', left:'-1vw',top:'2.98vh', width:'60vw', height:'35.02vh',padding:'1.5vw', border:'0px solid #f0f'}}>
+                <div style={{position:'absolute', left:'-1vw',top:'2.98vh', width:'59.7vw', height:'35.02vh',padding:'1.5vw', border:'0px solid #f0f'}}>
                   <Chart />
                 </div>
-                <div style={{position:'absolute', left:'-1vw', top:'-3vh',zIndex:'10000', width:'75%', height:'30vh',padding:'1.5vw', border:'0px solid #f0f'}}>
+                <div style={{position:'absolute', left:'-1vw', top:'-3vh', width:'75%', height:'30vh',padding:'1.5vw', border:'0px solid #f0f'}}>
                   <ChartAddysOverTime data={txDataChartOverTime}/> 
                 </div>
 

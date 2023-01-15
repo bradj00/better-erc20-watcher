@@ -31,7 +31,7 @@ const ConnectionStatusBanner = (props) => {
                 <div className="leftBarGridTop"> 
                     <div title="Watch Tokens" className="leftBarGridTopItem" onClick={()=>{setdisplayPanel('watchingTokens')}} > <MonetizationOnIcon style={{color:displayPanel=='watchingTokens'?'#fff':'rgba(255,255,255,0.4)', fontSize:'2vw'}}/> </div> 
                     <div title="Address Summaries" className="leftBarGridTopItem" onClick={()=>{setdisplayPanel('addressSummary')}}> <PersonIcon     style={{color:displayPanel=='addressSummary'?'#fff':'rgba(255,255,255,0.4)', fontSize:'2vw'}}/> </div> 
-                    <div title="Token Stats" className="leftBarGridTopItem" onClick={()=>{setdisplayPanel('tokenSummary')}}> <SummarizeIcon          style={{color:displayPanel=='tokenSummary'?'#fff':'rgba(255,255,255,0.4)', fontSize:'2vw'}}/> </div> 
+                    <div title="Manage Action Rules" className="leftBarGridTopItem" onClick={()=>{setdisplayPanel('tokenSummary')}}> <SummarizeIcon          style={{color:displayPanel=='tokenSummary'?'#fff':'rgba(255,255,255,0.4)', fontSize:'2vw'}}/> </div> 
                     <div title="Settings"    className="leftBarGridTopItem" onClick={()=>{setdisplayPanel('settingsDashboard')}}> <ConstructionIcon  style={{color:displayPanel=='settingsDashboard'?'#fff':'rgba(255,255,255,0.4)', fontSize:'2vw'}}/> </div> 
                 </div>
 
