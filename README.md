@@ -28,6 +28,9 @@ using:
 <sub>( This will be good for stepping into a community and quickly seeing commonly held ERC20 tokens and patterns)</sub>
 ![image](https://user-images.githubusercontent.com/99688245/212493974-77cdc1bc-a1fe-44bd-83d6-2add1ebc87c5.png)
 
+<sub>    </sub>
+![force-graph-3d-gif](https://user-images.githubusercontent.com/99688245/212602173-50b55b8a-0565-4f05-9d83-0b95bb5aaa53.gif)
+
 
 
 <sub>( chainData.js ingestion engine fetching and caching blockchain token TXs to mongo )</sub>
