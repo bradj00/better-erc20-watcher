@@ -21,12 +21,15 @@ using:
 
 
 <sub>( Feature rich front-end UI with live data updates )</sub>
-![image](https://user-images.githubusercontent.com/99688245/210706270-f799babc-c43e-4c8d-a24c-da2f783c9aaa.png)
+![image](https://user-images.githubusercontent.com/99688245/212523152-04c00d6a-99ef-43f3-af83-7d0c0964d033.png)
 
 <sub>( Address Summary stats, includes held tokens common to the existing database of watched addresses )</sub>
 
 <sub>( This will be good for stepping into a community and quickly seeing commonly held ERC20 tokens and patterns)</sub>
 ![image](https://user-images.githubusercontent.com/99688245/212493974-77cdc1bc-a1fe-44bd-83d6-2add1ebc87c5.png)
+
+<sub>Transaction Visualizer using react-force-graph to render transaction flows </sub>
+![force-graph-3d-gif](https://user-images.githubusercontent.com/99688245/212602173-50b55b8a-0565-4f05-9d83-0b95bb5aaa53.gif)
 
 
 
