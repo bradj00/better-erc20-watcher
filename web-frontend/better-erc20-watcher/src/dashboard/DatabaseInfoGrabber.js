@@ -50,6 +50,7 @@ const DatabaseInfoGrabber = () => {
     const {selectedAddressTxList, setselectedAddressTxList} = useContext(GeneralContext);
     const {clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList} = useContext(GeneralContext);
     const {fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance} = useContext(GeneralContext);
+    const {txVisualData, settxVisualData} = useContext(GeneralContext);
     
     useEffect(() => {
         if (searchInputLookup){
@@ -448,6 +449,12 @@ const DatabaseInfoGrabber = () => {
     //     // return () => clearTimeout(timeOutId);
     //   }, [DisplayMaxAmountFilterValue ]);
 
+    // useEffect(() => {
+    //     if (JSON.stringify(txVisualData) !== JSON.stringify(txDataChart) ){
+    //         console.log('CHANGING VISUAL DATA', txVisualData, txDataChart)
+    //         settxVisualData(dataChart.result);
+    //     }
+    // },[txVisualData, txDataChart]);
 
 
     useEffect(() => {
@@ -455,7 +462,7 @@ const DatabaseInfoGrabber = () => {
         let checkedMaxValue = 0;
         if (dataChart && dataChart.result){
             settxDataChart(dataChart.result);
-
+           
             
             
             settxDataChartOverTime(dataChart.resultOT);
@@ -481,6 +488,10 @@ const DatabaseInfoGrabber = () => {
                 })
                 // console.log('SETTING FINAL TEMP: ', temp)
                 settxData(temp);
+                if (JSON.stringify(txVisualData) !== JSON.stringify(txData) ){
+                    console.log('CHANGING VISUAL DATA', txVisualData, txData)
+                    settxVisualData(txData);
+                }
             }else {
                 // console.log('SETTING FINAL UNFILTERED TEMP: ', data.result)
                 settxData(data.result)

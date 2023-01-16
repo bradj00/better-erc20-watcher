@@ -198,7 +198,7 @@ useEffect(()=>{
       return (filteredtxDataDual[indexNum-1]?filteredtxDataDual[indexNum-1].block_timestamp_cut? filteredtxDataDual[indexNum-1].block_timestamp_cut : filteredtxDataDual[indexNum-1].time:'00:00');
     }else{
       return (formattedTxData[indexNum-1]? formattedTxData[indexNum-1].time : '00:00');
-    }
+    } 
   }
 
 

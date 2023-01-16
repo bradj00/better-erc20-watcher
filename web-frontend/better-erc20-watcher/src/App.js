@@ -6,6 +6,7 @@ import DatabaseInfoGrabber from './dashboard/DatabaseInfoGrabber.js';
 import React, {useContext, useEffect, useState} from 'react';
 import ConnectionStatusBanner from './dashboard/ConnectionStatusBanner.jsx';
 import Topbanner from './dashboard/Topbanner.jsx';
+import TxVisualizer from './dashboard/TxVisualizer.jsx';
 
 
 
@@ -15,6 +16,7 @@ export const GeneralContext   = React.createContext({});
 function App() {
 //create context for the app
 const [txData, settxData] = useState(null);
+const [txVisualData, settxVisualData] = useState(null);
 const [txDataChart, settxDataChart] = useState(null);
 const [getnewTxData, setgetnewTxData] = useState(null);
 const [audioEnabled, setAudioEnabled] = useState(true)
@@ -68,6 +70,7 @@ const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when 
 
 const contextObj = {
   txData, settxData,
+  txVisualData, settxVisualData,
   getnewTxData, setgetnewTxData,
   audioEnabled, setAudioEnabled,
   clickedDetailsAddress, setclickedDetailsAddress,
@@ -130,7 +133,7 @@ return (
           {displayPanel == 'watchingTokens'? <TokenOverviewDashboard />: <></>}
           {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
           {displayPanel == 'tokenSummary'? <TokenHoldersDashboard />: <></>}
-          {displayPanel == 'settingsDashboard'? <SettingsDashboard />: <></>}
+          {displayPanel == 'txVisualizer'? <TxVisualizer />: <></>}
           
           
       </div>

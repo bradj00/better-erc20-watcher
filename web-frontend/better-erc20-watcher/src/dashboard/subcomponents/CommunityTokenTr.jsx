@@ -87,7 +87,7 @@ const CommunityTokenTr = (props) => {
         <td onClick={()=>{ setclickedToggleUpdateFN(!clickedToggleUpdateFN) }} style={{maxWidth:'1vw',}}><ModeEditOutlineIcon style={{fontSize:'0.75vw'}}/></td>
         {clickedToggleUpdateFN?
         <>
-            <input value={newFriendlyNameInput} onKeyDown={(e)=>handleKeyDown(e, props.token.friendlyName.address)} onChange={(e) => setnewFriendlyNameInput(e.target.value)} style={{width:'80%',height:'100%', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="friendly name" />
+            <input value={newFriendlyNameInput} onKeyDown={(e)=>handleKeyDown(e, props.token.friendlyName.address)} onChange={(e) => setnewFriendlyNameInput(e.target.value)} style={{width:'80%',height:'3vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="friendly name" />
         </> 
         : determineWhichFNtoShow(props.token.friendlyName)}
         <td><a target="_blank" href={"https://etherscan.io/address/"+props.token.address}>{getEllipsisTxt(props.token.address,4)}</a></td>

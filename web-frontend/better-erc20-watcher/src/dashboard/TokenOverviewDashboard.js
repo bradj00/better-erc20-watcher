@@ -333,6 +333,20 @@ function determineExchangeColorMockup(poolName){
   }
 }
 
+function determineLpHeldCount(friendlyNameObj, LpArray) {
+  // gets count of LP tokens held by address
+  let lpHeldCount = 0;
+  LpArray.map((lp) => {
+    // console.log(lp);
+    if (lp.ownerOf.ownerOf && friendlyNameObj.address){
+      if (lp.ownerOf.ownerOf.toUpperCase() === friendlyNameObj.address.toUpperCase()) {
+        lpHeldCount++;
+      }
+    }
+  });
+  // console.log('lpHeldCount: ', lpHeldCount, friendlyNameObj.address)
+  return lpHeldCount;
+}
 
   return (
     <div style={{overflow:'hidden'}}>
@@ -383,7 +397,7 @@ function determineExchangeColorMockup(poolName){
               <div style={{position:'absolute',  top:'5%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
                 {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
                   return (
-                    <div style={{padding:'0.5vw', height:'20vh', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
+                    <div style={{padding:'0.5vw', height:'20vh', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw',  }}>
                       <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
                         Uniswap v3
                       </div>
@@ -403,15 +417,29 @@ function determineExchangeColorMockup(poolName){
                       <div style={{position:'absolute', left:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'30%',color:'#666'}}>
                         {getEllipsisTxt(item,6)}
                       </div>
-                      <div style={{ position:'relative', border:'0px solid #0f0', height:'78%', backgroundColor:'rgba(255,0,155,0.2)', borderRadius:'0.5vw', padding:'0.2vw', overflowY:'scroll', width:'55%',float:'right',}}>
+                      <div style={{ position:'relative', border:'0px solid #0f0', height:'85%', backgroundColor:'rgba(255,0,155,0.2)', borderRadius:'0.5vw', padding:'0.2vw', display:'flex', justifyContent:'center', overflowY:'scroll', width:'57%',float:'right',}}>
+                        <div style={{position:'absolute', width:'100%', height:'100%', overflow:'hidden'}}>
                         {filterToUniqueLPProvidersFN(detectedLPs.uniswap_v3_pools[item]).map((friendlyNameObj,index) => {
+                            // console.log(detectedLPs.uniswap_v3_pools[item]);
+                            
                             return (
-                              <div style={{position:'relative', bottom:'0%', textAlign:'right', lineHeight:'1.5vh', right:'3%', color:'#fff', fontSize:'0.75vw', }}>
-                                {displayAddressFN(friendlyNameObj)}
+                              <div style={{fontSize:'0.65vw', padding:'0.5vh', display:'grid',height:'2vh', gridTemplateColumns:'repeat(2, 1fr)', justifyContent:'center', alignItems:'center', width:'100%', border:'0px solid #0f0' }}>
+                                
+                                <div style={{textAlign:'left', float:'left', lineHeight:'1.5vh',  color:'#fff', }}>
+                                  {displayAddressFN(friendlyNameObj)}
+                                </div>
+
+                                <div style={{float:'right', position:'absolute', right:'5%',}}>
+                                  { detectedLPs.uniswap_v3_pools[item] ? determineLpHeldCount(friendlyNameObj, detectedLPs.uniswap_v3_pools[item]) : '0' }
+                                </div>
+
                               </div>
+
                             )
                           })
                         }
+
+                        </div>
                       </div>
                     </div>
                   )
@@ -489,7 +517,7 @@ function determineExchangeColorMockup(poolName){
                 <div style={{position:'absolute', left:'-1vw',top:'2.98vh', width:'59.7vw', height:'35.02vh',padding:'1.5vw', border:'0px solid #f0f'}}>
                   <Chart />
                 </div>
-                <div style={{position:'absolute', left:'-1vw', top:'-3vh', width:'75%', height:'30vh',padding:'1.5vw', border:'0px solid #f0f'}}>
+                <div style={{position:'absolute', left:'-1vw', top:'-3vh', width:'62.9vw', height:'38.75vh',padding:'1.5vw', border:'0px solid #f0f'}}>
                   <ChartAddysOverTime data={txDataChartOverTime}/> 
                 </div>
 

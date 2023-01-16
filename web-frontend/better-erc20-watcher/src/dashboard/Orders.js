@@ -11,7 +11,7 @@ import PoolIcon from '@mui/icons-material/Pool';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import EditIcon from '@mui/icons-material/Edit';
 import PersonIcon from '@mui/icons-material/Person';
-
+import ToFromCell from './subcomponents/ToFromCell';
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 
@@ -260,8 +260,8 @@ export default function Orders() {
                   <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
                   {/* <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell> */}
                   <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
-                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}  onClick={ ()=>{processTableClicked(row, 'from')} }>     {(row.from_address_friendlyName == undefined) ? getEllipsisTxt(row.from_address, 6): displayAddressFN(row.from_address_friendlyName)}</TableCell>
-                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}      onClick={ ()=>{processTableClicked(row, 'to') }}>   {(row.to_address_friendlyName== undefined) ? getEllipsisTxt(row.to_address, 6): displayAddressFN(row.to_address_friendlyName)} </TableCell>
+                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}  onClick={ ()=>{processTableClicked(row, 'from')} }>   <ToFromCell row={row} toFrom={'from'}  clickMode={rowClickMode}/>   </TableCell>
+                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}      onClick={ ()=>{processTableClicked(row, 'to') }}> <ToFromCell row={row} toFrom={'to'}    clickMode={rowClickMode}/>   </TableCell>
                   <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a> {determineShowPoolLink(row)? <div title="explore pool on UniSwap"  style={{float:'right', right:'0', top:'0'}}> <a target="_blank" className="PoolLinkHover" href={`https://info.uniswap.org/#/pools/`+getUniSwapPoolAddy(row)}> <PoolIcon /> </a> </div> : <></>} </TableCell>
                 </TableRow>
                 
@@ -281,7 +281,7 @@ export default function Orders() {
                 <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
                 <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
                 <TableCell style={{fontSize:'1vw',color: "white"}}  onClick={ ()=>{processTableClicked(row, 'from') } }>{((row.from_address_friendlyName == undefined) || (row.from_address_friendlyName == "0x000"))? getEllipsisTxt(row.from_address, 6): Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && key !== 'address'&& key !== 'ENS' && !value.startsWith('0x')) ? Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))? Object.entries(row.from_address_friendlyName).find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))[1] : getEllipsisTxt(row.from_address_friendlyName.address,6): getEllipsisTxt(row.from_address_friendlyName.address,6)}</TableCell>
-                <TableCell style={{fontSize:'1vw',color: "white"}}      onClick={ ()=>{processTableClicked(row, 'to') } }   >{((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6):   Object.entries(row.to_address_friendlyName).find(([key, value]) => key !== '_id' && key !== 'address'&& key !== 'ENS' && !value.startsWith('0x')) ? Object.entries(row.to_address_friendlyName)  .find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))? Object.entries(row.to_address_friendlyName)  .find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))[1] : getEllipsisTxt(row.to_address_friendlyName.address,6):   getEllipsisTxt(row.to_address_friendlyName.address,6)  }</TableCell>
+                <TableCell style={{fontSize:'1vw',color: "white"}}      onClick={ ()=>{processTableClicked(row, 'to') } }   >   {((row.to_address_friendlyName== undefined) || (row.to_address_friendlyName == "0x000"))? getEllipsisTxt(row.to_address, 6):   Object.entries(row.to_address_friendlyName).find(([key, value]) => key !== '_id' && key !== 'address'&& key !== 'ENS' && !value.startsWith('0x')) ? Object.entries(row.to_address_friendlyName)  .find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))? Object.entries(row.to_address_friendlyName)  .find(([key, value]) => key !== '_id' && typeof value === 'string' && !value.startsWith('0x'))[1] : getEllipsisTxt(row.to_address_friendlyName.address,6):   getEllipsisTxt(row.to_address_friendlyName.address,6)  }</TableCell>
                 <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a>  {determineShowPoolLink(row)? <div title="explore pool on UniSwap"  style={{float:'right', right:'0', top:'0'}}> <a target="_blank" className="PoolLinkHover" href={`https://info.uniswap.org/#/pools/`+getUniSwapPoolAddy(row)}> <PoolIcon /> </a> </div> : <></>}</TableCell>
               </TableRow>
             )})

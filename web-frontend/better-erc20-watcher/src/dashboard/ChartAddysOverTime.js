@@ -6,7 +6,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend
+  Legend,
+  ResponsiveContainer
 } from "recharts";
 
 const data = [
@@ -56,25 +57,29 @@ const data = [
 
 export default function ChartAddysOverTime(props) {
   return (
-    <LineChart
-      width={1150}
-      height={300}
-      data={props.data}
-      margin={{
-        top: 10,
-        right: 10,
-        bottom: 0,
-        left: 10,
-      }}
-    >
-      {/* <CartesianGrid strokeDasharray="3 3" /> */}
-      {/* <XAxis dataKey="name" /> */}
-      <YAxis yAxisId="left" />
-      <YAxis yAxisId="right" orientation="right" />
-      {/* <Tooltip /> */}
-      {/* <Legend /> */}
-      
-      <Line yAxisId="right" type="monotone" dot={{r:1}}  dataKey="uniqueAddresses" stroke="#82ca9d" />
-    </LineChart>
+    <React.Fragment>
+      <ResponsiveContainer>
+      <LineChart
+        width={120}
+        height={40}
+        data={props.data}
+        margin={{
+          top: 10,
+          right: 10,
+          bottom: 0,
+          left: 10,
+        }}
+      >
+        {/* <CartesianGrid strokeDasharray="3 3" /> */}
+        {/* <XAxis dataKey="name" /> */}
+        <YAxis yAxisId="left" />
+        <YAxis yAxisId="right" orientation="right" />
+        {/* <Tooltip /> */}
+        {/* <Legend /> */}
+        
+        <Line yAxisId="right" type="monotone" dot={{r:1}}  dataKey="uniqueAddresses" stroke="#82ca9d" />
+      </LineChart>
+      </ResponsiveContainer>
+    </React.Fragment>
   );
 }
