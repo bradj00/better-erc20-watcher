@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect, useRef} from 'react';
+import React, {useContext, useState, useEffect, useRef, useCallback} from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -40,7 +40,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import ChartAddysOverTime from './ChartAddysOverTime';
 import {ForceGraph3D,} from "react-force-graph";
 import  "../App.css";
-
+import SettingsOverscanIcon from '@mui/icons-material/SettingsOverscan';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -75,12 +75,33 @@ function genRandomTree(N = 80, reverse = false) {
 }
 
 
+
 function DashboardContent() {
+    const fgRef = useRef();
+
+
+    const [fullScreenToggle, setfullScreenToggle] = useState(false);
     const [defaultData, setDefaultData] = useState(genRandomTree());
     const [defaultDataLabels, setDefaultDataLabels] = useState(genRandomTree());
     const {txData, settxData} = useContext(GeneralContext); 
     const {filteredtxData, setfilteredtxData} = useContext(GeneralContext); 
     const {txVisualData, settxVisualData} = useContext(GeneralContext);
+
+
+    const handleNodeClick = useCallback(node => {
+        // Aim at node from outside it
+        const distance = 400;
+        const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+    
+        fgRef.current.cameraPosition(
+          { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
+          node, // lookAt ({ x, y, z })
+          1000  // ms transition duration
+        );
+      }, [fgRef]);
+    
+
+
 
     const displayAddressFN = (friendlyNameObj) => {
         if (friendlyNameObj === null || friendlyNameObj == undefined) {return 'null'}
@@ -105,7 +126,8 @@ function DashboardContent() {
     function getUniqueAddysForVisualizer(data) {
         let temp = {nodes: [], links: []};
         for (let i = 0; i < data.length; i++){
-            console.log('from: ',data[i].from_address_friendlyName, 'to: ', data[i].to_address_friendlyName)
+            // console.log('from: ',data[i].from_address_friendlyName, 'to: ', data[i].to_address_friendlyName)
+            console.log(data[i])
             let from_address                = data[i].from_address;
             let from_address_friendlyName   = data[i].from_address_friendlyName;
             let to_address                  = data[i].to_address;
@@ -130,6 +152,13 @@ function DashboardContent() {
             if (displayAddressFN(from_address_friendlyName) && displayAddressFN(to_address_friendlyName)){
                 temp.links.push({source: displayAddressFN(from_address_friendlyName), target: displayAddressFN(to_address_friendlyName), });
             }
+            //make nodes unique
+            temp.nodes = temp.nodes.filter((thing, index, self) =>
+                index === self.findIndex((t) => (
+                    t.id === thing.id
+                ))
+            )
+
         }
         return(temp);
     }
@@ -143,7 +172,7 @@ function DashboardContent() {
         }
     }, [filteredtxData, txVisualData])
 
-    const fgRef = useRef();
+    
     // const distance = 900;
 
     // useEffect(() => {
@@ -156,19 +185,26 @@ function DashboardContent() {
     //         x: distance * Math.sin(angle),
     //         z: distance * Math.cos(angle)
     //       });
-    //       angle += Math.PI / 6000;
+    //       angle += Math.PI / 300;
     //     }, 10);
     //   }, []);
 
 
     return (
-        <div style={{display:'flex',justifyContent:'center', alignItems:'center',position:'absolute', bottom:'1vh', width:'100vw', height:'91vh', overflow:'hidden'}}>
+        <div style={{display:'flex',justifyContent:'left', alignItems:'center',position:'absolute', bottom:'1vh', width:'100vw', height:'91vh', }}>
         
-            <div style={{display:'flex', borderRadius:'0.5vh',justifyContent:'center', alignItems:'center', position:'absolute', top:'1%', width:'80%', height:'18%', border:'1px solid rgba(255,255,255,0.1)'}}>
+            <div style={{display:'flex', borderRadius:'0.5vh',justifyContent:'center', alignItems:'center', position:'absolute', left:'0.5vw', top:'1%', width:'75vw', height:'18%', border:'1px solid rgba(255,255,255,0.1)'}}>
                 Filter Panel
             </div>
+            <div style={{display:'flex', borderRadius:'0.5vh',justifyContent:'center', alignItems:'center', position:'absolute', right:'0.5vw', top:'1%', width:'23.5vw', height:'99%', border:'1px solid rgba(255,255,255,0.1)'}}>
+                TX Details
+            </div>
 
-            <div style={{border:'1px solid rgba(255,255,255,0.1)', borderRadius:'0.5vh',  position:'absolute', bottom:'0', width:'90%', height:'80%',  overflow:'hidden'}}>
+            <div className={fullScreenToggle? "expandedTxView":"fitTxView"} >
+                <div className="hoverOpacity" onClick={ ()=>{setfullScreenToggle(!fullScreenToggle)}} style={{position:'absolute', right:'1%', top:'1%',zIndex:'10000'}}>
+                    <SettingsOverscanIcon style={{}}/>
+                </div>
+                    
                 <ThemeProvider theme={mdTheme}>
                     <Box sx={{ display: 'flex' }}>
                         <CssBaseline />
@@ -183,16 +219,24 @@ function DashboardContent() {
                     ref={fgRef}
                     graphData={defaultData} 
                     nodeAutoColorBy="group" 
-                    linkDirectionalParticleColor={() => "red"} 
-                    linkDirectionalParticleWidth={6}
+                    
                     linkHoverPrecision={10}
                     backgroundColor="rgba(5,5,8,1)"
-                    nodeLabel="id"
+                    // nodeLabel="id"
+                    nodeLabel= {function(d) {
+                        return "<div style='color: #111; background-color: #999; border: 1px solid rgba(255,255,255,0.5); border-radius:0.5vh; padding:0.5vh'; text-align:center><span class='label'>Name: " + d.id + "<br />...</span></div>";
+                    }}
                     // controlType= "orbit"
-                    // enableNodeDrag={false}
-                    // enableNavigationControls={false}
-                    // showNavInfo={false}
-                    
+                    enableNodeDrag={false}
+                    enableNavigationControls={true}
+                    showNavInfo={true}
+                    onNodeClick={handleNodeClick}
+                    // onLinkClick={link => fgRef.current.emitParticle(link)}
+                    // linkDirectionalArrowLength	={5}
+                    linkDirectionalParticles= {1}
+                    linkDirectionalParticleSpeed={0.005}
+                    linkDirectionalParticleColor={() => "#0f0"} 
+                    linkDirectionalParticleWidth={2}
                 />
 
             </div>

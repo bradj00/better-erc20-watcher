@@ -361,7 +361,27 @@ tr:nth-child(odd) {
 }
 
 
+.expandedTxView {
+  border: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 0.5vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vw;
+  overflow: hidden;
+}
 
+.fitTxView {
+  border: 1px solid rgba(255,255,255,0.1); 
+  border-radius: 0.5vh;
+  position: absolute;
+  left: 0.5vw;
+  bottom: 0;
+  width: 75%;
+  height: 80%;
+  overflow: hidden;
+}
 
 
 /* ------------------------------------------ */
