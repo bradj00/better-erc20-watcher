@@ -52,7 +52,7 @@ const ToFromCell = (props) => {
 
 
     return (
-        <div onClick={()=>{ editingFN==true? <></> : seteditingFN(true) }}>
+        <div  title={props.toFrom == 'to' ? props.row.to_address_friendlyName.address: props.toFrom == 'from'? props.row.from_address_friendlyName.address:<></>}  onClick={()=>{ editingFN==true? <></> : seteditingFN(true) }}>
             
             {
                 editingFN==true && props.clickMode == 'edit' ? 

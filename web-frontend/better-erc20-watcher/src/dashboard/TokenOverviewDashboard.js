@@ -168,7 +168,7 @@ function DashboardContent() {
           console.log('skipping ', displayAddressFN(item.ownerOf.friendlyName) )
         }
         else {
-          temp.push( {name: item.ownerOf.friendlyName, lowerLimit: item.lowerLimit, upperLimit: item.upperLimit, index: index} );
+          temp.push( {name: item.ownerOf.friendlyName, lowerLimit: item.lowerLimit, upperLimit: item.upperLimit, index: index, token0Held: item.token0Held, token1Held: item.token1Held} );
         }
 
         setLpChartData(temp);

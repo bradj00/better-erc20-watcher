@@ -50,18 +50,20 @@ const LiquidityChart = () => {
 
     const CustomTooltip = ({ active, payload, label }) => {
       if (active && payload && payload.length) {
-        // console.log('payload: ',payload)
+        console.log('payload: ',payload)
         return (
-          <div  style={{ backgroundColor:'#000',  borderRadius:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', fontSize:'0.75vw',  position:'relative',bottom:'-10vh',zIndex:'3', width:'8vw', height:'15vh'}}>
+          <div  style={{border:'1px solid rgba(255,255,255,0.2)',  backgroundColor:'#000',  borderRadius:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', fontSize:'0.75vw',  position:'relative',zIndex:'3', width:'8vw', height:'15vh'}}>
             
-            <div style={{padding:'0.45vw',position:'absolute', width:'100%', height:'100%'}}>
+            <div style={{padding:'0.45vw', paddingTop:'1%', position:'absolute', width:'100%', height:'100%'}}>
               <div style={{position:'relative'}}>lower: <div style={{textAlign:'right', position:'absolute', top:'0', width:'100%',}}> {commaNumber(payload[0].value) }     </div></div>
               <div style={{position:'relative'}}>upper: <div style={{textAlign:'right', position:'absolute', top:'0', width:'100%',}}> {commaNumber(payload[1].value)}      </div></div>
             </div>
 
-            <div style={{position:'absolute', textAlign:'center', bottom:'20%', fontSize:'0.9vw' }}>
-              {determineWhichFNtoShow(payload[0].payload.name)}
-              {payload[0].payload.index}
+              <div style={{fontSize:'auto'}}> {determineWhichFNtoShow(payload[0].payload.name)}                   </div>
+
+            <div style={{color:'#999', position:'absolute', textAlign:'center', bottom:'10%', width:'95%', fontSize:'0.7vw', }}>
+              <div style={{textAlign:'left', position:'absolute', left:'0'}}>token1</div>  <div style={{textAlign:'right'}}> {parseFloat(payload[0].payload.token0Held / (10 ** 18)).toFixed(3)} </div>
+              <div style={{textAlign:'left', position:'absolute', left:'0'}}>token2</div>  <div style={{textAlign:'right'}}> {parseFloat(payload[0].payload.token1Held / (10 ** 18)).toFixed(3)} </div>
             </div>
 
           </div>
