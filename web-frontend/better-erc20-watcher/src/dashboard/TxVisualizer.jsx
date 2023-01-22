@@ -81,27 +81,64 @@ function DashboardContent() {
 
 
     const [fullScreenToggle, setfullScreenToggle] = useState(false);
-    const [defaultData, setDefaultData] = useState(genRandomTree());
-    const [defaultDataLabels, setDefaultDataLabels] = useState(genRandomTree());
+    const {defaultData, setDefaultData} = useContext(GeneralContext); 
+    // const [defaultDataLabels, setDefaultDataLabels] = useState(genRandomTree());
     const {txData, settxData} = useContext(GeneralContext); 
     const {filteredtxData, setfilteredtxData} = useContext(GeneralContext); 
     const {txVisualData, settxVisualData} = useContext(GeneralContext);
 
 
     const handleNodeClick = useCallback(node => {
-        // Aim at node from outside it
-        const distance = 400;
-        const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
-    
-        fgRef.current.cameraPosition(
-          { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
-          node, // lookAt ({ x, y, z })
-          1000  // ms transition duration
-        );
-      }, [fgRef]);
-    
+        // const distance = 40;
+        // const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+        // fgRef.current.cameraPosition(
+        // { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
+        // node, // lookAt ({ x, y, z })
+        // 100  // ms transition duration
+        // );
+        
+        const { nodes, links } = defaultData;
+
+        // Remove node on click
+        const newLinks = links.filter(l => l.source !== node && l.target !== node); // Remove links attached to node
+        const newNodes = nodes.slice();
+        newNodes.splice(node.id, 1); // Remove node
+        // newNodes.forEach((n, idx) => { n.id = idx; }); // Reset node ids to array index
+
+        setDefaultData({ nodes: newNodes, links: newLinks });
 
 
+
+    }, [defaultData, setDefaultData, fgRef]);
+
+
+    // const handleNodeClick = useCallback(node => {
+    //     // remove node from defaultData
+    //     const newNodes = defaultData.nodes.filter(n => n.id !== node.id);
+    //     // remove links to/from node
+    //     const newLinks = defaultData.links.filter(l => l.source !== node.id && l.target !== node.id);
+    //     // update graph
+
+    //     setDefaultData({ nodes: newNodes, links: newLinks });
+        
+    //    console.log('newNodes: ',newNodes, 'newLinks: ',newLinks);
+
+
+
+
+    //     // const distance = 40;
+    //     // const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+    //     // fgRef.current.cameraPosition(
+    //     //   { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
+    //     //   node, // lookAt ({ x, y, z })
+    //     //   100  // ms transition duration
+    //     // );
+    // }, [fgRef]);
+    
+
+    useEffect(()=>{
+      console.log('defaultData: ',defaultData);  
+    })
 
     const displayAddressFN = (friendlyNameObj) => {
         if (friendlyNameObj === null || friendlyNameObj == undefined) {return 'null'}
@@ -127,7 +164,7 @@ function DashboardContent() {
         let temp = {nodes: [], links: []};
         for (let i = 0; i < data.length; i++){
             // console.log('from: ',data[i].from_address_friendlyName, 'to: ', data[i].to_address_friendlyName)
-            console.log(data[i])
+            // console.log(data[i])
             let from_address                = data[i].from_address;
             let from_address_friendlyName   = data[i].from_address_friendlyName;
             let to_address                  = data[i].to_address;

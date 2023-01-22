@@ -121,6 +121,12 @@ async function checkContractForTokenId(tokenId){
                     // console.log(index, line);
                 });
                 newObj["name"] = utf8data.name;
+                
+                //validate this works from the api first before we put it here but it needs to run as its written to db instead of computed each time it's read
+                // newObj["lowerLimit"] = /$(\d+.*)<\>$(\d+\.*)$/i.exec(/\d+.*\<\>\d+\.*$/i)[1];
+                // newObj["upperLimit"] = /$(\d+.*)<\>$(\d+\.*)$/i.exec(/\d+.*\<\>\d+\.*$/i)[2];
+                
+                
                 // console.log(newObj);
                 // console.log('----------------- ')
                 //put it into mongodb, then check the next tokenId

@@ -46,6 +46,7 @@ const Topbanner = () => {
     const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
     const {clickedToken, setclickedToken} = useContext(GeneralContext);
+    const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
     
     const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
     const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
@@ -207,7 +208,7 @@ const Topbanner = () => {
             friendlyLookupResponse.map((nameItem, index)=>{
                 return(
                     <div style={{display:'flex', width:'100%', border:'0px solid #0f0'}}>
-                    <div key={index} style={{color:'rgba(220,220,255,1)', width:'100%', float:'left'}} onClick={()=>{setclickedDetailsAddress(nameItem.address); setclickedDetailsAddressFN(displayAddressFN(nameItem)); setclickedSearchBar(false) }} >
+                    <div key={index} style={{color:'rgba(220,220,255,1)', width:'100%', float:'left'}} onClick={()=>{setclickedDetailsAddress(nameItem.address); setheldTokensSelectedAddress(nameItem.address); setclickedDetailsAddressFN(displayAddressFN(nameItem)); setclickedSearchBar(false) }} >
                         {displayAddressFN(nameItem)}
                     </div>
                     <div style={{float:'right',}}>

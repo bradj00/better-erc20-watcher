@@ -1,0 +1,4 @@
+none of the scripts in this folder should be used when this is done being written.
+
+they are only used to retro-actively fix things, like database schema that needed to look back on already
+ingested data and fix something

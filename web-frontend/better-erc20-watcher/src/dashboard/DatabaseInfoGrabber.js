@@ -466,7 +466,7 @@ const DatabaseInfoGrabber = () => {
             
             
             settxDataChartOverTime(dataChart.resultOT);
-            console.log('~~~~~ dataChart: ', dataChart);
+            // console.log('~~~~~ dataChart: ', dataChart);
         }
     },[dataChart])
 

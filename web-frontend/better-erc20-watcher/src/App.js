@@ -58,6 +58,7 @@ const [systemStatuses, setSystemStatuses] = useState();
 const [clickedToken, setclickedToken] = useState();
 const [searchInputLookup, setsearchInputLookup] = useState();
 const [detectedLPs, setdetectedLPs] = useState();
+const [LpChartData, setLpChartData] = useState([]);
 
 const [updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest] = useState();
 const [RequestFriendlyLookup, setRequestFriendlyLookup] = useState();
@@ -67,9 +68,12 @@ const [pageNumber, setpageNumber] = useState(1);
 const [displayPanel, setdisplayPanel] = useState('watchingTokens');
 
 const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
+const [defaultData, setDefaultData] = useState({ nodes: [], links: [] });
+
 
 const contextObj = {
   txData, settxData,
+  defaultData, setDefaultData,
   txVisualData, settxVisualData,
   getnewTxData, setgetnewTxData,
   audioEnabled, setAudioEnabled,
@@ -85,6 +89,7 @@ const contextObj = {
   chainDataHeartbeat, setchainDataHeartbeat,
   chainDataHeartbeatDiff, setchainDataHeartbeatDiff,
   latestEthBlock, setlatestEthBlock,
+  LpChartData, setLpChartData,
 
   MinAmountFilterValue, setMinAmountFilterValue,
   MaxAmountFilterValue, setMaxAmountFilterValue,

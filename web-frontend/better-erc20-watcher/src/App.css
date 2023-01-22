@@ -364,12 +364,13 @@ tr:nth-child(odd) {
 .expandedTxView {
   border: 1px solid rgba(255,255,255,0.1); 
   border-radius: 0.5vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vw;
+  position: absolute;
+  left: 0.49vw;
+  bottom:0vh;
+  width: 99.05%;
+  height: 100%;
   overflow: hidden;
+  transition: height 0.5s, width 0.5s;
 }
 
 .fitTxView {
@@ -377,10 +378,11 @@ tr:nth-child(odd) {
   border-radius: 0.5vh;
   position: absolute;
   left: 0.5vw;
-  bottom: 0;
+  bottom:0vh;
   width: 75%;
   height: 80%;
   overflow: hidden;
+  transition: height 0.5s, width 0.5s;
 }
 
 

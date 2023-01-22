@@ -12,6 +12,8 @@ import * as h from './helpers/h.cjs';
 import dotenv from 'dotenv';
 import web3 from 'web3';
 import getAllPaginatedData  from './helpers/fetchMoralisWithCursor.js';
+import {checkContractTokenIdForTokensHeld} from './v3-pool-info-grabber/v3-liq-token0and1.js';
+
 
 dotenv.config();
 const MongoClient = MongoClientQ.MongoClient;
@@ -107,7 +109,7 @@ async function checkLookupRequests()  {
                         // do something with the requests
                         for (let i = 0; i < requests.length; i++) { 
                             console.log(chalk.magenta('request: '), requests[i]);
-                            await dispatcher(requests[i].instructionMap, requests[i].requestUrl, requests[i].requestPostData);
+                            await dispatcher(requests[i].instructionMap, requests[i].requestUrl, requests[i].requestPostData, requests[i]._id);
                             // await new Promise(r => setTimeout(r, 1000));
                             //if we're on the last request, set lookingUp to false
                             if (i == requests.length - 1) {
@@ -130,7 +132,7 @@ async function checkLookupRequests()  {
 
 }
 
-function dispatcher(instructionMap, url, postData){
+function dispatcher(instructionMap, url, postData, mongoCollectionId){
     return new Promise((resolve, reject) => {
         switch(instructionMap){
             case 1:
@@ -143,6 +145,11 @@ function dispatcher(instructionMap, url, postData){
             case 2: 
                 console.log('fulfilling data lookup request: '+chalk.cyan('/detectedLiquidityPools/:watchedToken'));
                 getownerOfForLPTokenArray(url, postData)
+                .then((result)=>{ resolve() });
+                break;
+            case 3: 
+                console.log('fulfilling data lookup request: '+chalk.cyan('/detectedLiquidityPools/:watchedToken (Held Tokens)'));
+                getAndUpdateTokensHeldForTokenIds(url, postData, mongoCollectionId)
                 .then((result)=>{ resolve() });
                 break;
             default:
@@ -330,6 +337,66 @@ async function getownerOfForLPTokenArray(url, postData){
                 });
             }
         }
+
+        
+    });
+}
+
+//dispatcher instruction map 3
+async function getAndUpdateTokensHeldForTokenIds(url, postData, mongoCollectionId){
+    return new Promise(async (resolve, reject) => {
+        console.log('looking up array of tokenIds to determine tokensHeld values');
+        
+        
+            console.log('checking: ', postData.id, ' for tokensHeld')
+            let q = await checkContractTokenIdForTokensHeld(postData.id)
+            console.log('q: ', q)
+            await new Promise(r => setTimeout(r, 500));
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client1) {
+                if (err){
+                    h.fancylog(err, 'error');
+                }
+
+                //update the document matching the tokenId from collection postData.collectionName, then close client
+                const dbLP = client1.db('uniswap-v3-position-managers');
+                const collectionLP = dbLP.collection(postData.collectionName);
+                // timestamp
+                let d = new Date();
+                collectionLP.updateOne ({ tokenId : postData.id }, { $set: { token0Held: q.token0Held, token1Held: q.token1Held, heldLastUpdated: d } },{ upsert: true }, function(err, obj) {
+                    
+                    const collectionBucket = client1.db('externalLookupRequests').collection('rBucket');
+                    collectionBucket.deleteOne ({ _id : mongoCollectionId }, function(err, obj) {
+                    if (err) console.log('ERROR deleting document: ', err);
+                        console.log(chalk.green("___cleaned up rBucket request ID") );
+                        resolve();
+                        client1.close();
+                    });
+                    
+                    
+                });
+
+            });
+
+
+            
+            // MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+            //     if (err) {
+            //         h.fancylog(err, 'error');
+            //     }
+                
+            //     const db = client.db('externalLookupRequests');
+            //     const collectionBucket = db.collection('rBucket');
+            //     //remove the document matching the URL from the collection, then close client
+            //     collectionBucket.deleteOne ({ requestUrl : 'coolio URL blah blah' }, function(err, obj) {
+            //         if (err) console.log('ERROR deleting document: ', err);
+            //         console.log(chalk.green("cleaned up rBucket request (by requestUrl match)") );
+            //         // client.close();
+            //         resolve();
+            //     });
+            
+            // });
+            
+        
 
         
     });

@@ -428,6 +428,8 @@ app.listen(listenPort, () => {
             });
         });
 
+
+
         app.get('/getStakedMegaBalances/:address', cors(), async (req, res1) => {
             const address = req.params.address;
             const slicedAddress = req.params.address.replace('0x', '');
@@ -501,6 +503,36 @@ app.listen(listenPort, () => {
             });
         });
         
+
+        app.get('/updateLiquidityPoolsHeldAmounts/:watchedToken', cors(), async (req, res) => {
+            const watchedToken = req.params.watchedToken;
+            const tokenIds = req.query.tokenIds;
+            // tokenIds is delimited by a comma. put it in delimitedTokenIds array
+            const delimitedTokenIds = tokenIds.split(',');
+            console.log(chalk.cyan(req.params.watchedToken), '\n\tupdating held liquidity amounts for token ids: ', delimitedTokenIds);
+
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+                if (err){
+                    h.fancylog('error connecting to mongo: ', err);
+                }
+
+                for (let i = 0; i < delimitedTokenIds.length; i++){
+                    const c3 = client.db('externalLookupRequests').collection('rBucket');
+                    c3.insertOne({requestUrl: 'blank..', requestPostData: {id: parseInt(delimitedTokenIds[i]), collectionName: 'a_0xC36442b4a4522E871399CD717aBDD847Ab11FE88'}, instructionMap: 3});
+                    
+
+
+                    if (i == delimitedTokenIds.length - 1){
+                        setTimeout(()=>{client.close();}, 100);
+                    }
+
+                }
+                
+                
+            });
+            res.send();
+        });
+
         app.get('/detectedLiquidityPools/:watchedToken', cors(), async (req, res) => {
             // get all liquidity positions from db "uniswap-v3-position-managers" collection "a_"+0xC36442b4a4522E871399CD717aBDD847Ab11FE88 (uniswap position manager contract)
             // where watchedToken.symbol exists as a key value in the columns object (MEGA Address: exists as a key in the columns object) 
@@ -538,7 +570,19 @@ app.listen(listenPort, () => {
                         // console.log('docs: ', docs);
                         // forEach document, if there is no 'ownerOf' column, add it to an array to request from the external api
                         let requestArr = [];
-                        docs.forEach((doc, index) => {
+                        let newObj = {};
+                        docs.forEach(async (doc, index) => {
+                            // console.log('doc: ', doc);
+
+                            let result = await determineT0andT1HeldExists(doc.tokenId, 'a_0xC36442b4a4522E871399CD717aBDD847Ab11FE88')
+                            if (result == false) {
+                                let requestUrl = `blank..`; 
+                                const c3 = client.db('externalLookupRequests').collection('rBucket');
+                                console.log(doc.tokenId,'no t0 and t1 held cached. requesting lookup..');
+                                c3.insertOne({requestUrl: requestUrl, requestPostData: {id: doc.tokenId, collectionName: 'a_0xC36442b4a4522E871399CD717aBDD847Ab11FE88'}, instructionMap: 3});
+                            }
+
+
                             if (!doc.ownerOf) {
                                 requestArr.push(doc['Token ID']);
                             }
@@ -556,7 +600,7 @@ app.listen(listenPort, () => {
                                 }
                                 // each liquidityPoolStats is a v3 pool addy with token stats
                                 // client.close();
-                                res.send({uniswap_v3_pools:docs, someOtherPools:[], liquidityPoolStats: {'0xdb6897039084a2f8fb2b719716ba7a734f84aa66': {nativeHeld:620123, counterHeld:4.3}  }}); //send it regardless. next time it will be cached and show up
+                                res.send({uniswap_v3_pools:docs, someOtherPools:[], liquidityPoolStats: {'0xdb6897039084a2f8fb2b719716ba7a734f84aa66': {madeUpTempNumbers: 0, nativeHeld:620123, counterHeld:4.3}  }}); //send it regardless. next time it will be cached and show up
                             }
                         });
            
@@ -804,8 +848,33 @@ app.listen(listenPort, () => {
     // }); 
 
 });
-
-
+                                            //the address of the uniswap v3 position manager contract
+function determineT0andT1HeldExists(tokenId, managerAddress){
+    return new Promise((resolve, reject) => {
+        MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+            const db = client.db('uniswap-v3-position-managers');
+            const collection = db.collection(managerAddress);
+            collection.find({tokenId: tokenId}).toArray(function(err, result) {
+                // console.log(chalk.cyan('FOUND: '), result)
+                if (err) {
+                    h.fancylog(err, 'error');
+                    reject(err);
+                }
+                if (result.length > 0) {
+                    if (("token0Held" in result[0] && "token1Held" in result[0])) {
+                        resolve(true);
+                    }
+                    else {
+                        resolve(false);
+                    }
+                } else {
+                    resolve(false);
+                }
+                client.close();
+            });
+        });
+    });
+}
 
 function condenseArray(tempArray, filterMin, filterMax) {
     // console.log('filterMin: ', filterMin), console.log('filterMax: ', filterMax);

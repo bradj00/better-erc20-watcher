@@ -38,6 +38,10 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import tokenImage from './images/token_image.png';
 import LinkIcon from '@mui/icons-material/Link';
 import ChartAddysOverTime from './ChartAddysOverTime';
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+import LiquidityChart from './subcomponents/LiquidityChart';
+
 
 TimeAgo.addDefaultLocale(en);
 
@@ -141,6 +145,7 @@ function DashboardContent() {
   const {detectedLPs, setdetectedLPs} = useContext(GeneralContext); 
   const {txDataChart, settxDataChart} = useContext(GeneralContext);
   const {txDataChartOverTime, settxDataChartOverTime} = useContext(GeneralContext); 
+  const {LpChartData, setLpChartData} = useContext(GeneralContext); 
   
   const [toggleShowLPDiv, settoggleShowLPDiv] = React.useState(false);
   
@@ -150,10 +155,32 @@ function DashboardContent() {
   const [fakeData, setfakeData] = React.useState([{poolName: 'UniSwap v3 Pool', heldAmount: 'held: 600,241', linkedPair:'MATIC',priceUsd:'$0.21'}, {poolName: 'XT.com', linkedPair: 'WBTC', heldAmount:'held: 26,402',priceUsd:'$0.18'}, {poolName: 'Pancake Swap', heldAmount: 'held: 147,062', linkedPair:'USDC',priceUsd:'$0.24'}]);
 
 
+  function prepareLPChartData (LPs){
+    //for each key in the LPs.uniswap_v3_pools object, console log the key and the value
+    let temp = [];
+    let index = 0;
+    Object.keys(LPs.uniswap_v3_pools).forEach(function(key) {
+      LPs.uniswap_v3_pools[key].forEach(function(item) {
+        index++;
+        console.log('____',displayAddressFN(item.ownerOf.friendlyName), item.lowerLimit, item.upperLimit, item.token0Held, item.token1Held, index);
+        
+        if ( (item.token0Held == 0 && item.token1Held == 0) ) {
+          console.log('skipping ', displayAddressFN(item.ownerOf.friendlyName) )
+        }
+        else {
+          temp.push( {name: item.ownerOf.friendlyName, lowerLimit: item.lowerLimit, upperLimit: item.upperLimit, index: index} );
+        }
+
+        setLpChartData(temp);
+      });
+    });
+  }
+
 
   useEffect(() => {
     if (detectedLPs) {
       console.log('detectedLPs: ', detectedLPs)
+      prepareLPChartData(detectedLPs);
     }
   },[detectedLPs]);
 
@@ -161,7 +188,7 @@ function DashboardContent() {
 
 
   useEffect(() => {
-    console.log('systemStatuses: ', showTokenSelector)
+    // console.log('systemStatuses: ', showTokenSelector)
   },[systemStatuses]);
 
   useEffect(() => {
@@ -391,39 +418,59 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
               Detected DEXs
             </div>
             
-            <div style={{overflowY:'scroll', overflowX:'hidden', border:'1px solid rgba(100,100,100,0.4)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'47vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'11vh', }}>
-              
+            <div style={{overflowY:'scroll', overflowX:'hidden', border:'1px solid rgba(150,220,255,0.5)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'47vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'11vh', }}>
+              <div style={{display:'flex',position:'absolute', top:'0.5%', right:'0'}}>
+                <div className="hoverOpacity">
+                  <ArrowCircleLeftIcon style={{fontSize:'0.9vw'}}/>
+                </div>
+                <div style={{color:'rgba(255,255,255,0.4)', marginTop:'-0.25vh', marginLeft:'0.5vh', marginRight:'0.5vh'}}>
+                  1/3
+                </div>
+                <div className="hoverOpacity">
+                  <ArrowCircleRightIcon style={{fontSize:'0.9vw'}}/>
+                </div>
+              </div>
+                      
               {/* map of fake data array that show like placeholder cards */}
-              <div style={{position:'absolute',  top:'5%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
+              <div style={{position:'absolute',  top:'8%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
                 {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
                   return (
-                    <div style={{padding:'0.5vw', height:'20vh', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw',  }}>
+                    <div style={{padding:'0.5vw', display:'flex', justifyContent:'center', height:'42vh', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw',  }}>
+                      
+                      <div style={{position:'absolute', display:'flex', justifyContent:'center', alignItems:'center', borderRadius:'0.5vw', border:'1px solid rgba(255,255,255,0.6)', height:'40%', width:'95%', top: '13%', color:'#fff', fontSize:'1vw', }}>
+                        {/* liquidity chart  */}
+                        <LiquidityChart />
+                      </div>
                       <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
                         Uniswap v3
                       </div>
-                      <div onClick={()=>{ settoggleShowLPDiv(true) }} className="hoverOpacity" style={{ position:'absolute', bottom: '1%', left:'3%', fontSize:'0.75vw', fontStyle:'italic' }}>
+                      <div onClick={()=>{ settoggleShowLPDiv(true) }} className="hoverOpacity" style={{zIndex:'-1', position:'absolute', bottom: '41%',  fontSize:'0.75vw', fontStyle:'italic' }}>
                         {filterToUniqueLPProviders(detectedLPs.uniswap_v3_pools[item])} providers ({detectedLPs.uniswap_v3_pools[item].length})
                       </div>
                       <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
                         $0.21
                       </div>
-                      <div title="exit liquidity" style={{display:'flex', position:'absolute', top:'35%',fontSize:'0.85vw',  left:'1%', color:'#aaa', fontStyle:'italic',  }}>
-                        <div>
+                      
+                      <div title="exit liquidity" style={{lineHeight:'0.5', textAlign:'center', position:'absolute', top:'2%',fontSize:'0.85vw',  left:'1%', color:'#aaa', fontStyle:'italic',  }}>
+                        <div style={{marginLeft:'1vw'}}>
                           4.6
                         </div>
-                        <LinkIcon style={{marginLeft:'0.35vw'}}/>
-                        <div>{determineExitPair(detectedLPs.uniswap_v3_pools[item][0], clickedTokenSymbol? clickedTokenSymbol : 'nullll')}</div>
+                        <div>
+                          <LinkIcon style={{marginLeft:'0vw'}}/>
+                          {determineExitPair(detectedLPs.uniswap_v3_pools[item][0], clickedTokenSymbol? clickedTokenSymbol : 'nullll')}
+                        </div>
                       </div>
-                      <div style={{position:'absolute', left:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'30%',color:'#666'}}>
+
+                      {/* <div style={{position:'absolute', left:'2%',fontStyle:'italic', fontSize:'0.75vw',top:'30%',color:'#666'}}>
                         {getEllipsisTxt(item,6)}
-                      </div>
-                      <div style={{ position:'relative', border:'0px solid #0f0', height:'85%', backgroundColor:'rgba(255,0,155,0.2)', borderRadius:'0.5vw', padding:'0.2vw', display:'flex', justifyContent:'center', overflowY:'scroll', width:'57%',float:'right',}}>
-                        <div style={{position:'absolute', width:'100%', height:'100%', overflow:'hidden'}}>
+                      </div> */}
+                      <div style={{ position:'absolute',  bottom:'1%', width:'95%', height:'40%', alignItems:'center', backgroundColor:'rgba(255,255,255,0.1)', color:'#fff', zIndex:'-1',borderRadius:'0.5vw', padding:'0.2vw', display:'flex', justifyContent:'center', overflowY:'scroll', }}>
+                        <div style={{ width:'100%',  overflow:'hidden', }}>
                         {filterToUniqueLPProvidersFN(detectedLPs.uniswap_v3_pools[item]).map((friendlyNameObj,index) => {
                             // console.log(detectedLPs.uniswap_v3_pools[item]);
                             
                             return (
-                              <div style={{fontSize:'0.65vw', padding:'0.5vh', display:'grid',height:'2vh', gridTemplateColumns:'repeat(2, 1fr)', justifyContent:'center', alignItems:'center', width:'100%', border:'0px solid #0f0' }}>
+                              <div style={{fontSize:'0.75vw', padding:'0.5vh', display:'grid',height:'2vh', gridTemplateColumns:'repeat(2, 1fr)', justifyContent:'center', alignItems:'center', width:'100%',  }}>
                                 
                                 <div style={{textAlign:'left', float:'left', lineHeight:'1.5vh',  color:'#fff', }}>
                                   {displayAddressFN(friendlyNameObj)}
