@@ -59,7 +59,9 @@ const [clickedToken, setclickedToken] = useState();
 const [searchInputLookup, setsearchInputLookup] = useState();
 const [detectedLPs, setdetectedLPs] = useState();
 const [LpChartData, setLpChartData] = useState([]);
+const [RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice] = useState({});
 
+const [LpTotalTokensHeld, setLpTotalTokensHeld] = useState();
 const [updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest] = useState();
 const [RequestFriendlyLookup, setRequestFriendlyLookup] = useState();
 const [friendlyLookupResponse, setFriendlyLookupResponse] = useState();
@@ -69,12 +71,16 @@ const [displayPanel, setdisplayPanel] = useState('watchingTokens');
 
 const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
 const [defaultData, setDefaultData] = useState({ nodes: [], links: [] });
+const [ShownLiqPoolPriceData, setShownLiqPoolPriceData] = useState({});
 
 
 const contextObj = {
   txData, settxData,
+  LpTotalTokensHeld, setLpTotalTokensHeld,
   defaultData, setDefaultData,
   txVisualData, settxVisualData,
+  ShownLiqPoolPriceData, setShownLiqPoolPriceData, 
+  RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice,
   getnewTxData, setgetnewTxData,
   audioEnabled, setAudioEnabled,
   clickedDetailsAddress, setclickedDetailsAddress,

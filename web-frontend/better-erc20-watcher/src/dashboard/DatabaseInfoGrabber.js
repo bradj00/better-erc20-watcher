@@ -51,7 +51,10 @@ const DatabaseInfoGrabber = () => {
     const {clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList} = useContext(GeneralContext);
     const {fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance} = useContext(GeneralContext);
     const {txVisualData, settxVisualData} = useContext(GeneralContext);
-    
+    const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
+    const {ShownLiqPoolPriceData, setShownLiqPoolPriceData} = useContext(GeneralContext); 
+
+
     useEffect(() => {
         if (searchInputLookup){
             console.log('~~~~ searchInputLookup: ', searchInputLookup);
@@ -79,6 +82,13 @@ const DatabaseInfoGrabber = () => {
             fetchCommonlyHeldToken(communityHeldListFromSelectedAddy)
         }
     },[communityHeldListFromSelectedAddy]);
+
+    useEffect(() => {
+        if (RequestLiquidityPoolPrice && RequestLiquidityPoolPrice.token0 && RequestLiquidityPoolPrice.token1 && RequestLiquidityPoolPrice.feeAmount){
+            fetchLiquidityPoolPrice(RequestLiquidityPoolPrice.token0, RequestLiquidityPoolPrice.token1, RequestLiquidityPoolPrice.feeAmount)
+        }
+    },[RequestLiquidityPoolPrice]);
+    
 
     useEffect(() => {
         if (heldTokensSelectedAddress){
@@ -125,6 +135,15 @@ const DatabaseInfoGrabber = () => {
         })
     }
 
+    function fetchLiquidityPoolPrice(token0, token1, feeAmount) {
+        console.log('fetching : ', )
+        fetch('http://10.0.3.2:4000/getLiquidityPoolPrice?token0='+token0+'&token1='+token1+'&feeAmount='+feeAmount)
+        .then(response => response.json())
+        .then(data => {
+            console.log('POOL PRICE: ', data);
+            setShownLiqPoolPriceData(data);
+        })
+    }
     function fetchInGameMegaBalance(token, getFreshData) {
         console.log('fetching in-game mega balance for address: ', token)
         fetch('http://10.0.3.2:4000/getStakedMegaBalances/'+token+'?getFreshData='+getFreshData)

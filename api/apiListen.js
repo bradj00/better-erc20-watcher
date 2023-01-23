@@ -9,6 +9,7 @@ import * as h from './helpers/h.cjs';
 dotenv.config();
 // console.log('API_KEY: ', process.env.API_KEY);
 import getAllPaginatedData  from './helpers/fetchMoralisWithCursor.js';
+import getLiquidityPoolPriceFromOnChain from '../node/v3-pool-info-grabber/v3-liq-poolPrice.js';
 
 const MongoClient = MongoClientQ.MongoClient;
 // const mongoUrl = 'mongodb://localhost:27017';
@@ -503,6 +504,15 @@ app.listen(listenPort, () => {
             });
         });
         
+        app.get('/getLiquidityPoolPrice', cors(), async (req, res) => {
+            const token0 = req.query.token0;
+            const token1 = req.query.token1;
+            const feeAmount = req.query.feeAmount;
+
+            
+            const poolPrice = await getLiquidityPoolPriceFromOnChain(token0, token1, feeAmount)
+            res.send(poolPrice);
+        });
 
         app.get('/updateLiquidityPoolsHeldAmounts/:watchedToken', cors(), async (req, res) => {
             const watchedToken = req.params.watchedToken;

@@ -7,6 +7,25 @@ import { getEllipsisTxt } from '../helpers/h';
 
 const LiquidityChart = () => {
     const {LpChartData, setLpChartData} = useContext(GeneralContext); 
+    const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
+    const {ShownLiqPoolPriceData, setShownLiqPoolPriceData} = useContext(GeneralContext);  
+
+ 
+
+    useEffect(()=>{ 
+      if (ShownLiqPoolPriceData){  
+        console.log('ShownLiqPoolPriceData: ',ShownLiqPoolPriceData);
+      } 
+    },[ShownLiqPoolPriceData])
+
+
+    useEffect(()=>{
+      //request liquidity pool price from our API - this is not cached, and will have to be fetched from server every time component loads.
+      //perhaps there is a better way straight from the browser but my working code is in nodejs. - WALRUS optimize later.
+
+      setRequestLiquidityPoolPrice(); 
+
+    },[]);
 
     useEffect(()=>{
       if (LpChartData){
@@ -14,17 +33,6 @@ const LiquidityChart = () => {
       }
     },[LpChartData])
 
-    const getIntroOfPage = (label) => {
-      if (label === 'Page A') {
-        return "Page A is about men's clothing";
-      }
-      if (label === 'Page B') {
-        return "Page B is about women's dress";
-      }
-      else {
-        return label
-      }
-    };
 
 
     function determineWhichFNtoShow(tokenObj){
@@ -95,7 +103,7 @@ const LiquidityChart = () => {
         <YAxis type="category" hide width={150} padding={{ left: 0,  }} dataKey="name"/>
         <Bar dataKey="lowerLimit" stackId="a" fill="rgba(0,0,0,0)" />
         <Bar dataKey="upperLimit" stackId="a" fill="#82ca9d" />     
-        {/* <ReferenceLine x={990} stroke={"#f0f"} strokeWidth={1} /> */}
+        <ReferenceLine x={ShownLiqPoolPriceData? (ShownLiqPoolPriceData.token1in0 / 10 ** ShownLiqPoolPriceData.t0Decimals): 999999999999} stroke={"#FF00ff"} strokeWidth={2} />
         <Tooltip content={<CustomTooltip />} />
 
         </BarChart>

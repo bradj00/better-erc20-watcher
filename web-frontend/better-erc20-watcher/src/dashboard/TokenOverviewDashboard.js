@@ -127,6 +127,7 @@ function DashboardContent() {
   const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
   const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
   const {clickedToken, setclickedToken} = useContext(GeneralContext);
+  const {LpTotalTokensHeld, setLpTotalTokensHeld} = useContext(GeneralContext);
   
   const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
   const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
@@ -148,7 +149,7 @@ function DashboardContent() {
   const {LpChartData, setLpChartData} = useContext(GeneralContext); 
   
   const [toggleShowLPDiv, settoggleShowLPDiv] = React.useState(false);
-  
+  const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
   
   const timeAgo = new TimeAgo('en-US'); 
   
@@ -159,11 +160,57 @@ function DashboardContent() {
     //for each key in the LPs.uniswap_v3_pools object, console log the key and the value
     let temp = [];
     let index = 0;
+    let totalToken0Held = 0;
+    let totalToken1Held = 0;
     Object.keys(LPs.uniswap_v3_pools).forEach(function(key) {
+      
+      if (LPs.uniswap_v3_pools[key][0]){
+        console.log('LPs.uniswap_v3_pools[key][0]: ',LPs.uniswap_v3_pools[key][0]); 
+
+        const regex = new RegExp('Address', 'i');
+        const regex2 = new RegExp('Pool', 'i');
+        
+        let PoolTokenAddys = {};
+
+        //for each key name in the object
+        Object.keys(  LPs.uniswap_v3_pools[key][0]  ).forEach(key2 => {
+          const match = key2.match(regex);
+          const match2 = key2.match(regex2);
+          if (match && !match2) {
+            PoolTokenAddys[key2] = LPs.uniswap_v3_pools[key][0][key2];
+          }
+        }); 
+        let feeAmount = LPs.uniswap_v3_pools[key][0]["Fee Tier"];
+        if (feeAmount == "1%" ) { feeAmount = 10000 }
+        
+        //add the others.. WALRUS 
+        // if (feeAmount == "0.1%" ) { feeAmount == 10000 }
+        // if (feeAmount == "0.05%" ) { feeAmount == 500 }
+        
+        console.log('PoolTokenAddys: ',PoolTokenAddys, 'feeAmount: ', feeAmount);
+        //convert PoolTOkenAddys to an array
+        const PoolTokenAddysArray = Object.keys(PoolTokenAddys).map(function(key3) {
+          return PoolTokenAddys[key3];
+        });
+        setRequestLiquidityPoolPrice({token0: PoolTokenAddysArray[0], token1: PoolTokenAddysArray[1], feeAmount: feeAmount})
+
+
+        //for each key in PoolTokenAddys, console log the key and the value
+        Object.keys(PoolTokenAddys).forEach(function(key3) {
+          console.log('key: ',key3, 'value: ', PoolTokenAddys[key3] );
+          //request here
+          
+        });
+      }
+ 
+
+
       LPs.uniswap_v3_pools[key].forEach(function(item) {
         index++;
-        console.log('____',displayAddressFN(item.ownerOf.friendlyName), item.lowerLimit, item.upperLimit, item.token0Held, item.token1Held, index);
+        console.log('____',displayAddressFN(item.ownerOf.friendlyName), item.lowerLimit, item.upperLimit, item.token0Held, item.token1Held, index, item);
         
+        totalToken0Held += item.token0Held;
+        totalToken1Held += item.token1Held;
         if ( (item.token0Held == 0 && item.token1Held == 0) ) {
           console.log('skipping ', displayAddressFN(item.ownerOf.friendlyName) )
         }
@@ -171,6 +218,12 @@ function DashboardContent() {
           temp.push( {name: item.ownerOf.friendlyName, lowerLimit: item.lowerLimit, upperLimit: item.upperLimit, index: index, token0Held: item.token0Held, token1Held: item.token1Held} );
         }
 
+
+        
+
+
+
+        setLpTotalTokensHeld({token0Held: totalToken0Held, token1Held: totalToken1Held});
         setLpChartData(temp);
       });
     });
@@ -453,7 +506,9 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
                       
                       <div title="exit liquidity" style={{lineHeight:'0.5', textAlign:'center', position:'absolute', top:'2%',fontSize:'0.85vw',  left:'1%', color:'#aaa', fontStyle:'italic',  }}>
                         <div style={{marginLeft:'1vw'}}>
-                          4.6
+
+                          {/* put decimals in here from token info pull from api - WALRUS */}
+                          {LpTotalTokensHeld? parseFloat(LpTotalTokensHeld.token1Held / 10 ** 18).toFixed(3): '...'}
                         </div>
                         <div>
                           <LinkIcon style={{marginLeft:'0vw'}}/>
