@@ -34,7 +34,7 @@ function determineWhichFNtoShow(tokenObj){
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
-    console.log('payload: ',payload)
+    // console.log('payload: ',payload)
     return (
       <div  style={{border:'1px solid rgba(255,255,255,0.2)', textAlign:'center', color:'#fff', backgroundColor:'#000',  borderRadius:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', fontSize:'0.75vw',  position:'relative',zIndex:'3', width:'8vw', height:'6vh'}}>
         <div style={{width:'100%',position:'absolute'}}>

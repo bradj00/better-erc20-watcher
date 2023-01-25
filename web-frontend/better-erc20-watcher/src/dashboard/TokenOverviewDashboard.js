@@ -147,7 +147,9 @@ function DashboardContent() {
   const {txDataChart, settxDataChart} = useContext(GeneralContext);
   const {txDataChartOverTime, settxDataChartOverTime} = useContext(GeneralContext); 
   const {LpChartData, setLpChartData} = useContext(GeneralContext); 
-  
+  const {watchedTokenPriceUsd, setwatchedTokenPriceUsd} = useContext(GeneralContext);
+
+
   const [toggleShowLPDiv, settoggleShowLPDiv] = React.useState(false);
   const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
   
@@ -207,7 +209,7 @@ function DashboardContent() {
 
       LPs.uniswap_v3_pools[key].forEach(function(item) {
         index++;
-        console.log('____',displayAddressFN(item.ownerOf.friendlyName), item.lowerLimit, item.upperLimit, item.token0Held, item.token1Held, index, item);
+        // console.log('____',displayAddressFN(item.ownerOf.friendlyName), item.lowerLimit, item.upperLimit, item.token0Held, item.token1Held, index, item);
         
         totalToken0Held += item.token0Held;
         totalToken1Held += item.token1Held;
@@ -215,7 +217,9 @@ function DashboardContent() {
           console.log('skipping ', displayAddressFN(item.ownerOf.friendlyName) )
         }
         else {
-          temp.push( {name: item.ownerOf.friendlyName, lowerLimit: item.lowerLimit, upperLimit: item.upperLimit, index: index, token0Held: item.token0Held, token1Held: item.token1Held} );
+          if (item.ownerOf){
+            temp.push( {name: item.ownerOf.friendlyName, lowerLimit: item.lowerLimit, upperLimit: item.upperLimit, index: index, token0Held: item.token0Held, token1Held: item.token1Held} );
+          }
         }
 
 
@@ -371,7 +375,7 @@ function filterToUniqueLPProviders(LpArray) {
   let uniqueLpProvidersFN  = [];
   let uniqueLpProvidersObj = {};
   LpArray.map((lp) => {
-    if (!uniqueLpProvidersObj[lp.ownerOf.ownerOf]) {
+    if (lp && lp.ownerOf && lp.ownerOf.ownerOf &&  !uniqueLpProvidersObj[lp.ownerOf.ownerOf]) {
       uniqueLpProvidersObj[lp.ownerOf.ownerOf] = true;
       uniqueLpProviders.push(lp.ownerOf.ownerOf);
       uniqueLpProvidersFN.push(lp.ownerOf.friendlyName);
@@ -386,7 +390,7 @@ function filterToUniqueLPProvidersFN(LpArray) {
   let uniqueLpProvidersFN  = [];
   let uniqueLpProvidersObj = {};
   LpArray.map((lp) => {
-    if (!uniqueLpProvidersObj[lp.ownerOf.ownerOf]) {
+    if (lp && lp.ownerOf && lp.ownerOf.ownerOf &&  !uniqueLpProvidersObj[lp.ownerOf.ownerOf]) {
       uniqueLpProvidersObj[lp.ownerOf.ownerOf] = true;
       uniqueLpProvidersFN.push(lp.ownerOf.friendlyName);
     }
@@ -418,7 +422,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
   let lpHeldCount = 0;
   LpArray.map((lp) => {
     // console.log(lp);
-    if (lp.ownerOf.ownerOf && friendlyNameObj.address){
+    if (lp && lp.ownerOf && lp.ownerOf.ownerOf && friendlyNameObj.address){
       if (lp.ownerOf.ownerOf.toUpperCase() === friendlyNameObj.address.toUpperCase()) {
         lpHeldCount++;
       }
@@ -501,7 +505,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
                         {filterToUniqueLPProviders(detectedLPs.uniswap_v3_pools[item])} providers ({detectedLPs.uniswap_v3_pools[item].length})
                       </div>
                       <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
-                        $0.21
+                        ${watchedTokenPriceUsd? parseFloat(watchedTokenPriceUsd).toFixed(3) : '...'}
                       </div>
                       
                       <div title="exit liquidity" style={{lineHeight:'0.5', textAlign:'center', position:'absolute', top:'2%',fontSize:'0.85vw',  left:'1%', color:'#aaa', fontStyle:'italic',  }}>

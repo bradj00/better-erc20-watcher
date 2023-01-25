@@ -164,7 +164,7 @@ const Topbanner = () => {
 
     { showTokenSelector  ?
         <div style={{zIndex:'9999', width:'15%', height:'20vh', top:'5.5vh', border:'1px solid rgba(255,255,255,0.2)', borderTop:'0px solid #000', backgroundColor:'rgba(0,0,5,0.99)', left:'19vw', paddingTop:'1vh', position:'absolute'}}>
-        {watchedTokenList.map((token, index) => (
+        {watchedTokenList && Array.isArray(watchedTokenList)? watchedTokenList.map((token, index) => (
             token? token.tokenAddress?
                 <div style={{cursor:'pointer', zIndex:'10000', position:'relative', }} onClick={()=>{ updateSelectedToken(token); setshowTokenSelector(false) }}>
                     <div  style={{padding:'0.6vw',backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(215,215,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} >
@@ -178,9 +178,9 @@ const Topbanner = () => {
                 </div> 
             : <div style={{marginBottom:'1vh'}} key={index}></div> : <div key={index}></div>
             
-        ))}
+        )) : <></>}
         </div>: <></>
-        }
+    }
 
 
 

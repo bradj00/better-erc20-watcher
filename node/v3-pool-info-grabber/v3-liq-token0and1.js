@@ -3,9 +3,10 @@ import { ethers } from 'ethers'
 import * as fs from 'fs';
 import {ERC20, IUniswapV3PoolABI, IUniswapV3FactoryABI, IUniswapV3NFTmanagerABI}	from './ABIs.js';
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({path:'/.env'});
 
-const provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/"+process.env.ALCHEMY_API_KEY)
+const alchemyKey = process.env.ALCHEMY_KEY;
+const provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/"+alchemyKey)
 
     // V3 standard addresses
 const factory = "0x1F98431c8aD98523631AE4a59f267346ea31F984";

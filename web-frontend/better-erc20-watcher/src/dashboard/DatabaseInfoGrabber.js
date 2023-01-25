@@ -27,9 +27,10 @@ const DatabaseInfoGrabber = () => {
     const {selectedAddyInGameBalance, setselectedAddyInGameBalance} = useContext(GeneralContext);
     
     // explicit context variables needed because we are watching staking and deposit behavior for these addresses
-    const {megaPriceUsd, setmegaPriceUsd} = useContext(GeneralContext);
+    const {megaPriceUsd, setMegaPriceUsd} = useContext(GeneralContext);
     /////////////////////////////////////////////
     
+    const {watchedTokenPriceUsd, setwatchedTokenPriceUsd} = useContext(GeneralContext);
     const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
     const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
     const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
@@ -190,7 +191,17 @@ const DatabaseInfoGrabber = () => {
         .then(response => response.json())
         .then(data => {
             console.log('['+address+'] mega price: ', data);
-            setmegaPriceUsd(data);
+            setMegaPriceUsd(data);
+        })
+    }
+
+    function fetchWatchedTokenPriceUsd(address) {
+        console.log('fetching watched token price for address: ', address)
+        fetch('http://10.0.3.2:4000/fetchTokenUsdPrice/' + address)
+        .then(response => response.json())
+        .then(data => {
+            console.log('['+address+'] usd price: ', data);
+            setwatchedTokenPriceUsd(data.usdPrice);
         })
     }
 
@@ -446,7 +457,7 @@ const DatabaseInfoGrabber = () => {
             console.log('watching new token: ', viewingTokenAddress);
             setdetectedLPs();
             fetchDetectedLiquidityPools(viewingTokenAddress);
-
+            fetchWatchedTokenPriceUsd(viewingTokenAddress);
             //clear thisInterval
             clearInterval(intervalQ);
 

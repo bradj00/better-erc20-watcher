@@ -33,7 +33,8 @@ const [selectedAddressListOfTokens, setselectedAddressListOfTokens] = useState()
 const [communityHeldListFromSelected, setcommunityHeldListFromSelected] = useState();
 const [communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy] = useState();
 const [selectedAddyInGameBalance, setselectedAddyInGameBalance] = useState();
-const [megaPriceUsd, setmegaPriceUsd] = useState();
+
+const [watchedTokenPriceUsd, setwatchedTokenPriceUsd] = useState();
 const [heldTokensSelectedAddressFNdisplayed, setheldTokensSelectedAddressFNdisplayed] = useState();
 
 const [filteredtxDataInflow,   setfilteredtxDataInflow] = useState();
@@ -58,6 +59,7 @@ const [systemStatuses, setSystemStatuses] = useState();
 const [clickedToken, setclickedToken] = useState();
 const [searchInputLookup, setsearchInputLookup] = useState();
 const [detectedLPs, setdetectedLPs] = useState();
+const [megaPriceUsd, setMegaPriceUsd] = useState();
 const [LpChartData, setLpChartData] = useState([]);
 const [RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice] = useState({});
 
@@ -117,7 +119,8 @@ const contextObj = {
   communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy,
   getUpdatedTokenBalance, setgetUpdatedTokenBalance,
   selectedAddyInGameBalance, setselectedAddyInGameBalance,
-  megaPriceUsd, setmegaPriceUsd,
+  watchedTokenPriceUsd, setwatchedTokenPriceUsd,
+  megaPriceUsd, setMegaPriceUsd,
   heldTokensSelectedAddressFNdisplayed, setheldTokensSelectedAddressFNdisplayed,
   updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest,
   selectedAddressTxList, setselectedAddressTxList,

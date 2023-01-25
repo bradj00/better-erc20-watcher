@@ -1,6 +1,6 @@
 import React, { PureComponent, useContext } from 'react';
 import { useEffect } from 'react';
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { BarChart, Label, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { GeneralContext } from '../../App';
 import { commaNumber } from '../helpers/h';
 import { getEllipsisTxt } from '../helpers/h';
@@ -58,7 +58,7 @@ const LiquidityChart = () => {
 
     const CustomTooltip = ({ active, payload, label }) => {
       if (active && payload && payload.length) {
-        console.log('payload: ',payload)
+        // console.log('payload: ',payload)
         return (
           <div  style={{border:'1px solid rgba(255,255,255,0.2)',  backgroundColor:'#000',  borderRadius:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', fontSize:'0.75vw',  position:'relative',zIndex:'3', width:'8vw', height:'15vh'}}>
             
@@ -102,8 +102,14 @@ const LiquidityChart = () => {
         <XAxis type="number"  fontSize='0.75vw' domain={[0, 'dataMax']}/>
         <YAxis type="category" hide width={150} padding={{ left: 0,  }} dataKey="name"/>
         <Bar dataKey="lowerLimit" stackId="a" fill="rgba(0,0,0,0)" />
-        <Bar dataKey="upperLimit" stackId="a" fill="#82ca9d" />     
-        <ReferenceLine x={ShownLiqPoolPriceData? (ShownLiqPoolPriceData.token1in0 / 10 ** ShownLiqPoolPriceData.t0Decimals): 999999999999} stroke={"#FF00ff"} strokeWidth={2} />
+        <Bar dataKey="upperLimit" stackId="a" fill="#0ff" />     
+        <ReferenceLine    
+          label={{ position: 'right',  value: ShownLiqPoolPriceData? parseInt(ShownLiqPoolPriceData.token1in0 / 10 ** ShownLiqPoolPriceData.t0Decimals): <></> , fill: '#f0f',  fontSize: '1vw' }}  fill={'rgba(255,255,255,1)'}
+          x={ShownLiqPoolPriceData? (ShownLiqPoolPriceData.token1in0 / 10 ** ShownLiqPoolPriceData.t0Decimals): 999999999999} 
+          stroke={"#FF00ff"} 
+          strokeWidth={2} 
+        />
+
         <Tooltip content={<CustomTooltip />} />
 
         </BarChart>

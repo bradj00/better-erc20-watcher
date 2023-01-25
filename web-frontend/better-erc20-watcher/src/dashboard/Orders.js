@@ -73,7 +73,7 @@ export default function Orders() {
   const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
   const {filteredtxDataOutflow, setfilteredtxDataOutflow} = useContext(GeneralContext);
   const {displayPanel, setdisplayPanel} = useContext(GeneralContext); 
-
+  const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
   
   useEffect(() => {
     setTimeout(()=>{
@@ -81,6 +81,7 @@ export default function Orders() {
       setCurrentTime(new Date().toLocaleString());
     }, 1000);
   },[currentTime])
+
 
   useEffect(() => {
     // console.log('filteredtxData: ',filteredtxData)
@@ -110,6 +111,7 @@ export default function Orders() {
       if (oldtxData && oldtxData[0] && oldtxData.length>0 && txData[0] && (txData[0].transaction_hash != oldtxData[0].transaction_hash)){
         // console.log('new data: ', txData, oldtxData);
         if (audioEnabled){play();}
+        updatesMadeOnNewTxData();
 
       }else {
         // console.log('no new data');
@@ -118,6 +120,12 @@ export default function Orders() {
       setOldtxData(txData);
     }
   },[txData])
+
+
+  function updatesMadeOnNewTxData(){
+    console.log('requesting update on liquidity pool price')
+    setRequestLiquidityPoolPrice(true);
+  }
 
   function processTableClicked(row, fromOrTo){
     console.log('ROW: ', row, 'fromOrTo: ', fromOrTo)
@@ -159,10 +167,10 @@ export default function Orders() {
     if (row == null || row == undefined){return 'rgba(0, 0, 0, 1)'}
     // if ( typeof row.to_address_FriendlyName === 'object' && row.to_address_FriendlyName == null ) { return 'rgba(0, 0, 0, 1)'}
     // if ( typeof row.from_address_FriendlyName === 'object' && row.from_address_FriendlyName == null ) { return 'rgba(0, 0, 0, 1)'}
-    if (  row.from_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+    if (  row.from_address_friendlyName && row.from_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
       return 'rgba(0, 70, 0, 0.6)'
     } 
-    else if (  row.to_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+    else if ( row.to_address_friendlyName && row.to_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
       return 'rgba(70, 0, 0, 0.6)'
     } 
     else return 'rgba(0, 0, 0, 0.1)'
@@ -170,22 +178,23 @@ export default function Orders() {
 
   function determineShowPoolLink(row){
     if (row == null || row == undefined){return false}
-    if (  row.from_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+    if (  row.from_address_friendlyName && row.from_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
       return true
     } 
-    else if (  row.to_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+    else if (  row.to_address_friendlyName && row.to_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
       return true
     } 
     else return false
   
    
   }
+
   function getUniSwapPoolAddy(row){
     if (row == null || row == undefined){return false}
-    if (  row.from_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+    if (  row.from_address_friendlyName && row.from_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
       return row.from_address
     } 
-    else if (  row.to_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
+    else if ( row.to_address_friendlyName && row.to_address_friendlyName.manuallyDefined == "Uniswap v3 Pool") {
       return row.to_address
     } 
     else return false
