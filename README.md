@@ -21,7 +21,8 @@ using:
 
 
 <sub>( Feature rich front-end UI with live data updates )</sub>
-![image](https://user-images.githubusercontent.com/99688245/213899178-22c2f194-2bde-428d-878d-152d642925f4.png)
+![image](https://user-images.githubusercontent.com/99688245/215305627-7dff968a-9350-4022-abd8-1ce0293d93a8.png)
+
 
 <sub>( Address Summary stats, includes held tokens common to the existing database of watched addresses )</sub>
 
