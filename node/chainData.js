@@ -471,6 +471,6 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
 
     })
     .catch(function (error) {
-        console.log(chalk.red('there was an error making the web fetch call: '),error.code);
+        console.log(chalk.red('web fetch call err: '),error.code);
       })
 }

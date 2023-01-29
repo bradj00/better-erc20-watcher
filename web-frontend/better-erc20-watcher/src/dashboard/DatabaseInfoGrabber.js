@@ -86,6 +86,7 @@ const DatabaseInfoGrabber = () => {
 
     useEffect(() => {
         if (RequestLiquidityPoolPrice && RequestLiquidityPoolPrice.token0 && RequestLiquidityPoolPrice.token1 && RequestLiquidityPoolPrice.feeAmount){
+            setRequestLiquidityPoolPrice();
             fetchLiquidityPoolPrice(RequestLiquidityPoolPrice.token0, RequestLiquidityPoolPrice.token1, RequestLiquidityPoolPrice.feeAmount)
         }
     },[RequestLiquidityPoolPrice]);

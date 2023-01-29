@@ -108,10 +108,10 @@ export default function Orders() {
   useEffect(() => {
     if (txData !== null){
 
-      if (oldtxData && oldtxData[0] && oldtxData.length>0 && txData[0] && (txData[0].transaction_hash != oldtxData[0].transaction_hash)){
-        // console.log('new data: ', txData, oldtxData);
-        if (audioEnabled){play();}
+      if (oldtxData && oldtxData[0] && oldtxData.length>0 && txData[0] && (txData[0].transaction_hash != oldtxData[0].transaction_hash) ){
+        console.log('new data: ', txData, oldtxData);
         updatesMadeOnNewTxData();
+        if (audioEnabled){play();}
 
       }else {
         // console.log('no new data');
@@ -124,7 +124,10 @@ export default function Orders() {
 
   function updatesMadeOnNewTxData(){
     console.log('requesting update on liquidity pool price')
-    setRequestLiquidityPoolPrice(true);
+    let temp = RequestLiquidityPoolPrice;
+    setTimeout(()=>{
+      setRequestLiquidityPoolPrice(temp);
+    }, 500);
   }
 
   function processTableClicked(row, fromOrTo){

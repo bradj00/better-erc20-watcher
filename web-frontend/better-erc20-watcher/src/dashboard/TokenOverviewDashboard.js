@@ -82,31 +82,32 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    '& .MuiDrawer-paper': {
-      position: 'relative',
-      whiteSpace: 'nowrap',
-      width: drawerWidth,
-      transition: theme.transitions.create('width', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      boxSizing: 'border-box',
-      ...(!open && {
-        overflowX: 'hidden',
-        transition: theme.transitions.create('width', {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.leavingScreen,
-        }),
-        width: theme.spacing(7),
-        [theme.breakpoints.up('sm')]: {
-          width: theme.spacing(9),
-        },
-      }),
-    },
-  }),
-);
+
+// const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+//   ({ theme, open }) => ({
+//     '& .MuiDrawer-paper': {
+//       position: 'relative',
+//       whiteSpace: 'nowrap',
+//       width: drawerWidth,
+//       transition: theme.transitions.create('width', {
+//         easing: theme.transitions.easing.sharp,
+//         duration: theme.transitions.duration.enteringScreen,
+//       }),
+//       boxSizing: 'border-box',
+//       ...(!open && {
+//         overflowX: 'hidden',
+//         transition: theme.transitions.create('width', {
+//           easing: theme.transitions.easing.sharp,
+//           duration: theme.transitions.duration.leavingScreen,
+//         }),
+//         width: theme.spacing(7),
+//         [theme.breakpoints.up('sm')]: {
+//           width: theme.spacing(9),
+//         },
+//       }),
+//     },
+//   }),
+// );
 
 const mdTheme = createTheme({
   palette: {
@@ -147,6 +148,7 @@ function DashboardContent() {
   const {txDataChart, settxDataChart} = useContext(GeneralContext);
   const {txDataChartOverTime, settxDataChartOverTime} = useContext(GeneralContext); 
   const {LpChartData, setLpChartData} = useContext(GeneralContext); 
+  const {LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider} = useContext(GeneralContext); 
   const {watchedTokenPriceUsd, setwatchedTokenPriceUsd} = useContext(GeneralContext);
 
 
@@ -161,6 +163,7 @@ function DashboardContent() {
   function prepareLPChartData (LPs){
     //for each key in the LPs.uniswap_v3_pools object, console log the key and the value
     let temp = [];
+    let temp2 = {};
     let index = 0;
     let totalToken0Held = 0;
     let totalToken1Held = 0;
@@ -206,7 +209,7 @@ function DashboardContent() {
       }
  
 
-
+      
       LPs.uniswap_v3_pools[key].forEach(function(item) {
         index++;
         // console.log('____',displayAddressFN(item.ownerOf.friendlyName), item.lowerLimit, item.upperLimit, item.token0Held, item.token1Held, index, item);
@@ -216,24 +219,39 @@ function DashboardContent() {
         if ( (item.token0Held == 0 && item.token1Held == 0) ) {
           console.log('skipping ', displayAddressFN(item.ownerOf.friendlyName) )
         }
-        else {
+        else { 
           if (item.ownerOf){
             temp.push( {name: item.ownerOf.friendlyName, lowerLimit: item.lowerLimit, upperLimit: item.upperLimit, index: index, token0Held: item.token0Held, token1Held: item.token1Held} );
           }
         }
 
 
+        if (!temp2[displayAddressFN(item.ownerOf.friendlyName)]){
+           temp2[displayAddressFN(item.ownerOf.friendlyName)] = {}
+           temp2[displayAddressFN(item.ownerOf.friendlyName)].token0 = 0;
+           temp2[displayAddressFN(item.ownerOf.friendlyName)].token1 = 0;
+          }
         
+        // console.log('token0: ', item.token0Held, 'token1: ', item.token1Held); 
 
-
-
+        temp2[displayAddressFN(item.ownerOf.friendlyName)].token0 = temp2[displayAddressFN(item.ownerOf.friendlyName)].token0 + item.token0Held;
+        temp2[displayAddressFN(item.ownerOf.friendlyName)].token1 = temp2[displayAddressFN(item.ownerOf.friendlyName)].token1 + item.token1Held;
+        
         setLpTotalTokensHeld({token0Held: totalToken0Held, token1Held: totalToken1Held});
+        setLpToken0Token1HeldByProvider(temp2);
         setLpChartData(temp);
       });
     });
   }
 
 
+  useEffect(() => {
+    if (LpToken0Token1HeldByProvider) {
+      console.log('LpToken0Token1HeldByProvider: ',LpToken0Token1HeldByProvider);
+    }
+  },[LpToken0Token1HeldByProvider]);
+  
+  
   useEffect(() => {
     if (detectedLPs) {
       console.log('detectedLPs: ', detectedLPs)
@@ -475,7 +493,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
               Detected DEXs
             </div>
             
-            <div style={{overflowY:'scroll', overflowX:'hidden', border:'1px solid rgba(150,220,255,0.5)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'47vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'11vh', }}>
+            <div style={{overflowY:'hidden', overflowX:'hidden', border:'1px solid rgba(150,220,255,0.5)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'47vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'11vh', }}>
               <div style={{display:'flex',position:'absolute', top:'0.5%', right:'0'}}>
                 <div className="hoverOpacity">
                   <ArrowCircleLeftIcon style={{fontSize:'0.9vw'}}/>
@@ -488,7 +506,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
                 </div>
               </div>
                       
-              {/* map of fake data array that show like placeholder cards */}
+            
               <div style={{position:'absolute',  top:'8%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
                 {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
                   return (
@@ -501,45 +519,80 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
                       <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
                         Uniswap v3
                       </div>
-                      <div onClick={()=>{ settoggleShowLPDiv(true) }} className="hoverOpacity" style={{zIndex:'-1', position:'absolute', bottom: '41%',  fontSize:'0.75vw', fontStyle:'italic' }}>
-                        {filterToUniqueLPProviders(detectedLPs.uniswap_v3_pools[item])} providers ({detectedLPs.uniswap_v3_pools[item].length})
+                      <div onClick={()=>{ settoggleShowLPDiv(true) }} className="hoverOpacity" style={{ position:'absolute', bottom: '31%',  fontSize:'0.75vw', fontStyle:'italic' }}>
+                        {filterToUniqueLPProviders(detectedLPs.uniswap_v3_pools[item])} unique providers ({detectedLPs.uniswap_v3_pools[item].length} LP tokens)
                       </div>
                       <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
                         ${watchedTokenPriceUsd? parseFloat(watchedTokenPriceUsd).toFixed(3) : '...'}
                       </div>
                       
-                      <div title="exit liquidity" style={{lineHeight:'0.5', textAlign:'center', position:'absolute', top:'2%',fontSize:'0.85vw',  left:'1%', color:'#aaa', fontStyle:'italic',  }}>
-                        <div style={{marginLeft:'1vw'}}>
-
+                      <div title="exit liquidity" style={{display:'flex', justifyContent:'center', alignItems:'center', lineHeight:'0.5', textAlign:'left', position:'absolute', top:'55%', border:'0px solid #0f0', width:'100%', fontSize:'0.85vw',  color:'#aaa', fontStyle:'italic',  }}>
+                        <div style={{}}>
                           {/* put decimals in here from token info pull from api - WALRUS */}
-                          {LpTotalTokensHeld? parseFloat(LpTotalTokensHeld.token1Held / 10 ** 18).toFixed(3): '...'}
+                          {LpTotalTokensHeld? commaNumber(parseInt(LpTotalTokensHeld.token0Held / 10 ** 18)): '...'} {clickedTokenSymbol? clickedTokenSymbol : 'nullll'}
                         </div>
-                        <div>
-                          <LinkIcon style={{marginLeft:'0vw'}}/>
-                          {determineExitPair(detectedLPs.uniswap_v3_pools[item][0], clickedTokenSymbol? clickedTokenSymbol : 'nullll')}
+                        <div style={{}}>
+                        &nbsp;<LinkIcon />&nbsp;
+                        </div>
+                        <div style={{}}>
+                        {LpTotalTokensHeld? parseFloat(LpTotalTokensHeld.token1Held / 10 ** 18).toFixed(3): '...'} {determineExitPair(detectedLPs.uniswap_v3_pools[item][0], clickedTokenSymbol? clickedTokenSymbol : 'nullll')}
                         </div>
                       </div>
 
                       {/* <div style={{position:'absolute', left:'2%',fontStyle:'italic', fontSize:'0.75vw',top:'30%',color:'#666'}}>
                         {getEllipsisTxt(item,6)}
-                      </div> */}
-                      <div style={{ position:'absolute',  bottom:'1%', width:'95%', height:'40%', alignItems:'center', backgroundColor:'rgba(255,255,255,0.1)', color:'#fff', zIndex:'-1',borderRadius:'0.5vw', padding:'0.2vw', display:'flex', justifyContent:'center', overflowY:'scroll', }}>
-                        <div style={{ width:'100%',  overflow:'hidden', }}>
+                      </div> */} 
+                      <div style={{zIndex:'10001', overflowX:'hidden', overflowY:'scroll', position:'absolute',  bottom:'1%', width:'95%', height:'30%', alignItems:'center', backgroundColor:'rgba(255,255,255,0.1)', color:'#fff', borderRadius:'0.5vw', padding:'0.2vw', display:'flex', justifyContent:'center', }}>
+                        <div style={{ width:'100%', height:'100%',  position:'absolute', top:'0' }}>
+
+                        <div style={{ fontSize:'0.75vw', padding:'0.5vh', display:'grid',height:'2vh', gridTemplateColumns:'repeat(4, 1fr)', justifyContent:'center', alignItems:'center', width:'100%',  }}>
+                                
+                                <div style={{textDecoration:'underline', fontSize:'0.6vw', gridColumn:'span 2', border:'0px solid #0f0', width:'100%', textAlign:'left', float:'left', lineHeight:'1.5vh',  color:'#fff', }}>
+                                  Active Provider
+                                </div>
+
+                                <div style={{textAlign:'right', textDecoration:'underline'}}>
+                                  {clickedTokenSymbol? clickedTokenSymbol : <></>}
+                                </div>
+
+                                <div style={{textAlign:'right', textDecoration:'underline'}}>
+                                  {determineExitPair(detectedLPs.uniswap_v3_pools[item][0], clickedTokenSymbol? clickedTokenSymbol : 'nullll')}
+                                </div>
+
+                              </div>
+
+
                         {filterToUniqueLPProvidersFN(detectedLPs.uniswap_v3_pools[item]).map((friendlyNameObj,index) => {
                             // console.log(detectedLPs.uniswap_v3_pools[item]);
                             
                             return (
-                              <div style={{fontSize:'0.75vw', padding:'0.5vh', display:'grid',height:'2vh', gridTemplateColumns:'repeat(2, 1fr)', justifyContent:'center', alignItems:'center', width:'100%',  }}>
+                              LpToken0Token1HeldByProvider && LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)] && (LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token0 != 0 || LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token1 != 0) ? 
+                              
+                              <div style={{ fontSize:'0.75vw', padding:'0.5vh', display:'grid',height:'2vh', gridTemplateColumns:'repeat(4, 1fr)', justifyContent:'center', alignItems:'center', width:'100%',  }}>
                                 
-                                <div style={{textAlign:'left', float:'left', lineHeight:'1.5vh',  color:'#fff', }}>
-                                  {displayAddressFN(friendlyNameObj)}
+                                <div style={{fontSize:'0.6vw', gridColumn:'span 2', border:'0px solid #0f0', width:'100%', textAlign:'left', float:'left', lineHeight:'1.5vh',  color:'#fff', }}>
+                                  <span style={{color:'#0ff'}}>(x{ detectedLPs.uniswap_v3_pools[item] ? determineLpHeldCount(friendlyNameObj, detectedLPs.uniswap_v3_pools[item]) : '0' })</span> {displayAddressFN(friendlyNameObj)}
                                 </div>
 
-                                <div style={{float:'right', position:'absolute', right:'5%',}}>
-                                  { detectedLPs.uniswap_v3_pools[item] ? determineLpHeldCount(friendlyNameObj, detectedLPs.uniswap_v3_pools[item]) : '0' }
+                                <div style={{textAlign:'right' }}>
+                                  {
+                                    LpToken0Token1HeldByProvider? 
+                                    LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token0 == 0 ? <></>:
+                                    commaNumber(parseFloat(LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token0 / 10 ** 18).toFixed(0) )
+                                    : <>1</>
+                                  }
+                                </div>
+                                <div style={{textAlign:'right'}}>
+                                {
+                                    LpToken0Token1HeldByProvider? 
+                                    LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token1 == 0 ? <></>:
+                                    parseFloat(LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token1 / 10 ** 18).toFixed(3)
+                                    : <>2</>
+                                  }
                                 </div>
 
                               </div>
+                              :<></>
 
                             )
                           })

@@ -81,13 +81,14 @@ a:hover {
 }
 
 ::-webkit-scrollbar {
-  width: 0vw;
+  width: 0.1vw;
   background-color: #888;
   border-radius: 25px;
 }
 
 ::-webkit-scrollbar-thumb {
   background-color: #000;
+  width: 0vw;
 }
 
 

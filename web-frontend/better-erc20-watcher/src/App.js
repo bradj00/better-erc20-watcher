@@ -33,6 +33,7 @@ const [selectedAddressListOfTokens, setselectedAddressListOfTokens] = useState()
 const [communityHeldListFromSelected, setcommunityHeldListFromSelected] = useState();
 const [communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy] = useState();
 const [selectedAddyInGameBalance, setselectedAddyInGameBalance] = useState();
+const [LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider] = useState();
 
 const [watchedTokenPriceUsd, setwatchedTokenPriceUsd] = useState();
 const [heldTokensSelectedAddressFNdisplayed, setheldTokensSelectedAddressFNdisplayed] = useState();
@@ -131,6 +132,8 @@ const contextObj = {
   searchInputLookup, setsearchInputLookup,
   detectedLPs, setdetectedLPs,
   txDataChartOverTime, settxDataChartOverTime,
+  LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider,
+
 }
 
 
