@@ -694,19 +694,39 @@ app.listen(listenPort, () => {
 
         //gets the list of tokens we are watching top-level in the frontend UI
         app.get('/tokenInfo/:tokenAddress', cors(), async (req, res) => {
-            
-            const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+req.params.tokenAddress;
-            // console.log('>>>>>> url: ', url);
-            axios.get(url ,{
-                headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json;charset=UTF-8",
-                "X-API-Key" : moralisApiKey
-                },
-            })
-            .then(({data}) => {
-                res.send(data);
-            })
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+                const db = client.db('tokensMetadataCache');
+                const collection = db.collection('erc20');
+                
+                collection.find({"address": req.params.tokenAddress}).toArray(function(err, result) {
+                    if (result.length > 0) {
+                        console.log('found token metadata in mongo cache')
+                        res.send([result[0]]);
+                    }
+                    if (result.length == 0) {
+                        console.log('have to look up token metadata from external api..')
+                        const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+req.params.tokenAddress;
+                        // console.log('>>>>>> url: ', url);
+                        axios.get(url ,{
+                            headers: {
+                            Accept: "application/json",
+                            "Content-Type": "application/json;charset=UTF-8",
+                            "X-API-Key" : moralisApiKey
+                            },
+                        })
+                        .then(({data}) => {
+                            //cache data to mongo
+                            console.log('data: ', data);
+                            collection.insertOne(data[0], function(err, res) {
+                                if (err) throw err;
+                                console.log("1 document inserted");
+                            });
+
+                            res.send(data);
+                        })
+                    }    
+                });
+            });
         });
 
         //get transactions for a token by a holder address

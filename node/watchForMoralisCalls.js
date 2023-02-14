@@ -15,7 +15,7 @@ import getAllPaginatedData  from './helpers/fetchMoralisWithCursor.js';
 import {checkContractTokenIdForTokensHeld} from './v3-pool-info-grabber/v3-liq-token0and1.js';
 
 
-dotenv.config();
+dotenv.config({path:'./.env'});
 const MongoClient = MongoClientQ.MongoClient;
 
 // const mongoUrl = 'mongodb://localhost:27017';
@@ -152,6 +152,11 @@ function dispatcher(instructionMap, url, postData, mongoCollectionId){
                 getAndUpdateTokensHeldForTokenIds(url, postData, mongoCollectionId)
                 .then((result)=>{ resolve() });
                 break;
+            case 101: 
+                console.log('fulfilling data lookup request: '+chalk.cyan('/tokenInfo/:tokenAddress (token metadata info)'));
+                getTokenMetadataInfo(url, postData, mongoCollectionId)
+                .then((result)=>{ resolve() });
+                break;
             default:
                 console.log(chalk.cyan('default instruction'));
 
@@ -177,8 +182,10 @@ function getAddressTXsforToken(url, postData){
 
 
         getAllPaginatedData(url).then((result) => {
+            console.log('-------\n\n');
             console.log('finished getting ALL the great many TXS from Moralis.', result.length);
-            
+            console.log('result[0]: ', result[0]);
+            console.log('-------\n\n');
             //to do: rewrite this into a function because we're going to be updating system status messages all over the place
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
@@ -234,6 +241,7 @@ function getAddressTXsforToken(url, postData){
                         log_index: tx.log_index,
                         from_address_friendlyName: tx.from_address_friendlyName,
                         to_address_friendlyName: tx.to_address_friendlyName,
+                        token_metadata: tx.token_metadata,
                     }).toArray(async function(err, requests) {
                         //if it doesnt exist, insert it
                         if(requests.length == 0) {
@@ -251,6 +259,7 @@ function getAddressTXsforToken(url, postData){
                                 log_index: tx.log_index,
                                 from_address_friendlyName: tx.from_address_friendlyName,
                                 to_address_friendlyName: tx.to_address_friendlyName,
+                                token_metadata: tx.token_metadata,
                             });
                         }
                     });
@@ -270,6 +279,7 @@ function getAddressTXsforToken(url, postData){
                         log_index: tx.log_index,
                         from_address_friendlyName: tx.from_address_friendlyName,
                         to_address_friendlyName: tx.to_address_friendlyName,
+                        token_metadata: tx.token_metadata,
                     }).toArray(async function(err, requests) {
                         //if it doesnt exist, insert it
                         if(requests.length == 0) {
@@ -287,6 +297,7 @@ function getAddressTXsforToken(url, postData){
                                 log_index: tx.log_index,
                                 from_address_friendlyName: tx.from_address_friendlyName,
                                 to_address_friendlyName: tx.to_address_friendlyName,
+                                token_metadata: tx.token_metadata,
                             });
                         }
                     });
@@ -494,8 +505,61 @@ async function performLookups(requests) {
         throttle += 1000;
     });
 }
+////////////////////////////////////////////////////////////////////////////////////////
+// instruction maps >100 are lookup calls invoked by a main instruction map (1-99)
 
 
+//instruction map 101
+async function getTokenMetadataInfo(url, postData, mongoCollectionId){
+    return new Promise(async (resolve, reject) => {
+        MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+            
+            if (err) {
+                h.fancylog(err, 'error');
+            }
+            const db = client.db('tokensMetadataCache');
+            const collection = db.collection('erc20');
+                
+
+            await new Promise(r => setTimeout(r, 1000));
+            const url = 'https://deep-index.moralis.io/api/v2/erc20/metadata?chain=eth&addresses='+postData;
+            // console.log('>>>>>> url: ', url);
+            axios.get(url ,{
+                headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                "X-API-Key" : moralisApiKey
+                },
+            })
+            .then(({data}) => {
+                //cache data to mongo
+                console.log('erc20 token metadata: ', data);
+                collection.insertOne(data[0], function(err, res) {
+                    if (err) throw err;
+                    console.log("1 document inserted");
+
+
+
+                    const db1 = client.db('externalLookupRequests');
+                    const collectionBucket = db1.collection('rBucket');
+                    //remove the document matching the URL from the collection, then close client
+                    collectionBucket.deleteOne ({ _id : mongoCollectionId }, function(err, obj) {
+                        if (err) console.log('ERROR deleting document: ', err);
+                        console.log(chalk.green("cleaned up rBucket request (by requestUrl match)") );
+                        
+                        client.close();
+                        resolve();
+                    });
+
+
+                });
+            });
+
+
+
+        });
+    });
+}
 
 
 

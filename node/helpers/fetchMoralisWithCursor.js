@@ -92,13 +92,34 @@ const getAllPaginatedData = async (url) => {
             }
           }
 
-          //take allResults and add in their friendlyNames 
+          let tokenLookupAddys=[];
+          //take allResults and add in their friendlyNames and token symbol metadata to txs
           for (let i = 0; i < allResults.length; i++) {
             const from = await lookupSingleAddress(allResults[i].from_address);
             const to = await lookupSingleAddress(allResults[i].to_address);
+            const tokeninfo = await lookupDbTokenInfo(allResults[i].address);
             allResults[i].from_address_friendlyName = from;
             allResults[i].to_address_friendlyName = to;
+            if (tokeninfo == 'lookup'){
+              //cant put it in this time, but next time the token will be cached in our db 
+              tokenLookupAddys.push(allResults[i].address) 
+            }
+            else {allResults[i].token_metadata = tokeninfo;}
+
             if (i == allResults.length-1){
+              const uniqueTokenLookupAddys = [...new Set(tokenLookupAddys)];
+              MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                if (err) {
+                    h.fancylog(err, 'error');
+                }
+                const db = client.db('externalLookupRequests');
+                const collection = db.collection('rBucket');
+                collection.insertMany(uniqueTokenLookupAddys.map((addy) => { return {requestUrl: '', requestPostData: addy, instructionMap: 101}}), function(err, result) {
+                    client.close();
+                });
+              });
+              // c2.insertOne({requestUrl: requestUrl, requestPostData: null, instructionMap: 1});
+
               console.log('done')
               resolve(allResults)
             }
@@ -148,6 +169,31 @@ function lookupSingleAddress(address){
           client.close();
           resolve(address);
       } else {
+          client.close();
+          resolve(collection[0]);
+      }
+    });
+  } catch (error) {
+      console.error(error);
+      resolve(error);
+  }
+  });
+}
+function lookupDbTokenInfo(address){
+  return new Promise(async (resolve, reject) => {
+  try {
+    MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err1, client) {
+      if (err1) console.log(chalk.magenta('error: ', err1));
+      const db = client.db('tokensMetadataCache');
+      const collection = await db.collection('erc20').find({address: address}).toArray();
+      
+
+      if (collection.length === 0) { 
+          // console.log('token not found in cache: ', address)
+          client.close();
+          resolve('lookup'); //havent looked this token up before. return blank so it can be fetched and cached 
+      } else {
+          // console.log('token FOUND in cache: ', address)
           client.close();
           resolve(collection[0]);
       }

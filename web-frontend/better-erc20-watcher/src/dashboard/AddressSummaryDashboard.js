@@ -662,7 +662,13 @@ function determineWhichFNtoShow(tokenObj){
                           <tr style={{textAlign:'right'}}>
                             <td style={{textAlign:'center', display:'flex',justifyContent:'center',}}><img src={ethLogo? ethLogo : <></> } style={{marginTop:'5%', width:'1vw'}} /></td>
                             <td>{timeAgo.format(new Date(tx.block_timestamp))}</td>
-                            <td>{getEllipsisTxt(tx.address,3)}</td>
+                            <td>{
+                              tx.token_metadata && tx.token_metadata.symbol?
+                              !(tx.token_metadata.symbol.includes('http')  ||  ( tx.token_metadata.symbol.length > 18 ) || tx.token_metadata.symbol.includes('.com'))?
+                              tx.token_metadata.symbol 
+                              
+                              
+                              : getEllipsisTxt(tx.address,4): getEllipsisTxt(tx.address,4) }</td>
                             <td>{parseFloat(tx.value / (10**18)).toFixed(2)}</td>
                             <td>{determineWhichFNtoShow(tx.from_address_friendlyName)}</td>
                             <td>{determineWhichFNtoShow(tx.to_address_friendlyName)}</td>

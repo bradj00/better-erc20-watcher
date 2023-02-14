@@ -102,6 +102,12 @@ const DatabaseInfoGrabber = () => {
     },[heldTokensSelectedAddress]);
 
     useEffect(() => {
+        if (selectedAddressTxList){
+            console.log('selectedAddressTxList: ',selectedAddressTxList)
+        }
+    },[selectedAddressTxList]);
+
+    useEffect(() => {
         if (getUpdatedTokenBalance && getUpdatedTokenBalance != undefined){
             fetchUpdatedTokenBalance(getUpdatedTokenBalance);
             setgetUpdatedTokenBalance();
