@@ -7,6 +7,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import ConnectionStatusBanner from './dashboard/ConnectionStatusBanner.jsx';
 import Topbanner from './dashboard/Topbanner.jsx';
 import TxVisualizer from './dashboard/TxVisualizer.jsx';
+import TokenDetective from './dashboard/TokenDetective.jsx';
 
 
 
@@ -151,6 +152,8 @@ return (
           {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
           {displayPanel == 'tokenSummary'? <TokenHoldersDashboard />: <></>}
           {displayPanel == 'txVisualizer'? <TxVisualizer />: <></>}
+          {displayPanel == 'tokenDetective'? <TokenDetective />: <></>}
+          
           
           
       </div>

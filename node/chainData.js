@@ -27,9 +27,28 @@ var latestBlock = 0;
 
 const moralisApiKey = process.env.API_KEY;
 TimeAgo.addDefaultLocale(en)
+var theDate = Date().substr(15,9)
+var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
+var isRunning = false;
+
+getLatestBlockFromMoralis();
+updateAllWatchedTokens();
 
 
+//main loop
+/////////
+setInterval(()=>{
+    if (isRunning) return; //if we're already running, don't run again until the previous run is finished
+    getLatestBlockFromMoralis();
+    updateAllWatchedTokens('not cold start');
+    spinner.stop();
+    theDate = Date().substr(15,9)
+    spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
+    spinner.start();
+},sleepTimer);
+/////////
 
+//every 1 second, update heartbeat in the db
 setInterval(()=>{
     const timestamp = new Date().getTime();
     timestamp.toString();
@@ -60,10 +79,8 @@ setInterval(()=>{
 }, 1000);
 
 
-
-var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
 // const spinner = ora(`[`+Date().substr(15,9)+` ] `+'Begin checking '+chalk.magenta('Moralis')+' every '+chalk.magenta(sleepTimer/1000+'s')+' for new TXs...');
-spinner.color = 'white'
+// spinner.color = 'white'
 
 function lookupSingleAddress(address, delay5){
     return new Promise(async (resolve, reject) => {
@@ -146,17 +163,11 @@ function checkIfSyncing(tokenName){
     });
 }
 
-var theDate = Date().substr(15,9)
-var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
-setInterval(()=>{
-    getLatestBlockFromMoralis();
-    updateAllWatchedTokens('not cold start');
-    spinner.stop();
-    theDate = Date().substr(15,9)
-    spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
-    spinner.start();
-},sleepTimer);
-getLatestBlockFromMoralis();
+
+// var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
+
+
+
 
 
 
@@ -214,9 +225,9 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                    
 
                                     let q = 0;
-                                    if (collectionName != "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"){
-                                        q = 16017606 ;   //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
-                                    }       
+                                    // if (collectionName != "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"){
+                                    //     q = 16522135 ;   //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
+                                    // }       
                                     client.close();
                                     getTokenTranscationsFromMoralis(0, 100, collectionName, 1, q, coldStart, resolve, tokenTxs); 
                                 }
@@ -245,7 +256,6 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
 }
 
 
-updateAllWatchedTokens();
 function updateAllWatchedTokens(coldStart){
     
 
@@ -326,14 +336,17 @@ function getLatestBlockFromMoralis(){
 
 }
 
-function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
+// function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
+function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
+    isRunning = true;
+    if (cursor == 0){ cursor = '';}
     if ((fromBlock == undefined) || (!fromBlock)){
         // fromBlock = 16017606; //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
         fromBlock = 0; //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
     }
     
     //1 block past the last block we have in our db
-    const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&limit="+limit+"&offset="+offset+"&from_block="+(fromBlock+1)+"&to_date="+(new Date().getTime() );
+    const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&disable_total=false&limit="+limit+"&cursor="+cursor+"&from_block="+(fromBlock+1)+"&to_date="+(new Date().getTime() );
 
     axios.get(url ,{
         headers: {
@@ -378,9 +391,17 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
             
 
         } 
-        if ((offset) < (data.total)){ //if there are more pages
+        // if ((offset) < (data.total)){ //if there are more pages
+        //     setTimeout( ()=>{
+        //         getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
+        //     }, apiRateLimitMs);
+        // } 
+        if (data.cursor){ //if there are more pages
             setTimeout( ()=>{
-                getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
+                putPageInDatabase(tokenTxs, tokenAddress, spinner)
+                tokenTxs = [];
+
+                getTokenTranscationsFromMoralis(data.cursor, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
             }, apiRateLimitMs);
         } 
         else {
@@ -392,7 +413,6 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                 if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;}
                 
                 try{
-                // console.log('6\t');
                 MongoClient.connect(mongoUrl, function(err, client) {
                     if (err) console.log('THERE WAS AN ERROR: ',err);
                     const db = client.db(dbName);
@@ -426,7 +446,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                     collection.insertMany(tokenTxs, [{"continueOnError": true}], function(err, res) {
                         if (err) {
 
-                            if (err && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
+                            if (err && err.writeErrors && err.writeErrors[0] && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
                                 duplicateCount++;
                                 h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
                             } else if (res && res.insertedCount) {
@@ -466,11 +486,78 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
             } 
             }, 100);
 
-
+            isRunning = false; //clear the lock
         }
 
     })
     .catch(function (error) {
         console.log(chalk.red('web fetch call err: '),error.code);
       })
+}
+
+
+function putPageInDatabase(tokenTxs, tokenAddress, spinner){
+    if (tokenTxs.length > 0){
+ 
+        try{
+        // console.log('6\t');
+        MongoClient.connect(mongoUrl, function(err, client) {
+            if (err) console.log('THERE WAS AN ERROR: ',err);
+            const db = client.db(dbName);
+            const collection = db.collection("a_"+tokenAddress);
+            
+            
+
+            //for each token in tokenTxs, look up the friendlyNames for from and to addresses and add them to the object
+            tokenTxs.map((tx, index) => {
+                // return new Promise((resolve, reject) => {
+                    lookupSingleAddress(tx.from_address).then((q) => {
+                        lookupSingleAddress(tx.to_address).then((x) => {
+                            // console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
+                            
+                            tokenTxs[index].from_address_friendlyName = q;
+                            tokenTxs[index].to_address_friendlyName = x;
+
+                            // if (index == tx.length-1){
+                            //     resolve(true);
+                            // }
+                        });
+                    });
+                // });
+            })
+
+            collection.insertMany(tokenTxs, [{"continueOnError": true}], function(err, res) {
+                if (err) {
+
+                    if (err && err.writeErrors && err.writeErrors[0] && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
+                        duplicateCount++;
+                        h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
+                    } else if (res && res.insertedCount) {
+                        h.fancylog("Number of documents inserted: " + res.insertedCount, ' mongo ', spinner) ;
+                    } else {
+                        h.fancylog(chalk.red('mongo err: '), err, ' error ', spinner) ;
+                    }
+                    client.close();
+                    // resolve(true);
+                } else {
+                    //there's no error and insertion was successful. 
+                    h.fancylog('cached ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
+                    client.close();
+                    // resolve(true);
+                }
+                // client.close();
+            });
+        
+                
+            
+        });
+        } catch (error) {
+            console.log(error);
+            client.close();
+            // resolve(error);
+        }
+
+    }  
+    
+
 }
