@@ -153,6 +153,7 @@ function DashboardContent() {
 
 
   const [toggleShowLPDiv, settoggleShowLPDiv] = React.useState(false);
+  const {logScaleTickBox, setLogScaleTickBox} = useContext(GeneralContext)
   const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
   
   const timeAgo = new TimeAgo('en-US'); 
@@ -244,6 +245,12 @@ function DashboardContent() {
     });
   }
 
+
+  useEffect(() => {
+    if (logScaleTickBox) {
+      console.log('logScaleTickBox: ',logScaleTickBox);
+    }
+  },[logScaleTickBox]);
 
   useEffect(() => {
     if (LpToken0Token1HeldByProvider) {
@@ -670,6 +677,9 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
               </div>
             </div>
 
+            <div onClick={()=>{setLogScaleTickBox(!logScaleTickBox)}} style={{cursor:'pointer', display:'flex', justifyContent:'center', position:'absolute', width:'1vw', height:'1vw', backgroundColor:logScaleTickBox? 'rgba(255,255,255,1)': 'rgba(255,255,255,0)', border:logScaleTickBox? '':'1px solid #fff', top:'14vh', left:'19.5vw', zIndex:'5'}}>
+              <div style={{position:'absolute', top:'-2.5vh'}}>{logScaleTickBox? <>log</>: <>linear</>}</div>
+            </div>
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
               
               <div style={{position:'absolute', width:'100%', display:'flex',}}>

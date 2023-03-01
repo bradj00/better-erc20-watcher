@@ -639,7 +639,7 @@ app.listen(listenPort, () => {
                 
                 
                 if (pageNumber == 'allData') { //bad. temporary to display all data while I mock up the summarized chart loading. This will be replaced by paginated data + infinite scrolling
-                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(100).toArray(function(err, result) {  
+                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(200).toArray(function(err, result) {  
                         client.close();
                         res.send({totalPages: 1, result: result})
                     });

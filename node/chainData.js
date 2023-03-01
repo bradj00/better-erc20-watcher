@@ -44,6 +44,7 @@ setInterval(()=>{
     spinner.stop();
     theDate = Date().substr(15,9)
     spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
+    updateMsg('['+theDate+' ] all token TXs are up to date for all watched tokens. sleeping..');
     spinner.start();
 },sleepTimer);
 /////////
@@ -205,7 +206,10 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                 if (err) console.log(err); 
                                 if (result && result.length > 0){
                                     const timeAgo = new TimeAgo('en-US')
-                                    if (!coldStart && result[0]&& result[0].blockTimestamp){h.fancylog('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName,spinner);}
+                                    if (!coldStart && result[0]&& result[0].blockTimestamp){
+                                        updateMsg('bootup: checking most recent cached txs as starting point to fetch new TXs..');
+                                        h.fancylog('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName,spinner);
+                                    }
                                     // if (!coldStart){h.fancylog('most recent cached tx was [  ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName);}
 
                                     result[0].value = parseFloat(result[0].value/(10**18).toFixed(4));
@@ -221,7 +225,10 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                     
                                 }else {
                                     
-                                    if (!coldStart){h.fancylog('no txs for token (empty collection?)', ' mongo ', collectionName, spinner  );}
+                                    if (!coldStart){
+                                        updateMsg('no txs for token (empty collection?): '+collectionName);
+                                        h.fancylog('no txs for token (empty collection?)', ' mongo ', collectionName, spinner  );
+                                    }
                                    
 
                                     let q = 0;
@@ -262,6 +269,8 @@ function updateAllWatchedTokens(coldStart){
 
     if (!coldStart){
         console.log(chalk.cyan.underline.inverse('chainData.js')+'\n');
+        var theDate = Date().substr(15,9)
+        updateMsg('['+theDate+' ] bootup: cold start...');
         h.fancylog('cold start...');
     }
     //get all collection names from mongo for database "watchedTokens"
@@ -270,7 +279,12 @@ function updateAllWatchedTokens(coldStart){
     // console.log('5\t');
     MongoClient.connect(mongoUrl, function(err, client) {
         if (err) console.log('THERE WAS AN ERROR: ',err);
-        if (!client ){ h.fancylog('mongo client not connected. exiting..', 'error'); client.close(); return;}
+        if (!client ){
+            updateMsg('mongo client not connected. check chainData.js logs.');
+            h.fancylog('mongo client not connected. exiting..', 'error'); 
+            client.close();
+            return;
+        }
 
         const db = client.db(dbName);
         db.listCollections().toArray(function(err, collections) {
@@ -357,6 +371,7 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
     })
     .then(({data}) => {
         if (data.result.length > 0){
+            updateMsg('ingesting TXs for collection ['+tokenAddress+'] fetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) );
             h.fancylog('[ '+chalk.cyan(data.total+' TXs')+' ]\tfetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) , 'moralis', tokenAddress, spinner) ;
             // console.log('\t'+data.result.length+'\t'+data.result[0].transaction_hash);
         }
@@ -410,7 +425,10 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
 
             setTimeout(()=>{
             if (tokenTxs.length > 0){
-                if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;}
+                if (!coldStart){
+                    updateMsg('putting TXs into mongo for collection ['+tokenAddress+']');
+                    h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;
+                }
                 
                 try{
                 MongoClient.connect(mongoUrl, function(err, client) {
@@ -458,6 +476,7 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
                             resolve(true);
                         } else {
                             //there's no error and insertion was successful. 
+                            updateMsg('cached ['+res.insertedCount+'] new TXs for collection ['+tokenAddress+']');
                             h.fancylog('cached ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
                             client.close();
                             resolve(true);
@@ -541,6 +560,7 @@ function putPageInDatabase(tokenTxs, tokenAddress, spinner){
                     // resolve(true);
                 } else {
                     //there's no error and insertion was successful. 
+                    updateMsg('cached ['+res.insertedCount+'] new TXs for collection ['+tokenAddress+']');
                     h.fancylog('cached ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
                     client.close();
                     // resolve(true);
@@ -560,4 +580,25 @@ function putPageInDatabase(tokenTxs, tokenAddress, spinner){
     }  
     
 
+}
+
+function updateMsg(message){
+    MongoClient.connect(mongoUrl, function(err, client) {
+        if (err) console.log('Mongo ERR: ',err);
+        const db = client.db('systemStats');
+        if (message){
+        //get date as epoch time
+        var d = new Date();    
+        db.collection("systemStatuses").updateOne({name:"ingestion-engine"}, {$set:{name:"ingestion-engine", statusMsg: message, lastAction: d  }},{upsert: true},  function(err, result) {
+            
+            if (err) console.log('Mongo ERR: ',err);
+            // console.log('OK UPDATED: ',result)
+            client.close();
+        });
+        }
+        else {
+            console.log(chalk.cyan('error: no message to update'))
+            client.close();
+        }
+    });
 }

@@ -248,7 +248,8 @@ const LookupAddressesFromApi = (ListOfAddresses) => {
                     MongoClient.connect(mongoUrl, function(err, client) {
                         if (err) console.log('Mongo ERR: ',err);
                         const db = client.db('systemStats');
-                        db.collection("systemStatuses").updateOne({name:"translator"}, {$set:{name:"translator", lookupIndex: 0, lookupIndexMax: 0}},{upsert: true},  function(err, result) {
+                        var d = new Date();
+                        db.collection("systemStatuses").updateOne({name:"translator-opensea"}, {$set:{name:"translator", lookupIndex: 0, lookupIndexMax: 0, statusMsg: "indexing new addresses against external API", lastAction: d}},{upsert: true},  function(err, result) {
                             
                             if (err) console.log('Mongo ERR: ',err);
                             // console.log('OK UPDATED: ',result)
@@ -262,7 +263,8 @@ const LookupAddressesFromApi = (ListOfAddresses) => {
                 MongoClient.connect(mongoUrl, function(err, client) {
                     if (err) console.log('Mongo ERR: ',err);
                     const db = client.db('systemStats');
-                    db.collection("systemStatuses").updateOne({name:"translator"}, {$set:{name:"translator", lookupIndex: index+1, lookupIndexMax: ListOfAddresses.length}},{upsert: true},  function(err, result) {
+                    var d = new Date();
+                    db.collection("systemStatuses").updateOne({name:"translator-opensea"}, {$set:{name:"translator", lookupIndex: index+1, lookupIndexMax: ListOfAddresses.length, statusMsg: "indexing new addresses against external API", lastAction: d}},{upsert: true},  function(err, result) {
                         
                         if (err) console.log('Mongo ERR: ',err);
                         // console.log('OK UPDATED: ',result)

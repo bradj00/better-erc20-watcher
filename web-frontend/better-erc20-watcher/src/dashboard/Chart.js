@@ -33,7 +33,7 @@ export default function Chart() {
   const [timeFilter,settimeFilter] = useState(0);
   const [timeFilterDisplay,settimeFilterDisplay] = useState(0);
 
-
+  const {logScaleTickBox, setLogScaleTickBox} = useContext(GeneralContext)
   const [filteredtxDataChart, setfilteredtxDataChart] = useState();
   
   
@@ -210,6 +210,7 @@ useEffect(()=>{
       
       <ResponsiveContainer>
         <BarChart 
+          
           width={120} 
           height={40} 
           data={clickedDetailsAddress? filteredtxDataDual : formattedTxDataChart}
@@ -234,6 +235,8 @@ useEffect(()=>{
           <YAxis
             stroke={theme.palette.text.secondary}
             style={theme.typography.body2}
+            scale={logScaleTickBox? "log" : "linear"} 
+            domain={logScaleTickBox? ['auto', 'auto'] : []}
           >
             <Label
               angle={270}
