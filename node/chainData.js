@@ -372,6 +372,10 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
     .then(({data}) => {
         if (data.result.length > 0){
             updateMsg('ingesting TXs for collection ['+tokenAddress+'] fetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) );
+            
+            // console.log('--------')
+            // console.log(data)
+            // console.log('--------')
             h.fancylog('[ '+chalk.cyan(data.total+' TXs')+' ]\tfetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) , 'moralis', tokenAddress, spinner) ;
             // console.log('\t'+data.result.length+'\t'+data.result[0].transaction_hash);
         }
@@ -384,12 +388,12 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
         for (let i = 0; i < data.result.length; i++) {
             delay5++;
             let tx = data.result[i];
-
-            lookupSingleAddress(tx.from_address, delay5).then((q) => {
-                lookupSingleAddress(tx.to_address, delay5).then((x) => {
+            // console.log(tx)
+            lookupSingleAddress(tx.from_address, delay5).then(async (q) => {
+                lookupSingleAddress(tx.to_address, delay5).then(async (x) => {
                     // console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
 
-                    tokenTxs.push({
+                    await tokenTxs.push({
                         block_number: tx.block_number,
                         block_timestamp: tx.block_timestamp,
                         from_address: tx.from_address,
@@ -399,6 +403,12 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
                         from_address_friendlyName: q,
                         to_address_friendlyName: x
                     });
+                    console.log('added TX to batch: ', tokenTxs.length, ' / ', data.result.length)
+                    if (tokenTxs.length == data.result.length){
+                        console.log('there are ',tokenTxs.length,' batched TXs to put into mongo');
+                        putPageInDatabase(tokenTxs, tokenAddress, spinner)
+                    }
+                    
 
                 });
             });
@@ -406,11 +416,8 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
             
 
         } 
-        // if ((offset) < (data.total)){ //if there are more pages
-        //     setTimeout( ()=>{
-        //         getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
-        //     }, apiRateLimitMs);
-        // } 
+
+
         if (data.cursor){ //if there are more pages
             setTimeout( ()=>{
                 putPageInDatabase(tokenTxs, tokenAddress, spinner)
@@ -420,7 +427,7 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
             }, apiRateLimitMs);
         } 
         else {
-
+            
             var duplicateCount = 0;
 
             setTimeout(()=>{
@@ -526,25 +533,7 @@ function putPageInDatabase(tokenTxs, tokenAddress, spinner){
             const collection = db.collection("a_"+tokenAddress);
             
             
-
-            //for each token in tokenTxs, look up the friendlyNames for from and to addresses and add them to the object
-            tokenTxs.map((tx, index) => {
-                // return new Promise((resolve, reject) => {
-                    lookupSingleAddress(tx.from_address).then((q) => {
-                        lookupSingleAddress(tx.to_address).then((x) => {
-                            // console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
-                            
-                            tokenTxs[index].from_address_friendlyName = q;
-                            tokenTxs[index].to_address_friendlyName = x;
-
-                            // if (index == tx.length-1){
-                            //     resolve(true);
-                            // }
-                        });
-                    });
-                // });
-            })
-
+            
             collection.insertMany(tokenTxs, [{"continueOnError": true}], function(err, res) {
                 if (err) {
 
@@ -567,6 +556,7 @@ function putPageInDatabase(tokenTxs, tokenAddress, spinner){
                 }
                 // client.close();
             });
+            
         
                 
             
