@@ -29,7 +29,7 @@ const moralisApiKey = process.env.API_KEY;
 TimeAgo.addDefaultLocale(en)
 var theDate = Date().substr(15,9)
 var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
-var isRunning = false;
+// var isRunning = false;
 
 getLatestBlockFromMoralis();
 updateAllWatchedTokens();
@@ -38,7 +38,7 @@ updateAllWatchedTokens();
 //main loop
 /////////
 setInterval(()=>{
-    if (isRunning) return; //if we're already running, don't run again until the previous run is finished
+    // if (isRunning) return; //if we're already running, don't run again until the previous run is finished
     getLatestBlockFromMoralis();
     updateAllWatchedTokens('not cold start');
     spinner.stop();
@@ -352,7 +352,7 @@ function getLatestBlockFromMoralis(){
 
 // function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
 function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
-    isRunning = true;
+    // isRunning = true;
     if (cursor == 0){ cursor = '';}
     if ((fromBlock == undefined) || (!fromBlock)){
         // fromBlock = 16017606; //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
@@ -403,9 +403,9 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
                         from_address_friendlyName: q,
                         to_address_friendlyName: x
                     });
-                    console.log('added TX to batch: ', tokenTxs.length, ' / ', data.result.length)
+                    process.stdout.write('added TX to batch: '+ tokenTxs.length+ ' / '+ data.result.length+'\r')
                     if (tokenTxs.length == data.result.length){
-                        console.log('there are ',tokenTxs.length,' batched TXs to put into mongo');
+                        console.log('\nthere are ',tokenTxs.length,' batched TXs to put into mongo');
                         putPageInDatabase(tokenTxs, tokenAddress, spinner)
                     }
                     
@@ -450,7 +450,7 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
                         // return new Promise((resolve, reject) => {
                             lookupSingleAddress(tx.from_address).then((q) => {
                                 lookupSingleAddress(tx.to_address).then((x) => {
-                                    console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
+                                    // console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
                                     
                                     tokenTxs[index].from_address_friendlyName = q;
                                     tokenTxs[index].to_address_friendlyName = x;
@@ -512,7 +512,7 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
             } 
             }, 100);
 
-            isRunning = false; //clear the lock
+            // isRunning = false; //clear the lock
         }
 
     })
@@ -538,8 +538,9 @@ function putPageInDatabase(tokenTxs, tokenAddress, spinner){
                 if (err) {
 
                     if (err && err.writeErrors && err.writeErrors[0] && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
-                        duplicateCount++;
-                        h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
+                        // duplicateCount++;
+                        // h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
+                        h.fancylog('ignoring [xxx] duplicate tx', ' mongo ', spinner) ;
                     } else if (res && res.insertedCount) {
                         h.fancylog("Number of documents inserted: " + res.insertedCount, ' mongo ', spinner) ;
                     } else {
