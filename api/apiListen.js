@@ -144,7 +144,7 @@ app.listen(listenPort, () => {
             const theAddy = req.params.address;
             console.log('>>>>>> update balances for: ', theAddy);
             let url = 'https://deep-index.moralis.io/api/v2/'+theAddy+'/erc20?chain=eth';
-            // console.log('>>>>>> url: ', url);
+            console.log('>>>>>> url:  ', url);
             axios.get(url ,{
                 headers: {
                 Accept: "application/json",
@@ -153,42 +153,70 @@ app.listen(listenPort, () => {
                 },
             })
             .then(({data}) => {
-                MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
-                    if (err) {
-                        h.fancylog(err, 'error');
-                    }
-                    console.log('data: ', data);
-                    const db = client.db('pivotTables');
-                    const collection = db.collection('allAddresses');
-                    // update document where "address" == theAddy
-                    const updateDoc = await collection.updateOne ({address: theAddy}, {$set: {data}}, {upsert: true});
-                    
-                    //after we update the info, pull it from mongo and send it back to the client
-                    const regex = new RegExp(theAddy, 'i');
+                let url2 = 'https://deep-index.moralis.io/api/v2/'+theAddy+'/balance?chain=eth';
+                console.log('>>>>>> url2: ', url2);
+                
+                axios.get(url2 ,{
+                    headers: {
+                    accept: "application/json",
+                    // "Content-Type": "application/json;charset=UTF-8",
+                    "X-API-Key" : moralisApiKey
+                    },
+                })
+                .then((nativeBalance) => {
+                    nativeBalance = nativeBalance.data.balance;
+                    console.log('-----------------------')
+                    console.log('nativeBalance: ', nativeBalance);
+                    console.log('-----------------------')
 
-                    let temp = [{address: theAddy}];
-                    temp[0]["data"] = [];
-                    if (data) {
-                        for (const token of data) {
-                            let update = await db.collection('allAddresses').updateOne({ address: theAddy }, { $set: { [token.token_address]: {metadata: token} } });
-                            //push token to temp array
-                            // temp.push({[token.token_address]: token});
-                            console.log(token)
-                            temp[0][token.token_address] = {metadata: token};
-                            temp[0]["data"].push(token);
-                            //if last item in array, send temp array to client
-                            if (data.indexOf(token) === data.length - 1) {
-                                client.close();
-                                res.send(temp);
+                    MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+                        if (err) {
+                            h.fancylog(err, 'error');
+                        }
+                        console.log('data: ', data.length);
+                        const db = client.db('pivotTables');
+                        const collection = db.collection('allAddresses');
+                        // update document where "address" == theAddy
+                        const updateDoc = await collection.updateOne ({address: theAddy}, {$set: {data}}, {upsert: true});
+                        let update = await db.collection('allAddresses').updateOne({ address: theAddy }, { $set: { "native_eth": {metadata: 
+                            {
+                            token_address: "native_eth",
+                            name: "Ethereum native ETH balance",
+                            symbol: "ETH",
+                            decimals: 18,
+                            thumbnail: null,
+                            logo: null,
+                            balance: nativeBalance
+                            }
+                        }} });
+                        
+                        //after we update the info, pull it from mongo and send it back to the client
+                        const regex = new RegExp(theAddy, 'i');
+
+                        let temp = [{address: theAddy}];
+                        temp[0]["data"] = [];
+                        if (data) {
+                            for (const token of data) {
+                                let update = await db.collection('allAddresses').updateOne({ address: theAddy }, { $set: { [token.token_address]: {metadata: token} } });
+                                //push token to temp array
+                                // temp.push({[token.token_address]: token});
+                                // console.log(token)
+                                temp[0][token.token_address] = {metadata: token};
+                                temp[0]["data"].push(token);
+                                //if last item in array, send temp array to client
+                                if (data.indexOf(token) === data.length - 1) {
+                                    client.close();
+                                    res.send(temp);
+                                }
                             }
                         }
-                    }
-                    // res.send(addressColumns)
+                        // res.send(addressColumns)
 
 
-                    // const addressColumns = await collection.find({address: regex}).toArray();
-                    //     console.log('addressColumns: ', addressColumns);
-                        
+                        // const addressColumns = await collection.find({address: regex}).toArray();
+                        //     console.log('addressColumns: ', addressColumns);
+                            
+                    });
                 });
 
             })
@@ -645,7 +673,7 @@ app.listen(listenPort, () => {
                     });
                 }
                 else if (pageNumber == 'chart') {
-                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(10000).toArray(function(err, result) {    
+                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).limit(5000).toArray(function(err, result) {    
                         const db = client.db('watchedTokens-addresses-over-time');
                         const collectionOT = db.collection("a_"+req.params.collectionName);
                         collectionOT.find({}).toArray(function(err, resultOT) {
@@ -813,7 +841,10 @@ app.listen(listenPort, () => {
             
         });
 
-
+        // WALRUS - architectually maybe this is best triggered on-demand from the frontend rather than a periodic job.
+        // add frontend button somewhere to kick off a total update of all token balances for any address holding this watched token 
+        // app.get('/updateCommunityTokenBalances/:watchedTokenAddress', cors(), async (req, res) => {
+        // });
 
 
         app.get('/watchedTokenList', cors(), async (req, res) => {
@@ -952,6 +983,7 @@ function condenseArray(tempArray, filterMin, filterMax) {
 
 
 async function getUsdPriceFromMoralis(tokenAddress){
+    if (tokenAddress == "native_eth") {tokenAddress="0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"} //if native_eth, change to weth address
     return new Promise((resolve, reject) => {
         let url = 'https://deep-index.moralis.io/api/v2/erc20/'+tokenAddress+'/price?chain=eth';
             

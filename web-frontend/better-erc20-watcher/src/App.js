@@ -7,6 +7,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import ConnectionStatusBanner from './dashboard/ConnectionStatusBanner.jsx';
 import Topbanner from './dashboard/Topbanner.jsx';
 import TxVisualizer from './dashboard/TxVisualizer.jsx';
+import TokenDetective from './dashboard/TokenDetective.jsx';
 
 
 
@@ -75,7 +76,7 @@ const [displayPanel, setdisplayPanel] = useState('watchingTokens');
 const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
 const [defaultData, setDefaultData] = useState({ nodes: [], links: [] });
 const [ShownLiqPoolPriceData, setShownLiqPoolPriceData] = useState({});
-
+const [logScaleTickBox, setLogScaleTickBox] = React.useState(false);
 
 const contextObj = {
   txData, settxData,
@@ -133,7 +134,7 @@ const contextObj = {
   detectedLPs, setdetectedLPs,
   txDataChartOverTime, settxDataChartOverTime,
   LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider,
-
+  logScaleTickBox, setLogScaleTickBox
 }
 
 
@@ -151,6 +152,8 @@ return (
           {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
           {displayPanel == 'tokenSummary'? <TokenHoldersDashboard />: <></>}
           {displayPanel == 'txVisualizer'? <TxVisualizer />: <></>}
+          {displayPanel == 'tokenDetective'? <TokenDetective />: <></>}
+          
           
           
       </div>
