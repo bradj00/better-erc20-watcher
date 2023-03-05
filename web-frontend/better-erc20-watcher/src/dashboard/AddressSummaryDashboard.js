@@ -531,9 +531,9 @@ function determineWhichFNtoShow(tokenObj){
                           }
 
                           //filter out tokens that have extendedValue < 1
-                          if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && selectedAddressListOfTokens[0][token].usdValue[0].usdValue && (selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue < 0.001 || selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue > 1000000000000)  ){
-                            return (<></>)
-                          }
+                          // if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && selectedAddressListOfTokens[0][token].usdValue[0].usdValue && (selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue < 0.001 || selectedAddressListOfTokens[0][token].usdValue[0].usdValue.extendedValue > 1000000000000)  ){
+                          //   return (<></>)
+                          // }
                           //filter out blacklisted
                           if (selectedAddressListOfTokens && selectedAddressListOfTokens[0] && selectedAddressListOfTokens[0][token]&& selectedAddressListOfTokens[0][token].usdValue && selectedAddressListOfTokens[0][token].usdValue[0] && (selectedAddressListOfTokens[0][token].usdValue[0].blacklisted ) ){
                             return (<></>)
@@ -563,7 +563,12 @@ function determineWhichFNtoShow(tokenObj){
                                 </div>
 
                                 </td>
-                                <td><a href={`https://etherscan.io/token/${selectedAddressListOfTokens[0][token].metadata.token_address}?a=${heldTokensSelectedAddress}`} target="_blank" rel="noopener noreferrer">{getEllipsisTxt(selectedAddressListOfTokens[0][token].metadata.token_address, 4)}</a></td>
+                                <td>
+                                  { selectedAddressListOfTokens[0][token].metadata.token_address.match(/native/) ? 
+                                  <>{selectedAddressListOfTokens[0][token].metadata.token_address}</>
+                                  :<a href={`https://etherscan.io/token/${selectedAddressListOfTokens[0][token].metadata.token_address}?a=${heldTokensSelectedAddress}`} target="_blank" rel="noopener noreferrer">{getEllipsisTxt(selectedAddressListOfTokens[0][token].metadata.token_address, 4)}</a>
+                                  }
+                                  </td>
                                 <td>{selectedAddressListOfTokens[0][token].metadata.symbol}</td>
                                 <td style={{textAlign:'right'}}>{commaNumber(parseFloat((selectedAddressListOfTokens[0][token].metadata.balance)/ (10 **selectedAddressListOfTokens[0][token].metadata.decimals)).toFixed(4))}</td>
                                 
