@@ -747,6 +747,40 @@ app.listen(listenPort, () => {
             });
         });    
 
+
+        //add a new address to the list of addresses we are watching closely/realtime
+        app.get('/addCloselyWatchedAddress/:theAddress', cors(), async (req, res) => {
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+                const db = client.db('closelyWatchedAddresses');
+                //create a collection with the name of the address
+                const collection = db.collection("a_"+req.params.theAddress);
+                collection.insertOne({address: req.params.theAddress}, function(err, res) {
+                    if (err) throw err;
+                    console.log("added new address to closelyWatchedAddresses collection: ", req.params.theAddress);
+                    client.close();
+                });
+                
+            });
+        });
+        
+        //remove an address from the list of addresses we are watching closely/realtime
+        app.get('/removeCloselyWatchedAddress/:theAddress', cors(), async (req, res) => {
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+                const db = client.db('closelyWatchedAddresses');
+                //create a collection with the name of the address
+                const collection = db.collection("a_"+req.params.theAddress);
+                //drop collection with the name of the address
+                collection.drop(function(err, delOK) {
+                    if (err) throw err;
+                    if (delOK) console.log("closelyWatchedAddresses collection deleted: ", req.params.theAddress);
+                    client.close();
+                });
+                
+            });
+        });
+
+
+
         app.get('/friendlyName/:theAddress', cors(), async (req, res) => {
             // console.log('q\t');
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
