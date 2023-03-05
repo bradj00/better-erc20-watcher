@@ -27,9 +27,29 @@ var latestBlock = 0;
 
 const moralisApiKey = process.env.API_KEY;
 TimeAgo.addDefaultLocale(en)
+var theDate = Date().substr(15,9)
+var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
+// var isRunning = false;
+
+getLatestBlockFromMoralis();
+updateAllWatchedTokens();
 
 
+//main loop
+/////////
+setInterval(()=>{
+    // if (isRunning) return; //if we're already running, don't run again until the previous run is finished
+    getLatestBlockFromMoralis();
+    updateAllWatchedTokens('not cold start');
+    spinner.stop();
+    theDate = Date().substr(15,9)
+    spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
+    updateMsg('['+theDate+' ] all token TXs are up to date for all watched tokens. sleeping..');
+    spinner.start();
+},sleepTimer);
+/////////
 
+//every 1 second, update heartbeat in the db
 setInterval(()=>{
     const timestamp = new Date().getTime();
     timestamp.toString();
@@ -60,10 +80,8 @@ setInterval(()=>{
 }, 1000);
 
 
-
-var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
 // const spinner = ora(`[`+Date().substr(15,9)+` ] `+'Begin checking '+chalk.magenta('Moralis')+' every '+chalk.magenta(sleepTimer/1000+'s')+' for new TXs...');
-spinner.color = 'white'
+// spinner.color = 'white'
 
 function lookupSingleAddress(address, delay5){
     return new Promise(async (resolve, reject) => {
@@ -146,17 +164,11 @@ function checkIfSyncing(tokenName){
     });
 }
 
-var theDate = Date().substr(15,9)
-var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
-setInterval(()=>{
-    getLatestBlockFromMoralis();
-    updateAllWatchedTokens('not cold start');
-    spinner.stop();
-    theDate = Date().substr(15,9)
-    spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
-    spinner.start();
-},sleepTimer);
-getLatestBlockFromMoralis();
+
+// var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
+
+
+
 
 
 
@@ -194,7 +206,10 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                 if (err) console.log(err); 
                                 if (result && result.length > 0){
                                     const timeAgo = new TimeAgo('en-US')
-                                    if (!coldStart && result[0]&& result[0].blockTimestamp){h.fancylog('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName,spinner);}
+                                    if (!coldStart && result[0]&& result[0].blockTimestamp){
+                                        updateMsg('bootup: checking most recent cached txs as starting point to fetch new TXs..');
+                                        h.fancylog('most recent cached tx was [ '+ chalk.cyan(timeAgo.format(new Date(result[0].block_timestamp)) )+' ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName,spinner);
+                                    }
                                     // if (!coldStart){h.fancylog('most recent cached tx was [  ] for ERC20 token '+chalk.cyan.underline(collectionName)+': ', ' mongo ', collectionName);}
 
                                     result[0].value = parseFloat(result[0].value/(10**18).toFixed(4));
@@ -210,13 +225,16 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
                                     
                                 }else {
                                     
-                                    if (!coldStart){h.fancylog('no txs for token (empty collection?)', ' mongo ', collectionName, spinner  );}
+                                    if (!coldStart){
+                                        updateMsg('no txs for token (empty collection?): '+collectionName);
+                                        h.fancylog('no txs for token (empty collection?)', ' mongo ', collectionName, spinner  );
+                                    }
                                    
 
                                     let q = 0;
-                                    if (collectionName != "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"){
-                                        q = 16017606 ;   //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
-                                    }       
+                                    // if (collectionName != "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"){
+                                    //     q = 16522135 ;   //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
+                                    // }       
                                     client.close();
                                     getTokenTranscationsFromMoralis(0, 100, collectionName, 1, q, coldStart, resolve, tokenTxs); 
                                 }
@@ -245,13 +263,14 @@ function updateSingleTokenList(tokenAddresses, coldStart) {
 }
 
 
-updateAllWatchedTokens();
 function updateAllWatchedTokens(coldStart){
     
 
 
     if (!coldStart){
         console.log(chalk.cyan.underline.inverse('chainData.js')+'\n');
+        var theDate = Date().substr(15,9)
+        updateMsg('['+theDate+' ] bootup: cold start...');
         h.fancylog('cold start...');
     }
     //get all collection names from mongo for database "watchedTokens"
@@ -260,7 +279,12 @@ function updateAllWatchedTokens(coldStart){
     // console.log('5\t');
     MongoClient.connect(mongoUrl, function(err, client) {
         if (err) console.log('THERE WAS AN ERROR: ',err);
-        if (!client ){ h.fancylog('mongo client not connected. exiting..', 'error'); client.close(); return;}
+        if (!client ){
+            updateMsg('mongo client not connected. check chainData.js logs.');
+            h.fancylog('mongo client not connected. exiting..', 'error'); 
+            client.close();
+            return;
+        }
 
         const db = client.db(dbName);
         db.listCollections().toArray(function(err, collections) {
@@ -326,14 +350,17 @@ function getLatestBlockFromMoralis(){
 
 }
 
-function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
+// function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
+function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount, fromBlock, coldStart, resolve, tokenTxs){
+    // isRunning = true;
+    if (cursor == 0){ cursor = '';}
     if ((fromBlock == undefined) || (!fromBlock)){
         // fromBlock = 16017606; //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
         fromBlock = 0; //WALRUS - super active tokens wont start from beginning of time (only for testing while building the ingestion engine)
     }
     
     //1 block past the last block we have in our db
-    const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&limit="+limit+"&offset="+offset+"&from_block="+(fromBlock+1)+"&to_date="+(new Date().getTime() );
+    const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&disable_total=false&limit="+limit+"&cursor="+cursor+"&from_block="+(fromBlock+1)+"&to_date="+(new Date().getTime() );
 
     axios.get(url ,{
         headers: {
@@ -344,6 +371,11 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
     })
     .then(({data}) => {
         if (data.result.length > 0){
+            updateMsg('ingesting TXs for collection ['+tokenAddress+'] fetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) );
+            
+            // console.log('--------')
+            // console.log(data)
+            // console.log('--------')
             h.fancylog('[ '+chalk.cyan(data.total+' TXs')+' ]\tfetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) , 'moralis', tokenAddress, spinner) ;
             // console.log('\t'+data.result.length+'\t'+data.result[0].transaction_hash);
         }
@@ -356,12 +388,12 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
         for (let i = 0; i < data.result.length; i++) {
             delay5++;
             let tx = data.result[i];
-
-            lookupSingleAddress(tx.from_address, delay5).then((q) => {
-                lookupSingleAddress(tx.to_address, delay5).then((x) => {
+            // console.log(tx)
+            lookupSingleAddress(tx.from_address, delay5).then(async (q) => {
+                lookupSingleAddress(tx.to_address, delay5).then(async (x) => {
                     // console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
 
-                    tokenTxs.push({
+                    await tokenTxs.push({
                         block_number: tx.block_number,
                         block_timestamp: tx.block_timestamp,
                         from_address: tx.from_address,
@@ -371,6 +403,12 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                         from_address_friendlyName: q,
                         to_address_friendlyName: x
                     });
+                    process.stdout.write('added TX to batch: '+ tokenTxs.length+ ' / '+ data.result.length+'\r')
+                    if (tokenTxs.length == data.result.length){
+                        console.log('\nthere are ',tokenTxs.length,' batched TXs to put into mongo');
+                        putPageInDatabase(tokenTxs, tokenAddress, spinner)
+                    }
+                    
 
                 });
             });
@@ -378,21 +416,28 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
             
 
         } 
-        if ((offset) < (data.total)){ //if there are more pages
+
+
+        if (data.cursor){ //if there are more pages
             setTimeout( ()=>{
-                getTokenTranscationsFromMoralis(offset + limit, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
+                putPageInDatabase(tokenTxs, tokenAddress, spinner)
+                tokenTxs = [];
+
+                getTokenTranscationsFromMoralis(data.cursor, limit, tokenAddress, pageCount+1, fromBlock, coldStart, resolve, tokenTxs);
             }, apiRateLimitMs);
         } 
         else {
-
+            
             var duplicateCount = 0;
 
             setTimeout(()=>{
             if (tokenTxs.length > 0){
-                if (!coldStart){h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;}
+                if (!coldStart){
+                    updateMsg('putting TXs into mongo for collection ['+tokenAddress+']');
+                    h.fancylog('Done fetching token TXs. Attempting to put TXs into mongo...', ' mongo ', tokenAddress, spinner) ;
+                }
                 
                 try{
-                // console.log('6\t');
                 MongoClient.connect(mongoUrl, function(err, client) {
                     if (err) console.log('THERE WAS AN ERROR: ',err);
                     const db = client.db(dbName);
@@ -405,7 +450,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                         // return new Promise((resolve, reject) => {
                             lookupSingleAddress(tx.from_address).then((q) => {
                                 lookupSingleAddress(tx.to_address).then((x) => {
-                                    console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
+                                    // console.log('\n\t\t'+chalk.cyan('from: '),tx.from_address, chalk.cyan('to: '),tx.to_address);
                                     
                                     tokenTxs[index].from_address_friendlyName = q;
                                     tokenTxs[index].to_address_friendlyName = x;
@@ -426,7 +471,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                     collection.insertMany(tokenTxs, [{"continueOnError": true}], function(err, res) {
                         if (err) {
 
-                            if (err && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
+                            if (err && err.writeErrors && err.writeErrors[0] && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
                                 duplicateCount++;
                                 h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
                             } else if (res && res.insertedCount) {
@@ -438,6 +483,7 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
                             resolve(true);
                         } else {
                             //there's no error and insertion was successful. 
+                            updateMsg('cached ['+res.insertedCount+'] new TXs for collection ['+tokenAddress+']');
                             h.fancylog('cached ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
                             client.close();
                             resolve(true);
@@ -466,11 +512,84 @@ function getTokenTranscationsFromMoralis(offset, limit, tokenAddress, pageCount,
             } 
             }, 100);
 
-
+            // isRunning = false; //clear the lock
         }
 
     })
     .catch(function (error) {
         console.log(chalk.red('web fetch call err: '),error.code);
       })
+}
+
+
+function putPageInDatabase(tokenTxs, tokenAddress, spinner){
+    if (tokenTxs.length > 0){
+ 
+        try{
+        // console.log('6\t');
+        MongoClient.connect(mongoUrl, function(err, client) {
+            if (err) console.log('THERE WAS AN ERROR: ',err);
+            const db = client.db(dbName);
+            const collection = db.collection("a_"+tokenAddress);
+            
+            
+            
+            collection.insertMany(tokenTxs, [{"continueOnError": true}], function(err, res) {
+                if (err) {
+
+                    if (err && err.writeErrors && err.writeErrors[0] && err.writeErrors[0].errmsg.includes("duplicate key error collection")){
+                        // duplicateCount++;
+                        // h.fancylog('ignoring ['+chalk.red(duplicateCount)+'] duplicate tx', ' mongo ', spinner) ;
+                        h.fancylog('ignoring [xxx] duplicate tx', ' mongo ', spinner) ;
+                    } else if (res && res.insertedCount) {
+                        h.fancylog("Number of documents inserted: " + res.insertedCount, ' mongo ', spinner) ;
+                    } else {
+                        h.fancylog(chalk.red('mongo err: '), err, ' error ', spinner) ;
+                    }
+                    client.close();
+                    // resolve(true);
+                } else {
+                    //there's no error and insertion was successful. 
+                    updateMsg('cached ['+res.insertedCount+'] new TXs for collection ['+tokenAddress+']');
+                    h.fancylog('cached ('+chalk.cyan(res.insertedCount)+') new TXs', ' mongo ', tokenAddress, spinner) ;
+                    client.close();
+                    // resolve(true);
+                }
+                // client.close();
+            });
+            
+        
+                
+            
+        });
+        } catch (error) {
+            console.log(error);
+            client.close();
+            // resolve(error);
+        }
+
+    }  
+    
+
+}
+
+function updateMsg(message){
+    MongoClient.connect(mongoUrl, function(err, client) {
+        if (err) console.log('Mongo ERR: ',err);
+        const db = client.db('systemStats');
+        if (message){
+        //get date as epoch time
+        var d = new Date();    
+        db.collection("systemStatuses").updateOne({name:"ingestion-engine"}, {$set:{name:"ingestion-engine", statusMsg: message, lastAction: d  }},{upsert: true},  function(err, result) {
+            
+            if (err) console.log('Mongo ERR: ',err);
+            // console.log('OK UPDATED: ',result)
+            client.close();
+        });
+        }
+        else {
+            console.log(chalk.cyan('error: no message to update'))
+            client.close();
+        }
+    });
 }

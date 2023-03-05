@@ -52,9 +52,11 @@ const ToFromCell = (props) => {
 
 
     return (
+
         <div  title={props.toFrom == 'to' ? props.row.to_address_friendlyName.address: props.toFrom == 'from'? props.row.from_address_friendlyName.address:<></>}  onClick={()=>{ editingFN==true? <></> : seteditingFN(true) }}>
             
             {
+            props.row.to_address_friendlyName? 
                 editingFN==true && props.clickMode == 'edit' ? 
                 <div className="hoverOpacity" style={{display:'flex'}}>
                     <input  value={newFriendlyNameInput} onKeyDown={(e)=>handleKeyDown(e)} onChange={(e) => setnewFriendlyNameInput(e.target.value)} style={{width:'80%',height:'3vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="friendly name" />
@@ -73,7 +75,10 @@ const ToFromCell = (props) => {
                 'null'
 
 
+            :<></>
+                
             }
+            
             
         </div>
     )

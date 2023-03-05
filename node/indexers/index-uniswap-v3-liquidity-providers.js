@@ -82,7 +82,7 @@ async function checkLatestCachedToken(){
 
 async function checkContractForTokenId(tokenId){
     return new Promise(async (resolve, reject) => {
-        
+        updateMsg('checking tokenId: '+tokenId);
         console.log('checking tokenId: '+tokenId);
         const options = {
             method: 'POST',
@@ -166,6 +166,7 @@ async function checkContractForTokenId(tokenId){
               }
               if (revertedCounter < maxMissingTokenIds){checkContractForTokenId(tokenId+1);}
               else {
+                    updateMsg('last successfully read token '+(tokenId-25)+': reverted '+maxMissingTokenIds+' times in a row, assuming max token id has been reached.  Sleeping 1 HOUR.');
                     console.log('\n\n[ '+chalk.cyan(revertedCounter)+' ] reverted '+maxMissingTokenIds+' times in a row, assuming max token id has been reached.  Sleeping '+chalk.cyan('1 HOUR')+'.');
                     resolve('finished');
                     //wait 5 seconds
@@ -178,7 +179,27 @@ async function checkContractForTokenId(tokenId){
 }
 
 
+function updateMsg(message){
+    MongoClient.connect(mongoUrl, function(err, client) {
+        if (err) console.log('Mongo ERR: ',err);
+        const db = client.db('systemStats');
+        if (message){
+        //get date as epoch time
+        var d = new Date();    
+        db.collection("systemStatuses").updateOne({name:"indexer-uniswap-v3-lproviders"}, {$set:{name:"indexer-uniswap-v3-lproviders", statusMsg: message, lastAction: d  }},{upsert: true},  function(err, result) {
+            
+            if (err) console.log('Mongo ERR: ',err);
+            // console.log('OK UPDATED: ',result)
+            client.close();
+        });
+        }
+        else {
+            console.log(chalk.cyan('error: no message to update'))
+            client.close();
+        }
+    });
 
+}
 
 
 

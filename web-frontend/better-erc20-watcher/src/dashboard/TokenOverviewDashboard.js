@@ -153,6 +153,7 @@ function DashboardContent() {
 
 
   const [toggleShowLPDiv, settoggleShowLPDiv] = React.useState(false);
+  const {logScaleTickBox, setLogScaleTickBox} = useContext(GeneralContext)
   const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
   
   const timeAgo = new TimeAgo('en-US'); 
@@ -244,6 +245,12 @@ function DashboardContent() {
     });
   }
 
+
+  useEffect(() => {
+    if (logScaleTickBox) {
+      console.log('logScaleTickBox: ',logScaleTickBox);
+    }
+  },[logScaleTickBox]);
 
   useEffect(() => {
     if (LpToken0Token1HeldByProvider) {
@@ -609,67 +616,18 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
             
 
 
-            <div style={{position:'absolute', top:'62vh', left:' 5%', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
-              Central Exchanges
+            <div style={{position:'absolute', top:'62vh', left:'3vw', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
+              Closely Watching Activity
             </div>
             <div style={{overflowY:'scroll', overflowX:'hidden', border:'1px solid rgba(100,100,100,0.4)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'30vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'65vh', }}>
               
               {/* map of fake data array that show like placeholder cards */}
-              <div style={{position:'absolute', top:'5%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
-                {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
-                  return (
-                    <>
-                    <div style={{padding:'0.5vw', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('XT.com'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
-                      <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
-                        {/* {item.name.slice(0,7)} */}
-                        XT.com
-                      </div>
-                      <div style={{position:'relative', top: '0%', left:' 10%', color:'#fff', fontSize:'0.75vw', }}>
-                        {/* {item.heldAmount} */}
-                        600,241
-                      </div>
-                      <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
-                        {/* {item.priceUsd} */}
-                        $0.19
-                      </div>
-                      <div title="exit liquidity" style={{display:'flex', position:'absolute', top:'2.5vh',fontSize:'0.85vw',  right:'25%', color:'#aaa', fontStyle:'italic',  }}>
-                      {/* <div></div>
-                      <LinkIcon />
-                      <div></div> */}
-                      </div>
-                      <div style={{position:'absolute', right:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'0',color:'#666'}}>
-                        {getEllipsisTxt(item["Pool Address"],6)}
-                      </div>
-                    </div>
-                    <div style={{padding:'0.5vw', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Binance'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
-                      <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
-                        {/* {item.name.slice(0,7)} */}
-                        Binance
-                      </div>
-                      <div style={{position:'relative', top: '0%', left:' 10%', color:'#fff', fontSize:'0.75vw', }}>
-                        {/* {item.heldAmount} */}
-                        126,400
-                      </div>
-                      <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
-                        {/* {item.priceUsd} */}
-                        $0.183
-                      </div>
-                      <div title="exit liquidity" style={{display:'flex', position:'absolute', top:'2.5vh',fontSize:'0.85vw',  right:'25%', color:'#aaa', fontStyle:'italic',  }}>
-                      {/* <div></div>
-                      <LinkIcon />
-                      <div></div> */}
-                      </div>
-                      <div style={{position:'absolute', right:'2%',fontStyle:'italic', fontSize:'0.75vw',bottom:'0',color:'#666'}}>
-                        {getEllipsisTxt(item["Pool Address"],6)}
-                      </div>
-                    </div>
-                    </>
-                  )
-                })
-                : null : null}
-              </div>
+              
             </div>
 
+            <div onClick={()=>{setLogScaleTickBox(!logScaleTickBox)}} style={{cursor:'pointer', display:'flex', justifyContent:'center', position:'absolute', width:'1vw', height:'1vw', backgroundColor:logScaleTickBox? 'rgba(255,255,255,1)': 'rgba(255,255,255,0)', border:logScaleTickBox? '':'1px solid #fff', top:'14vh', left:'19.5vw', zIndex:'5'}}>
+              <div style={{position:'absolute', top:'-2.5vh'}}>{logScaleTickBox? <>log</>: <>linear</>}</div>
+            </div>
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
               
               <div style={{position:'absolute', width:'100%', display:'flex',}}>
