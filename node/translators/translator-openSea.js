@@ -113,7 +113,7 @@ setInterval(() => {
         })
     })
 
-}, 1000 * sleepSeconds); // run every 5 minutes...super overkill but good to test running this many times before we daemonize it with cron
+}, 1000000 * sleepSeconds); // run every 50000 minutes...super overkill but good to test running this many times before we daemonize it with cron
 
 
 async function getAddresses() {
@@ -186,16 +186,17 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
 
 
     for (let i = 0; i < addresses.length; i++) {
-        // setTimeout(() => {
+        // setTimeout(async () => {
             // console.log('hello ', addresses[i]);
             let friendlyName = await dbFN.collection('lookup').find({address: addresses[i]}).limit(1).toArray()
             const collections = await db.listCollections().toArray();
 
             if(friendlyName[0]){
-                if (silentSwitch == 'loud'){
+                // if (silentSwitch == 'loud'){
                     // console.log('updating all collections matching address: ', chalk.magenta(addresses[i]),' with friendlyName: ', chalk.magenta(friendlyName[0]));
-                    h.fancylog('updating all collections matching address: '+ chalk.magenta(addresses[i])+' with friendlyName: '+chalk.magenta(friendlyName[0]), ' mongo ')
-                }
+                    // h.fancylog('[ '+i+' / '+addresses.length+' ] updating all collections matching address: '+ chalk.magenta(addresses[i])+' with friendlyName: '+chalk.magenta(friendlyName[0]), ' mongo ')
+                    process.stdout.write('\r[ '+i+' / '+addresses.length+' ] updating all collections matching address: '+ chalk.magenta(addresses[i])+' with friendlyName: '+chalk.magenta(friendlyName[0])+'   ')
+                // }
 
                 
                 for (let j = 0; j < collections.length; j++) {
@@ -214,16 +215,16 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
                     db.collection(collections[j].name).updateMany(  {to_address: addresses[i]}, {$set: {to_address_friendlyName: addresses[i] }})
                 }
             }
+            if (i == addresses.length - 1) {
+                h.fancylog(chalk.yellow('UpdateTxsFromEachCollection()')+'\tfinished. Updated TXs for: '+chalk.yellow(i)+ ' addresses',' mongo ')
+                // console.log('--------------------------------------------');
+                h.fancylog(`all token TXs are up to date for all watched tokens. sleeping ${chalk.cyan(sleepSeconds)} seconds..`, 'system ')
+                // client.close();
+                setTimeout(()=>{        //this should be event driven, not a timeout but it's a blocker for now
+                    client.close();
+                },5000);
+            }
         // }, 200 * i);
-        if (i == addresses.length - 1) {
-            h.fancylog(chalk.yellow('UpdateTxsFromEachCollection()')+'\tfinished. Updated TXs for: '+chalk.yellow(i)+ ' addresses',' mongo ')
-            // console.log('--------------------------------------------');
-            h.fancylog(`all token TXs are up to date for all watched tokens. sleeping ${chalk.cyan(sleepSeconds)} seconds..`, 'system ')
-            // client.close();
-            setTimeout(()=>{        //this should be event driven, not a timeout but it's a blocker for now
-                client.close();
-            },5000);
-        }
     }
 
 }

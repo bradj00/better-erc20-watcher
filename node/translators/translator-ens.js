@@ -112,7 +112,7 @@ setInterval(() => {
         })
     })
 
-}, 1000 * sleepSeconds); // run every 5 minutes...super overkill but good to test running this many times before we daemonize it with cron
+}, 100000000 * sleepSeconds); // run every 5 minutes...super overkill but good to test running this many times before we daemonize it with cron
 
 
 async function getAddresses() {
@@ -194,7 +194,7 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
             if(friendlyName[0]){
                 if (silentSwitch == 'loud'){
                     // console.log('updating all collections matching address: ', chalk.magenta(addresses[i]),' with friendlyName: ', chalk.magenta(friendlyName[0].friendlyName));
-                    h.fancylog('updating all collections matching address: '+ chalk.magenta(addresses[i])+' with friendlyName: '+chalk.magenta(friendlyName[0].friendlyName), ' mongo ')
+                    h.fancylog('[ '+i+' / '+addresses.length+' ] updating all collections matching address: '+ chalk.magenta(addresses[i])+' with friendlyName: '+chalk.magenta(friendlyName[0]), ' mongo ')
                 }
 
                 

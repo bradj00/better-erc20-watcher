@@ -212,35 +212,38 @@ function DashboardContent() {
 
       
       LPs.uniswap_v3_pools[key].forEach(function(item) {
-        index++;
-        // console.log('____',displayAddressFN(item.ownerOf.friendlyName), item.lowerLimit, item.upperLimit, item.token0Held, item.token1Held, index, item);
-        
-        totalToken0Held += item.token0Held;
-        totalToken1Held += item.token1Held;
-        if ( (item.token0Held == 0 && item.token1Held == 0) ) {
-          console.log('skipping ', displayAddressFN(item.ownerOf.friendlyName) )
-        }
-        else { 
-          if (item.ownerOf){
-            temp.push( {name: item.ownerOf.friendlyName, lowerLimit: item.lowerLimit, upperLimit: item.upperLimit, index: index, token0Held: item.token0Held, token1Held: item.token1Held} );
+        if (item && item.ownerOf && item.ownerOf.friendlyName){
+          index++;
+          // console.log('____',displayAddressFN(item.ownerOf.friendlyName), item.lowerLimit, item.upperLimit, item.token0Held, item.token1Held, index, item);
+          
+          totalToken0Held += item.token0Held;
+          totalToken1Held += item.token1Held;
+          if ( (item.token0Held == 0 && item.token1Held == 0) ) {
+            console.log('skipping ', displayAddressFN(item.ownerOf.friendlyName) )
           }
-        }
-
-
-        if (!temp2[displayAddressFN(item.ownerOf.friendlyName)]){
-           temp2[displayAddressFN(item.ownerOf.friendlyName)] = {}
-           temp2[displayAddressFN(item.ownerOf.friendlyName)].token0 = 0;
-           temp2[displayAddressFN(item.ownerOf.friendlyName)].token1 = 0;
+          else { 
+            if (item.ownerOf){
+              temp.push( {name: item.ownerOf.friendlyName, lowerLimit: item.lowerLimit, upperLimit: item.upperLimit, index: index, token0Held: item.token0Held, token1Held: item.token1Held} );
+            }
           }
-        
-        // console.log('token0: ', item.token0Held, 'token1: ', item.token1Held); 
 
-        temp2[displayAddressFN(item.ownerOf.friendlyName)].token0 = temp2[displayAddressFN(item.ownerOf.friendlyName)].token0 + item.token0Held;
-        temp2[displayAddressFN(item.ownerOf.friendlyName)].token1 = temp2[displayAddressFN(item.ownerOf.friendlyName)].token1 + item.token1Held;
-        
-        setLpTotalTokensHeld({token0Held: totalToken0Held, token1Held: totalToken1Held});
-        setLpToken0Token1HeldByProvider(temp2);
-        setLpChartData(temp);
+
+          if (!temp2[displayAddressFN(item.ownerOf.friendlyName)]){
+            temp2[displayAddressFN(item.ownerOf.friendlyName)] = {}
+            temp2[displayAddressFN(item.ownerOf.friendlyName)].token0 = 0;
+            temp2[displayAddressFN(item.ownerOf.friendlyName)].token1 = 0;
+            }
+          
+          // console.log('token0: ', item.token0Held, 'token1: ', item.token1Held); 
+
+          temp2[displayAddressFN(item.ownerOf.friendlyName)].token0 = temp2[displayAddressFN(item.ownerOf.friendlyName)].token0 + item.token0Held;
+          temp2[displayAddressFN(item.ownerOf.friendlyName)].token1 = temp2[displayAddressFN(item.ownerOf.friendlyName)].token1 + item.token1Held;
+          
+          setLpTotalTokensHeld({token0Held: totalToken0Held, token1Held: totalToken1Held});
+          setLpToken0Token1HeldByProvider(temp2);
+          setLpChartData(temp);
+        }
+        else return;
       });
     });
   }
