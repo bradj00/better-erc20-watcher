@@ -22,7 +22,7 @@ const dbName = 'watchedTokens';
 const dbNameFriendlyNames = 'friendlyNames';
 
 const apiRateLimitMs = 1000; //delay for Moralis API limit when fetching new pages
-const sleepTimer = 15000;    //delay for Moralis API limit for how often to update token TXs
+const sleepTimer = 86400000;    //delay for Moralis API limit for how often to update token TXs
 var latestBlock = 0;
 
 const moralisApiKey = process.env.API_KEY;

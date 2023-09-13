@@ -203,7 +203,7 @@ function DashboardContent() {
 
   useEffect(() => {
     if (updateBlacklistRequest){
-      const url = "http://10.0.3.2:4000/addToBlacklist/"+updateBlacklistRequest;
+      const url = "http://10.0.3.240:4000/addToBlacklist/"+updateBlacklistRequest;
       fetch(url)
       .then(response => response.json())
       .then(data => {

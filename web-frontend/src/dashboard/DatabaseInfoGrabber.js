@@ -10,6 +10,7 @@ const DatabaseInfoGrabber = () => {
     const [filteredAddyData, setFilteredAddyData] = useState(null)
     const [intervalQ, setintervalQ] = useState(null)
     const {txData, settxData} = useContext(GeneralContext);
+    const {TxSummaryData, setTxSummaryData} = useContext(GeneralContext); 
     const {txDataChart, settxDataChart} = useContext(GeneralContext); 
     const {txDataChartOverTime, settxDataChartOverTime} = useContext(GeneralContext); 
     const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
@@ -133,7 +134,7 @@ const DatabaseInfoGrabber = () => {
     //pulls specifically fresh data from the Moralis API
     function fetchUpdatedTokenBalance(address) {
         console.log('fetching updated token balance for address: ', address)
-        fetch('http://10.0.3.2:4000/updateTokenBalances/' + address)
+        fetch('http://10.0.3.240:4000/updateTokenBalances/' + address)
         .then(response => response.json())
         .then(data => {
             console.log('['+address+'] token balances: ', data);
@@ -145,7 +146,7 @@ const DatabaseInfoGrabber = () => {
 
     function fetchLiquidityPoolPrice(token0, token1, feeAmount) {
         console.log('fetching : ', )
-        fetch('http://10.0.3.2:4000/getLiquidityPoolPrice?token0='+token0+'&token1='+token1+'&feeAmount='+feeAmount)
+        fetch('http://10.0.3.240:4000/getLiquidityPoolPrice?token0='+token0+'&token1='+token1+'&feeAmount='+feeAmount)
         .then(response => response.json())
         .then(data => {
             console.log('POOL PRICE: ', data);
@@ -154,7 +155,7 @@ const DatabaseInfoGrabber = () => {
     }
     function fetchInGameMegaBalance(token, getFreshData) {
         console.log('fetching in-game mega balance for address: ', token)
-        fetch('http://10.0.3.2:4000/getStakedMegaBalances/'+token+'?getFreshData='+getFreshData)
+        fetch('http://10.0.3.240:4000/getStakedMegaBalances/'+token+'?getFreshData='+getFreshData)
         .then(response => response.json())
         .then(data => {
             console.log('['+token+'] in-game mega balance: ', data);
@@ -163,7 +164,7 @@ const DatabaseInfoGrabber = () => {
     }
     function fetchCommonlyHeldToken(token) {
         console.log('fetching community held list for token filter: ', token)
-        fetch('http://10.0.3.2:4000/findCommonHeld/' + token)
+        fetch('http://10.0.3.240:4000/findCommonHeld/' + token)
         .then(response => response.json())
         .then(data => {
             console.log('['+token+'] common held list: ', data);
@@ -172,7 +173,7 @@ const DatabaseInfoGrabber = () => {
     }
     function fetchFNforAddress(address) {
         console.log('fetching friendly name for address: ', address)
-        fetch('http://10.0.3.2:4000/friendlyName/' + address)
+        fetch('http://10.0.3.240:4000/friendlyName/' + address)
         .then(response => response.json())
         .then(data => {
             console.log('FN Lookup:\t['+address+'] friendly name: ', data[0]);
@@ -183,7 +184,7 @@ const DatabaseInfoGrabber = () => {
     //pulls only cached data from mongoDB
     function fetchSelectedAddressHeldTokens(address) {
         console.log('fetching held tokens for address: ', address)
-        fetch('http://10.0.3.2:4000/tokenBalances/' + address)
+        fetch('http://10.0.3.240:4000/tokenBalances/' + address)
         .then(response => response.json())
         .then(data => {
             console.log('['+address+'] token balances: ', data);
@@ -194,7 +195,7 @@ const DatabaseInfoGrabber = () => {
     //explicit fetch calls for special tokens we are watching for staking / deposit contracts over.
     function fetchMegaPriceUsd(address) {
         console.log('fetching mega price for address: ', address)
-        fetch('http://10.0.3.2:4000/fetchTokenUsdPrice/' + address)
+        fetch('http://10.0.3.240:4000/fetchTokenUsdPrice/' + address)
         .then(response => response.json())
         .then(data => {
             console.log('['+address+'] mega price: ', data);
@@ -204,7 +205,7 @@ const DatabaseInfoGrabber = () => {
 
     function fetchWatchedTokenPriceUsd(address) {
         console.log('fetching watched token price for address: ', address)
-        fetch('http://10.0.3.2:4000/fetchTokenUsdPrice/' + address)
+        fetch('http://10.0.3.240:4000/fetchTokenUsdPrice/' + address)
         .then(response => response.json())
         .then(data => {
             console.log('['+address+'] usd price: ', data);
@@ -213,7 +214,7 @@ const DatabaseInfoGrabber = () => {
     }
 
     function fetchAllSystemStatuses() {
-        fetch('http://10.0.3.2:4000/system/systemStatus')
+        fetch('http://10.0.3.240:4000/system/systemStatus')
         .then(response => response.json())
         .then(data => {
             // console.log('system status: ', data);
@@ -239,7 +240,7 @@ const DatabaseInfoGrabber = () => {
     function fetchAddressTokenTxList(address, getFreshData) {
         // setclockCountsArrayForSelectedAddressTxList(); //clear it out
         console.log('fetching address token tx list for address: ', address)
-        fetch('http://10.0.3.2:4000/TokenTXsByAddress/'+address+'?getFreshData='+getFreshData)
+        fetch('http://10.0.3.240:4000/TokenTXsByAddress/'+address+'?getFreshData='+getFreshData)
         .then(response => response.json())
         .then(data => {
             console.log('address token tx list: ', data);
@@ -273,7 +274,7 @@ const DatabaseInfoGrabber = () => {
         })
     }
     function fetchWatchedTokenList() {
-        fetch('http://10.0.3.2:4000/watchedTokenList')
+        fetch('http://10.0.3.240:4000/watchedTokenList')
         .then(response => response.json())
         .then(data => {
             console.log('watched token list: ', data);
@@ -285,7 +286,7 @@ const DatabaseInfoGrabber = () => {
     }
     function fetchDetectedLiquidityPools(watchedToken) {
         console.log('fetching detected liquidity pools for token: ', watchedToken)
-        fetch('http://10.0.3.2:4000/detectedLiquidityPools/'+watchedToken)
+        fetch('http://10.0.3.240:4000/detectedLiquidityPools/'+watchedToken)
         .then(response => response.json())
         .then(data => {
             let temp = {uniswap_v3_pools:{}};
@@ -313,7 +314,7 @@ const DatabaseInfoGrabber = () => {
         console.log('updating address '+address+' with manually defined Friendly Name: ', friendlyName)
         
 
-        fetch('http://10.0.3.2:4000/updateFN/'+address+'/'+friendlyName) //hacky way to do this. should be a post request but I ran into CORS issues and this was the quickest way to get it working
+        fetch('http://10.0.3.240:4000/updateFN/'+address+'/'+friendlyName) //hacky way to do this. should be a post request but I ran into CORS issues and this was the quickest way to get it working
         .then(response => response.json())
         .then(data => {
             console.log('ok: ', data);
@@ -328,7 +329,7 @@ const DatabaseInfoGrabber = () => {
 
 
     function fetchAddressFilteredTransactions( viewingTokenAddress, clickedDetailsAddress ){
-        fetch('http://10.0.3.2:4000/txs/' + viewingTokenAddress+'/'+clickedDetailsAddress)
+        fetch('http://10.0.3.240:4000/txs/' + viewingTokenAddress+'/'+clickedDetailsAddress)
         .then(response => response.json())
         .then(data => {
             console.log('filtered txs: ', data);
@@ -337,7 +338,7 @@ const DatabaseInfoGrabber = () => {
     }
     
     function fetchFriendlyNameLookup( address ){
-        fetch('http://10.0.3.2:4000/friendlyName/' + address)
+        fetch('http://10.0.3.240:4000/friendlyName/' + address)
         .then(response => response.json())
         .then(data => {
             console.log('looked up friendly name for address: ', address, 'result: ', data)
@@ -352,7 +353,7 @@ const DatabaseInfoGrabber = () => {
 
 
     function fetchChainDataHeartbeat(){
-        fetch('http://10.0.3.2:4000/')
+        fetch('http://10.0.3.240:4000/')
         .then(response => response.json())
         .then(data => {
             setchainDataHeartbeat(data[0].heartbeat);
@@ -364,7 +365,7 @@ const DatabaseInfoGrabber = () => {
     }
 
     function fetchLatestBlockFromChain(){
-        const url = "http://10.0.3.2:4000/latestBlock/";
+        const url = "http://10.0.3.240:4000/latestBlock/";
         fetch(url)
         .then(response => response.json())
         .then(data => {setlatestEthBlock(data)} )
@@ -376,13 +377,19 @@ const DatabaseInfoGrabber = () => {
             return;
         }
         // console.log('viewingTokenAddress: ', viewingTokenAddress)
-        
-        let url = 'http://10.0.3.2:4000/txs/' + viewingTokenAddress + '?pageNumber=allData&filterMin='+MinAmountFilterValue+'&filterMax='+MaxAmountFilterValue;
+        // http://10.0.3.240:4000/txs/summary/0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e?pageNumber=allData
+        let url            = 'http://10.0.3.240:4000/txs/' + viewingTokenAddress + '?pageNumber=allData&filterMin='+MinAmountFilterValue+'&filterMax='+MaxAmountFilterValue;
+        let summaryDataUrl = 'http://10.0.3.240:4000/txs/summary/' + viewingTokenAddress + '?pageNumber=allData'
+        fetch(summaryDataUrl)
+        .then(response => response.json())
+        .then(data => setTxSummaryData(data))
+
+
         fetch(url)
         .then(response => response.json())
         .then(data => setData(data))
         
-        let url2 = 'http://10.0.3.2:4000/txs/' + viewingTokenAddress + '?pageNumber=chart&filterMin='+MinAmountFilterValue+'&filterMax='+MaxAmountFilterValue;
+        let url2 = 'http://10.0.3.240:4000/txs/' + viewingTokenAddress + '?pageNumber=chart&filterMin='+MinAmountFilterValue+'&filterMax='+MaxAmountFilterValue;
         fetch(url2)
         .then(response => response.json())
         .then(data => setDataChart(data))

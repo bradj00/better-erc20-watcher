@@ -2,7 +2,7 @@ import axios from 'axios';
 import chalk from 'chalk';
 import * as MongoClientQ from 'mongodb';
 import { resolve } from 'path';
-import { getSystemErrorMap } from 'util';
+// import { getSystemErrorMap } from 'util';
 import * as h from '../helpers/h.cjs';
 
 const MongoClient = MongoClientQ.MongoClient;
@@ -193,6 +193,8 @@ async function UpdateTxsFromEachCollection(addresses, silentSwitch){
                 if (silentSwitch == 'loud'){
                     // console.log('updating all collections matching address: ', chalk.magenta(addresses[i]),' with friendlyName: ', chalk.magenta(friendlyName[0]));
                     h.fancylog('updating all collections matching address: '+ chalk.magenta(addresses[i])+' with friendlyName: '+chalk.magenta(friendlyName[0]), ' mongo ')
+                                         
+
                 }
 
                 

@@ -101,6 +101,12 @@ const Topbanner = () => {
     return firstAddress;
   }
 
+  useEffect(()=>{
+    if (clickedDetailsAddressFN){
+        console.log('clickedDetailsAddressFN: ',clickedDetailsAddressFN);
+    }
+  },[clickedDetailsAddressFN])
+
     function updateSelectedToken (token){
 
         console.log('clicked: ',token, token); 
@@ -112,6 +118,14 @@ const Topbanner = () => {
         setclickedToken(token); 
         setfilteredtxDataInflow(); 
         setfilteredtxDataOutflow(); 
+    }
+
+
+    function doTheUpdate(nameItem){
+        setclickedDetailsAddress(nameItem.address); 
+        setheldTokensSelectedAddress(nameItem.address); 
+        setclickedDetailsAddressFN(displayAddressFN(nameItem)); 
+        setclickedSearchBar(false);
     }
     
     useEffect(() => {
@@ -196,19 +210,22 @@ const Topbanner = () => {
     </div>
 
     {
+
+
         (clickedDetailsAddressFN || clickedSearchBar)?
         clickedSearchBar?
         
             <div style={{zIndex:'10000', }} id="searchBox" >
                 <form onSubmit={(e)=>{console.log('searching watchedToken TXs for address: ', searchInput); e.preventDefault(); setclickedDetailsAddress(searchInput); setclickedSearchBar(false); !clickedDetailsAddressFN? setclickedDetailsAddressFN(searchInput): <></> }}>
-                <input style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'15vw', display:'flex',textAlign:'center', border:'1px solid rgba(255,255,255,0.4)', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
+                {/* <input onKeyDown={(e) => e.key === "Enter" && doTheUpdate({address: e.target.value})} style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'15vw', display:'flex',textAlign:'center', border:'1px solid rgba(255,255,255,0.4)', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  /> */}
+                <input onKeyDown={(e) => e.key === "Enter" && doTheUpdate({address: e.target.value})} style={{backgroundColor:'rgba(0,0,0,0.2)',height:'3vh', width:'15vw', display:'flex',textAlign:'center', border:'1px solid rgba(255,255,255,0.4)', color:'#fff'}} autoFocus placeholder='search for a holder address' type="text" value={searchInput? searchInput: ''} onChange={(e) => {setsearchInput(e.target.value); }}  />
                 </form>
             <div style={{border:'2px dashed rgba(255,255,255,0.4)', overflowY:'scroll', position:'absolute',top:'100%',width:'15vw', cursor:'pointer', backgroundColor:'rgba(10,10,10,1)', padding:'1vh', height:'12vh', }}>
             {friendlyLookupResponse && Array.isArray(friendlyLookupResponse)?
             friendlyLookupResponse.map((nameItem, index)=>{
                 return(
                     <div style={{display:'flex', width:'100%', border:'0px solid #0f0'}}>
-                    <div key={index} style={{color:'rgba(220,220,255,1)', width:'100%', float:'left'}} onClick={()=>{setclickedDetailsAddress(nameItem.address); setheldTokensSelectedAddress(nameItem.address); setclickedDetailsAddressFN(displayAddressFN(nameItem)); setclickedSearchBar(false) }} >
+                    <div key={index} style={{color:'rgba(220,220,255,1)', width:'100%', float:'left'}} onClick={()=>{doTheUpdate(nameItem); }} >
                         {displayAddressFN(nameItem)}
                     </div>
                     <div style={{float:'right',}}>

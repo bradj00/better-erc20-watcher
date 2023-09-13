@@ -17,6 +17,7 @@ export const GeneralContext   = React.createContext({});
 function App() {
 //create context for the app
 const [txData, settxData] = useState(null);
+const [TxSummaryData, setTxSummaryData] = useState(null);
 const [txVisualData, settxVisualData] = useState(null);
 const [txDataChart, settxDataChart] = useState(null);
 const [getnewTxData, setgetnewTxData] = useState(null);
@@ -134,7 +135,8 @@ const contextObj = {
   detectedLPs, setdetectedLPs,
   txDataChartOverTime, settxDataChartOverTime,
   LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider,
-  logScaleTickBox, setLogScaleTickBox
+  logScaleTickBox, setLogScaleTickBox,
+  TxSummaryData, setTxSummaryData
 }
 
 

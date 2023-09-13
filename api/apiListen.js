@@ -20,6 +20,10 @@ const listenPort = process.env.API_LISTEN_PORT;
 const moralisApiKey = process.env.API_KEY;
 
 
+import Web3 from 'web3';
+const web3 = new Web3();
+
+
 const IgnoredAddresses = ["0x333e3763085fc14854978f89261890339cb2f6a9", "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"]
 // const IgnoredAddresses = []
 
@@ -677,6 +681,45 @@ app.listen(listenPort, () => {
             });
         });
 
+        // SUMMARY STATS FOR A GIVEN RANGE.  Aggregate  SEND/RECEIVE by address
+        app.get('/txs/summary/:collectionName', cors(), async (req, res) => { 
+            // console.log('query: ', req.params.collectionName, req.query);
+            const pageNumber = req.query.pageNumber;
+            const filterMin = req.query.filterMin;
+            const filterMax = req.query.filterMax;
+            // console.log('3\t');
+            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
+                const db = client.db(dbName);
+                const collection = db.collection(("a_"+req.params.collectionName));
+                
+                
+                if (pageNumber == 'allData') { //bad. temporary to display all data while I mock up the summarized chart loading. This will be replaced by paginated data + infinite scrolling
+                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).toArray(function(err, result) {  
+                        client.close();
+                        fetchSummaryStats(result).then((summarized)=>{
+                            res.send({totalPages: 1, result: summarized})
+                        })
+                    });
+                }
+                else {
+                    const pageLimit = 10;
+                    collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).skip(pageNumber * pageLimit).limit(pageLimit).toArray(function(err, result) {  
+                        
+                        collection.count({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }, function(err, count) {
+                        const totalPages = Math.ceil(count/pageLimit);
+                        client.close();
+
+                        fetchSummaryStats(result).then((summarized)=>{
+                            res.send({totalPages: totalPages-1, result: summarized})
+                        })
+
+                        });
+                    });
+                }
+            });
+        });
+
+
 
         app.get('/txs/:collectionName/txDetails/:txDetails', cors(), async (req, res) => {
             const pageNumber = req.query.pageNumber;
@@ -869,7 +912,7 @@ app.listen(listenPort, () => {
                 // for (let i = 0; i < filteredList2.length; i++) {
                 //     const tokenAddress = filteredList2[i];
 
-                //     const url = 'http://10.0.3.2:4000/tokenInfo/'+tokenAddress;
+                //     const url = 'http://10.0.3.240:4000/tokenInfo/'+tokenAddress;
                 //     axios.get(url ,{
                 //     })
                 //     .then(({data}) => {
@@ -887,7 +930,7 @@ app.listen(listenPort, () => {
                 for (let i = 0; i < filteredList2.length; i++) {
                     const tokenAddress = filteredList2[i];
 
-                    const url = 'http://10.0.3.2:4000/tokenInfo/'+tokenAddress;
+                    const url = 'http://10.0.3.240:4000/tokenInfo/'+tokenAddress;
                     promises.push(axios.get(url ,{
                     })
                     )
@@ -1015,6 +1058,88 @@ async function getUsdPriceFromMoralis(tokenAddress){
         })
     });
 }
+
+
+
+
+
+
+
+
+async function fetchSummaryStats(transactions) {
+    if (!transactions){console.log('empty??? returning.'); return;}
+    const summary = {};
+
+    for (let tx of transactions) {
+        if (!summary[tx.from_address]) {
+            summary[tx.from_address] = { sent: '0', received: '0', sentTxCount: 0, receivedTxCount: 0 };
+        }
+        if (!summary[tx.to_address]) {
+            summary[tx.to_address] = { sent: '0', received: '0', sentTxCount: 0, receivedTxCount: 0 };
+        }
+
+        summary[tx.from_address].sent = (BigInt(summary[tx.from_address].sent) + BigInt(tx.value)).toString();
+        summary[tx.to_address].received = (BigInt(summary[tx.to_address].received) + BigInt(tx.value)).toString();
+
+        // Increment transaction count for sender and receiver
+        summary[tx.from_address].sentTxCount++;
+        summary[tx.to_address].receivedTxCount++;
+    }
+
+    // Convert values from Wei to Ether and parse them into integers
+    const convertedSummary = [];
+    for (let address in summary) {
+        convertedSummary.push({
+            address: address,
+            sent: parseInt(web3.utils.fromWei(summary[address].sent, 'ether')),
+            received: parseInt(web3.utils.fromWei(summary[address].received, 'ether')),
+            sentTxCount: summary[address].sentTxCount,
+            receivedTxCount: summary[address].receivedTxCount
+        });
+    }
+
+    // Sort the array by the received amount in descending order
+    convertedSummary.sort((a, b) => b.received - a.received);
+
+
+    // Sort by received value
+    const sortedAddresses = Object.keys(convertedSummary).sort((a, b) => convertedSummary[b].sentTxCount - convertedSummary[a].sentTxCount);
+
+    // Console log the summary stats in a neat table format
+    // console.log("Address".padEnd(42), "||", "SENT".padStart(20), "||", "RECEIVED".padStart(20), "||", "SENT TXs".padStart(10), "||", "RECEIVED TXs".padStart(12));
+    // console.log("-".repeat(120));
+    // for (let address of sortedAddresses) {
+    //     console.log(address, "||", 
+    //                 convertedSummary[address].sent.toString().padStart(20), "||", 
+    //                 convertedSummary[address].received.toString().padStart(20), "||", 
+    //                 convertedSummary[address].sentTxCount.toString().padStart(10), "||", 
+    //                 convertedSummary[address].receivedTxCount.toString().padStart(12));
+    // }
+    return convertedSummary;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 async function getAllTokenBalanceUsdPrices(tokenArray){
