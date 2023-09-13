@@ -30,7 +30,8 @@ using:
 ![image](https://user-images.githubusercontent.com/99688245/212493974-77cdc1bc-a1fe-44bd-83d6-2add1ebc87c5.png)
 
 <sub>Transaction Visualizer using react-force-graph to render transaction flows </sub>
-![force-graph-3d-gif](https://user-images.githubusercontent.com/99688245/212721116-7b504fd4-cfaf-4024-8e76-b3a1d6a9029f.gif)
+![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/86447241-407d-4e74-be3a-a628a556650d)
+
 
 
 
