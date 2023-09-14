@@ -99,11 +99,23 @@ function DashboardContent() {
 
     const handleNodeClick = useCallback(node => {
         const { nodes, links } = defaultData;
+    
+        // Remove links connected to the clicked node
         const newLinks = links.filter(l => l.source !== node && l.target !== node);
-        const newNodes = nodes.slice();
-        newNodes.splice(node.id, 1);
+    
+        // Create a set of all unique node IDs that are present in the newLinks array
+        const linkedNodeIds = new Set();
+        newLinks.forEach(link => {
+            linkedNodeIds.add(link.source.id);
+            linkedNodeIds.add(link.target.id);
+        });
+    
+        // Filter the nodes array to only include nodes whose IDs are in the linkedNodeIds set
+        const newNodes = nodes.filter(n => linkedNodeIds.has(n.id));
+    
         setDefaultData({ nodes: newNodes, links: newLinks });
-    }, [defaultData, setDefaultData, fgRef]);
+    }, [defaultData, setDefaultData]);
+    
 
     const displayAddressFN = (friendlyNameObj) => {
         if (friendlyNameObj === null || friendlyNameObj == undefined) { return 'null' }
@@ -404,12 +416,12 @@ function DashboardContent() {
                 enableNavigationControls={true}
                 showNavInfo={true}
                 onNodeClick={handleNodeClick}
-                linkDirectionalParticles={1}
+                linkDirectionalParticles={0}
                 linkDirectionalParticleSpeed={0.001}
                 linkDirectionalParticleColor={() => "#444"}
                 linkDirectionalParticleWidth={2}
 
-            />
+                />
             </div>
         </div>
     );

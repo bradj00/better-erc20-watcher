@@ -18,11 +18,10 @@ const dbName = process.env.DB_NAME;
 const dbNameFN = process.env.DB_NAME_FN;
 const listenPort = process.env.API_LISTEN_PORT; 
 const moralisApiKey = process.env.API_KEY;
-
+const INFURA_ENDPOINT = process.env.INFURA_ENDPOINT
 
 import Web3 from 'web3';
-const web3 = new Web3();
-
+const web3 = new Web3(new Web3.providers.HttpProvider(INFURA_ENDPOINT));
 
 const IgnoredAddresses = ["0x333e3763085fc14854978f89261890339cb2f6a9", "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"]
 // const IgnoredAddresses = []
@@ -124,23 +123,16 @@ app.listen(listenPort, () => {
 
         });
 
-        app.get('/latestBlock', cors(),(req, res) => {
+        app.get('/latestBlock', cors(), async (req, res) => {
             
-            const url = "https://deep-index.moralis.io/api/v2/dateToBlock?chain=eth&date="+(new Date().getTime() );
-            // console.log('>>>>>> url: ', url);
-            axios.get(url ,{
-                headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json;charset=UTF-8",
-                "X-API-Key" : moralisApiKey
-                },
-            })
-            .then(({data}) => {
+            // const url = "https://deep-index.moralis.io/api/v2/dateToBlock?chain=eth&date="+(new Date().getTime() );
+            const block = await web3.eth.getBlock('latest')
+            try {
+                console.log('LATEST BLOCK IS: ',data)
                 res.send(data);
-            })
-            .catch((err) => {
+            }catch (err){
                 console.log('error: ', err);
-            });
+            }
 
         });
         
@@ -428,7 +420,7 @@ app.listen(listenPort, () => {
 
         app.get('/fetchTokenUsdPrice/:address', cors(), async (req, res1) => {
             //get token price from Moralis
-            getUsdPriceFromMoralis(req.params.address).then((price) => {
+            getUsdPrice(req.params.address).then((price) => {
                 res1.send(price);
             });
         });
@@ -1030,32 +1022,23 @@ function condenseArray(tempArray, filterMin, filterMax) {
 
 
 
-async function getUsdPriceFromMoralis(tokenAddress){
+async function getUsdPrice(tokenAddress){
     return new Promise((resolve, reject) => {
-        let url = 'https://deep-index.moralis.io/api/v2/erc20/'+tokenAddress+'/price?chain=eth';
+        let url = 'https://api.coingecko.com/api/v3/coins/1/contract/'+tokenAddress+'';
             
-        console.log('getting usd price: ', url)
-        axios.get(url ,{
+        console.log('getting usd price from API ', chalk.yellow(url))
+        axios.get(url,{
             headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            "X-API-Key" : moralisApiKey
-            },
+                'Accept-Encoding': 'gzip'
+            }
         })
-        .then(({data}) => {
-            // console.log('---------------------------------')
-            // console.log(data)
-            // console.log('---------------------------------')
-
-            resolve(data);
+        .then(response => {
+            console.log('RESPONSARINO: ',Object.keys(response.data));
+            resolve(response.data);
         })
-        .catch((error) => {
-            console.error('['+chalk.cyan(tokenAddress)+'] '+chalk.red('error fetching from moralis: '),error.response.data.message)
-            
-            //we still need to put this into mongo so we dont re-check it every time.
-
-            resolve(0);
-        })
+        .catch(error => {
+            console.error('Error fetching data from API:', error.message);
+        });
     });
 }
 
@@ -1168,7 +1151,7 @@ async function getAllTokenBalanceUsdPrices(tokenArray){
 
             await new Promise((resolve) => setTimeout(resolve, 1000));
             console.log('['+count+' / '+uniqueAddresses.length+']\taddress: ', tokenAddress)
-            let usdPriceObj = await getUsdPriceFromMoralis(tokenAddress);
+            let usdPriceObj = await getUsdPrice(tokenAddress);
 
             // console.log(chalk.cyan('__usdPriceObj: ', usdPriceObj));
             // console.log(usdPriceObj);
