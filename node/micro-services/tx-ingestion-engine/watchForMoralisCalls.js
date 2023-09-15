@@ -1,3 +1,6 @@
+// deprecated - to be removed when finalizing tx-ingestion-engine rearchitecture/reorganization
+
+
 // this script is called by the watcher to check for moralis lookup requests from mongodb 
 // if there are lookup requests to process, call them sequentially following throttle rules 
 // and update the db with the results

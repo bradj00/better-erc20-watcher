@@ -455,13 +455,12 @@ const DatabaseInfoGrabber = () => {
         fetchMegaPriceUsd('0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e');
 
         setInterval(()=>{
-            fetchAllSystemStatuses();
+            // fetchAllSystemStatuses();
         }, 1000);
 
         setInterval(()=>{
-            fetchChainDataHeartbeat();
-            fetchLatestBlockFromChain();
-            // fetchAllSystemStatuses();
+            // fetchChainDataHeartbeat();
+            // fetchLatestBlockFromChain();
         }, 10000);
     },[])
 

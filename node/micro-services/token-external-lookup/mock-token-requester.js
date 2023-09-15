@@ -57,17 +57,17 @@ async function main() {
         await requestTokenData(address);
     }
 
-    console.log('All requests sent. Waiting for processing...');
+    console.log('All requests sent!');
 
     // Periodically check the status of each jobID
-    setInterval(async () => {
-        // console.log('Job IDs: ',jobIDs)
-        for (const jobID of jobIDs) {
-            const status = await checkJobStatus(jobID);
-            console.log(`JobID ${jobID} status: ${status}`);
-        }
-        console.log('-----------\n\n')
-    }, CHECK_INTERVAL);
+    // setInterval(async () => {
+    //     // console.log('Job IDs: ',jobIDs)
+    //     for (const jobID of jobIDs) {
+    //         const status = await checkJobStatus(jobID);
+    //         console.log(`JobID ${jobID} status: ${status}`);
+    //     }
+    //     console.log('-----------\n\n')
+    // }, CHECK_INTERVAL);
 }
 
 main();

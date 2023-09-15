@@ -1,36 +1,64 @@
-console.clear(); 
+console.clear();
 
 import express from 'express';
 
 const app = express();
 const PORT = 4020;
-const RATE_LIMIT = 3; // Define your acceptable rate limit per minute here
 
-// In-memory storage for service call counts
+const RATE_LIMIT = [
+    { serviceName: 'coingecko', maxRate: 3 },
+    { serviceName: 'infura', maxRate: 10 },
+];
+
+// In-memory storage for service call counts and queue
 const serviceCallCounts = {};
+
+// Helper function to get the rate limit for a specific service
+function getMaxRate(serviceName) {
+    const service = RATE_LIMIT.find(s => s.serviceName === serviceName);
+    return service ? service.maxRate : Infinity; // Default to no limit if service not found
+}
 
 // Middleware to reset counts every minute
 setInterval(() => {
     for (const service in serviceCallCounts) {
-        serviceCallCounts[service] = 0;
+        if (serviceCallCounts[service].count < getMaxRate(service)) {
+            serviceCallCounts[service].inQueue = 0; // Reset inQueue count if service is HEALTHY
+        }
+        serviceCallCounts[service].count = 0;
     }
-}, 10000); 
+}, 60000); //reset counts every 60 seconds to base the call rates per minute
 
 app.get('/request/:externalService', (req, res) => {
     const serviceName = req.params.externalService;
 
-    // Initialize count for the service if it doesn't exist
+    // Initialize count and queue for the service if they don't exist
     if (!serviceCallCounts[serviceName]) {
-        serviceCallCounts[serviceName] = 0;
+        serviceCallCounts[serviceName] = { count: 0, inQueue: 0 };
     }
 
     // Check the current rate
-    if (serviceCallCounts[serviceName] < RATE_LIMIT) {
-        serviceCallCounts[serviceName]++;
+    if (serviceCallCounts[serviceName].count < getMaxRate(serviceName)) {
+        serviceCallCounts[serviceName].count++;
         res.json({ status: 'GRANTED' });
     } else {
+        serviceCallCounts[serviceName].inQueue++;
         res.json({ status: 'RATE_EXCEEDED' });
     }
+});
+
+app.get('/status', (req, res) => {
+    const serviceStatuses = {};
+
+    for (const service in serviceCallCounts) {
+        serviceStatuses[service] = {
+            count: serviceCallCounts[service].count,
+            inQueue: serviceCallCounts[service].inQueue,
+            status: serviceCallCounts[service].count < getMaxRate(service) ? 'HEALTHY' : 'RATE_LIMITED'
+        };
+    }
+
+    res.json(serviceStatuses);
 });
 
 app.listen(PORT, () => {

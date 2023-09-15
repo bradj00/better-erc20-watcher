@@ -1,4 +1,4 @@
-
+// deprecated? Consider deleting or condensing when refactoring the tx-ingestion-engine micro service
 
 import chalk from 'chalk';
 import * as MongoClientQ from 'mongodb';

@@ -1,3 +1,11 @@
+// THIS ENTIRE API LISTENER IS NEEDLESS CENTRALIZATION!
+//
+// THIS SHOULD BE BROKEN OUT TO THE RESPECTIVE MICRO-SERVICE APIS 
+//
+// RE-FACTORING WOULD REMOVE THE NEED TO HAVE THIS API HANDLE WAITING FOR OTHER APIS TO FINISH AND
+//
+// OFFLOAD THAT LOGIC TO THE REACT FRONTEND WEB CLIENT
+
 
 import * as MongoClientQ from 'mongodb';
 import express from 'express';
@@ -5,8 +13,8 @@ import cors from 'cors';
 import chalk from 'chalk';
 import axios from 'axios';
 import dotenv from 'dotenv';
-import * as h from './helpers/h.cjs'; 
 dotenv.config();
+import * as h from './helpers/h.cjs'; 
 // console.log('API_KEY: ', process.env.API_KEY);
 import getAllPaginatedData  from './helpers/fetchMoralisWithCursor.js';
 import getLiquidityPoolPriceFromOnChain from '../node/v3-pool-info-grabber/v3-liq-poolPrice.js';
@@ -18,7 +26,7 @@ const dbName = process.env.DB_NAME;
 const dbNameFN = process.env.DB_NAME_FN;
 const listenPort = process.env.API_LISTEN_PORT; 
 const moralisApiKey = process.env.API_KEY;
-const INFURA_ENDPOINT = process.env.INFURA_ENDPOINT
+const INFURA_ENDPOINT = process.env.INFURA_ENDPOINT;
 
 import Web3 from 'web3';
 const web3 = new Web3(new Web3.providers.HttpProvider(INFURA_ENDPOINT));
@@ -1033,7 +1041,8 @@ async function getUsdPrice(tokenAddress){
             }
         })
         .then(response => {
-            console.log('RESPONSARINO: ',Object.keys(response.data));
+            // console.log('RESPONSARINO: ',Object.keys(response.data));
+            console.log('RESPONSARINO: ',response.data.public_interest_score);
             resolve(response.data);
         })
         .catch(error => {
