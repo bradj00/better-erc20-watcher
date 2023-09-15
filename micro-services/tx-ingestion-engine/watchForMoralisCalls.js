@@ -11,10 +11,10 @@
 import * as MongoClientQ from 'mongodb';
 import axios from 'axios';
 import chalk from 'chalk';
-import * as h from './helpers/h.cjs'; 
+import * as h from '../../helpers/h.cjs'; 
 import dotenv from 'dotenv';
 import web3 from 'web3';
-import getAllPaginatedData  from './helpers/fetchMoralisWithCursor.js';
+import getAllPaginatedData  from '../../helpers/fetchMoralisWithCursor.js';
 import {checkContractTokenIdForTokensHeld} from './v3-pool-info-grabber/v3-liq-token0and1.js';
 
 

@@ -15,7 +15,7 @@ using:
 
 -openAI to prototype scaffold faster
 
--Moralis API for blockchain data
+-Third Party External APIs for blockchain and market data
 
 -React webUI frontend for better visualization and management
 
@@ -45,5 +45,9 @@ using:
 
 <sub>( OneNote User Guide detailing mechanical operation and use )</sub>
 ![image](https://user-images.githubusercontent.com/99688245/201840676-3fedcf9d-adc2-4f10-8afb-2a1b1bba0dce.png)
+
+
+
+(Some Market Data provided by CoinGecko! Backlink to be added in webUI.)
 
 

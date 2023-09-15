@@ -8,13 +8,14 @@ import chalk from 'chalk';
 import axios from 'axios';
 import ora from 'ora';
 import dotenv from 'dotenv';
-import * as h from './helpers/h.cjs';
+import * as h from '../../helpers/h.cjs';
 import * as MongoClientQ from 'mongodb';
 
 dotenv.config();
 
 
 // import  lookupSingleAddress from './translator.js';
+
 
 const MongoClient = MongoClientQ.MongoClient; 
 const mongoUrl = 'mongodb://127.0.0.1:27017';
@@ -26,6 +27,8 @@ const sleepTimer = 86400000;    //delay for Moralis API limit for how often to u
 var latestBlock = 0;
 
 const moralisApiKey = process.env.API_KEY;
+const infuraApiKey = process.env.INFURA_API_KEY;
+
 TimeAgo.addDefaultLocale(en)
 var theDate = Date().substr(15,9)
 var spinner = ora(`[ `+theDate+` ] `+"[" + chalk.bold.rgb(0,255,255)('system ') + "]"+' [ block '+chalk.cyan(latestBlock)+' ] all token TXs are up to date for all watched tokens. sleeping..')
@@ -360,24 +363,24 @@ function getTokenTranscationsFromMoralis(cursor, limit, tokenAddress, pageCount,
     }
     
     //1 block past the last block we have in our db
-    const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&disable_total=false&limit="+limit+"&cursor="+cursor+"&from_block="+(fromBlock+1)+"&to_date="+(new Date().getTime() );
+    // const url = "https://deep-index.moralis.io/api/v2/erc20/"+tokenAddress+"/transfers?chain=eth&disable_total=false&limit="+limit+"&cursor="+cursor+"&from_block="+(fromBlock+1)+"&to_date="+(new Date().getTime() );
+    const url = "";
 
     axios.get(url ,{
         headers: {
         Accept: "application/json",
         "Content-Type": "application/json;charset=UTF-8",
-        "X-API-Key" : moralisApiKey
+        // "X-API-Key" : moralisApiKey
+        "X-API-Key" : infuraApiKey
         },
     })
+
+
     .then(({data}) => {
         if (data.result.length > 0){
-            updateMsg('ingesting TXs for collection ['+tokenAddress+'] fetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) );
             
-            // console.log('--------')
-            // console.log(data)
-            // console.log('--------')
+            updateMsg('ingesting TXs for collection ['+tokenAddress+'] fetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) );
             h.fancylog('[ '+chalk.cyan(data.total+' TXs')+' ]\tfetched page: '+ pageCount  +" / "+ Math.ceil((data.total / limit)) , 'moralis', tokenAddress, spinner) ;
-            // console.log('\t'+data.result.length+'\t'+data.result[0].transaction_hash);
         }
 
         const timeAgo = new TimeAgo('en-US')

@@ -11,7 +11,7 @@ import chalk from 'chalk';
 import * as MongoClientQ from 'mongodb';
 import { resolve } from 'path';
 import { getSystemErrorMap } from 'util';
-import * as h from './helpers/h.cjs';
+import * as h from '../../helpers/h.cjs';
 import dotenv from 'dotenv';
 dotenv.config();
 
