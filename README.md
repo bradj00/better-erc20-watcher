@@ -43,8 +43,9 @@ using:
 ![image](https://user-images.githubusercontent.com/99688245/202107232-82cb591c-a2cf-423a-b455-df82a6be85a0.png)
 
 
-<sub>( OneNote User Guide detailing mechanical operation and use )</sub>
-![image](https://user-images.githubusercontent.com/99688245/201840676-3fedcf9d-adc2-4f10-8afb-2a1b1bba0dce.png)
+<sub>Architecture design</sub>
+![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/8adffeac-8987-4b4f-b9c1-2ce01ed1234b)
+
 
 
 
