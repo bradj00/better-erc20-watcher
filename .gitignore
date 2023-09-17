@@ -103,3 +103,5 @@ dist
 # TernJS port file
 .tern-port
 node/indexers/testing-temp/v3-liq-token0and1.js
+micro-services/api-gateway/certs/cert.pem
+micro-services/api-gateway/certs/key.pem

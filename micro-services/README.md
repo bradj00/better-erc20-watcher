@@ -1,0 +1,1 @@
+Every Micro Service is designed in mind to be converted into a Docker Container

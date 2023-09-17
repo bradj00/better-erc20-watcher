@@ -8,10 +8,22 @@ import ConnectionStatusBanner from './dashboard/ConnectionStatusBanner.jsx';
 import Topbanner from './dashboard/Topbanner.jsx';
 import TxVisualizer from './dashboard/TxVisualizer.jsx';
 import TokenDetective from './dashboard/TokenDetective.jsx';
+import TestWSSComponent from './dashboard/TestWSSComponent.jsx';
+import WebsocketInfoGrabber from './dashboard/WebsocketInfoGrabber.jsx';
 
 
-
+//OLD
+/////
 export const GeneralContext   = React.createContext({});
+/////
+
+export const dataLookupRequestsContext           = React.createContext({});
+export const apiGatewayContext                   = React.createContext({});
+export const rateLimiterContext                  = React.createContext({});
+export const labelingEngineContext               = React.createContext({});
+export const tokenExternalLookupContext          = React.createContext({});
+export const txIngestionEngineContext            = React.createContext({});
+
 
 
 function App() {
@@ -72,12 +84,66 @@ const [RequestFriendlyLookup, setRequestFriendlyLookup] = useState();
 const [friendlyLookupResponse, setFriendlyLookupResponse] = useState();
 const [updateFriendlyName, setupdateFriendlyName] = useState();
 const [pageNumber, setpageNumber] = useState(1);
-const [displayPanel, setdisplayPanel] = useState('watchingTokens');
+// const [displayPanel, setdisplayPanel] = useState('watchingTokens');
+const [displayPanel, setdisplayPanel] = useState('test');
 
 const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
 const [defaultData, setDefaultData] = useState({ nodes: [], links: [] });
 const [ShownLiqPoolPriceData, setShownLiqPoolPriceData] = useState({});
 const [logScaleTickBox, setLogScaleTickBox] = React.useState(false);
+
+/////////////////////////////////
+// MICRO SERVICE RE-FACTOR
+/////////////////////////////////
+const [dataCalls, setDataCalls] = useState({
+  pending: [],
+  failed: {}
+});
+
+
+
+
+
+
+// separate global context variables to better manage data sharing through components
+/////////////////////////////////////////////////////////////////////////////////////
+
+//  component requests for DatabaseInfoGrabber to initiate a fetch
+const dataLookupRequests = {
+  // getter, setGetter,
+  // ...
+}
+
+//  any data returned will be populated in one of these below
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+const apiGateway = {
+  // getter, setGetter,
+  // ...
+  watchedTokenList, setWatchedTokenList,
+}
+const rateLimiter = {
+  // looks like: serviceStatusObj: {'infura': 'healthy', 'etherscan': 'limited', etc.}
+  // serviceStatusObj, setserviceStatusObj,
+}
+const labelingEngine = {
+  // getter, setGetter,
+  // ...  
+}
+const tokenExternalLookup = {
+  // getter, setGetter,
+  // ...  
+}
+const txIngestionEngine = {
+  // getter, setGetter,
+  // ...
+}
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
+
+
+
 
 const contextObj = {
   txData, settxData,
@@ -136,7 +202,13 @@ const contextObj = {
   txDataChartOverTime, settxDataChartOverTime,
   LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider,
   logScaleTickBox, setLogScaleTickBox,
-  TxSummaryData, setTxSummaryData
+  TxSummaryData, setTxSummaryData,
+
+
+///////////////////////////////////////////////
+/////////MICRO SERVICE RE-FACTOR///////////////
+
+  dataCalls, setDataCalls
 }
 
 
@@ -146,20 +218,40 @@ useEffect(() => {
 
 return (
   <>
-    <GeneralContext.Provider value={contextObj} >
-      <div style={{display:'hidden', overflow:'hidden',display:'flex', alignItems:'center',  border:'0px solid #0f0'}}>
+    <GeneralContext.Provider             value={contextObj} > 
+    <dataLookupRequestsContext.Provider  value={dataLookupRequests} >
+    <apiGatewayContext.Provider          value={apiGateway} >
+    <rateLimiterContext.Provider         value={rateLimiter} >
+    <labelingEngineContext.Provider      value={labelingEngine} >
+    <tokenExternalLookupContext.Provider value={tokenExternalLookup} >
+    <txIngestionEngineContext.Provider   value={txIngestionEngine} >
+
+      <div style={{overflow:'hidden',display:'flex', alignItems:'center',  border:'0px solid #0f0'}}>
           {/* <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/> */}
           <Topbanner />
-          {displayPanel == 'watchingTokens'? <TokenOverviewDashboard />: <></>}
-          {displayPanel == 'addressSummary'? <AddressSummaryDashboard />: <></>}
-          {displayPanel == 'tokenSummary'? <TokenHoldersDashboard />: <></>}
-          {displayPanel == 'txVisualizer'? <TxVisualizer />: <></>}
-          {displayPanel == 'tokenDetective'? <TokenDetective />: <></>}
+          {displayPanel === 'watchingTokens'? <TokenOverviewDashboard />: <></>}
+          {displayPanel === 'addressSummary'? <AddressSummaryDashboard />: <></>}
+          {displayPanel === 'tokenSummary'? <TokenHoldersDashboard />: <></>}
+          {displayPanel === 'txVisualizer'? <TxVisualizer />: <></>}
+          {displayPanel === 'tokenDetective'? <TokenDetective />: <></>}
+          {displayPanel === 'test'? 
+          
+            <>
+              <WebsocketInfoGrabber />
+            </>
+            : <></>}
           
           
           
       </div>
-    <DatabaseInfoGrabber />
+    {/* <DatabaseInfoGrabber /> */}
+
+    </txIngestionEngineContext.Provider>
+    </tokenExternalLookupContext.Provider>
+    </labelingEngineContext.Provider>
+    </rateLimiterContext.Provider>
+    </apiGatewayContext.Provider>
+    </dataLookupRequestsContext.Provider>
     </GeneralContext.Provider>
   </>
 );
