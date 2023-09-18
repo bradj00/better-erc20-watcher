@@ -20,6 +20,9 @@ using:
 -React webUI frontend for better visualization and management
 
 
+<sub>Architecture design</sub>
+![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/00df9568-e148-48a0-8bb1-1d6f993c498f)
+
 <sub>( Feature rich front-end UI with live data updates )</sub>
 ![image](https://user-images.githubusercontent.com/99688245/215305627-7dff968a-9350-4022-abd8-1ce0293d93a8.png)
 
@@ -41,10 +44,6 @@ using:
 
 <sub>( translator.js service querying OpenSea api for human readable name and caching to mongo )</sub>
 ![image](https://user-images.githubusercontent.com/99688245/202107232-82cb591c-a2cf-423a-b455-df82a6be85a0.png)
-
-
-<sub>Architecture design</sub>
-![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/00df9568-e148-48a0-8bb1-1d6f993c498f)
 
 
 
