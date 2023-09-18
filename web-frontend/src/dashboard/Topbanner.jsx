@@ -151,7 +151,7 @@ const Topbanner = () => {
     <div style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
                 
                 
-    <div onClick={()=>{setshowTokenSelector(!showTokenSelector) }} className="hoverWatchedTokenSelector" style={{zIndex:'10000', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'1vh', display:'flex', justifyContent:'center', textAlign:'center', position:'absolute', left:'19%', width:'15%',height:'80%'}} >
+    <div onClick={()=>{setshowTokenSelector(!showTokenSelector) }} className="hoverWatchedTokenSelector" style={{zIndex:'10000', border:'1px solid rgba(255,255,255,0.8)', borderRadius:'1vh', display:'flex', justifyContent:'center', textAlign:'center', position:'absolute', left:'19%', width:'15%',height:'80%'}} >
         {
         viewingTokenAddress? 
             <div style={{zIndex:'10000', cursor:'pointer', }} >
@@ -179,11 +179,11 @@ const Topbanner = () => {
     { showTokenSelector  ?
         <div style={{zIndex:'9999', width:'15%', height:'20vh', top:'5.5vh', border:'1px solid rgba(255,255,255,0.2)', borderTop:'0px solid #000', backgroundColor:'rgba(0,0,5,0.99)', left:'19vw', paddingTop:'1vh', position:'absolute'}}>
         {watchedTokenList && Array.isArray(watchedTokenList)? watchedTokenList.map((token, index) => (
-            token? token.tokenAddress?
+            token? token.data.address?
                 <div style={{cursor:'pointer', zIndex:'10000', position:'relative', }} onClick={()=>{ updateSelectedToken(token); setshowTokenSelector(false) }}>
-                    <div  style={{padding:'0.6vw',backgroundColor:viewingTokenAddress?token.tokenAddress.address?  viewingTokenAddress == token.tokenAddress.address? 'rgba(215,215,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} >
-                        <img src={token.tokenAddress.logo? token.tokenAddress.logo : tokenImage } style={{marginLeft:token.tokenAddress.logo?'0':'-0.5vh', height:token.tokenAddress.logo?'3vh':'4vh'}} />{token.tokenAddress.logo?<>&nbsp;&nbsp;</>: <>&nbsp;</>}
-                        {token.tokenAddress.symbol}
+                    <div  style={{padding:'0.6vw',backgroundColor:viewingTokenAddress?token.data.address?  viewingTokenAddress == token.data.address? 'rgba(215,215,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} >
+                        <img src={token.data.logo? token.data.logo : tokenImage } style={{marginLeft:token.tokenAddress.logo?'0':'-0.5vh', height:token.data.logo?'3vh':'4vh'}} />{token.data.logo?<>&nbsp;&nbsp;</>: <>&nbsp;</>}
+                        {token.data.symbol}
                     </div>
                     {/* <div style={{border:'0px solid #0f0', textAlign:'left', fontSize:'1.3vh', left:'3vw', bottom:'-2%', position:'absolute',color:'#999',fontStyle:'italic', width:'100%',}}>
                         re-indexing database in progress
@@ -256,7 +256,7 @@ const Topbanner = () => {
     } 
 
     </div>
-    <div style={{border:'0px solid #0ff', position:'absolute',top:'5%',}}>
+    <div style={{border:'0px solid #0ff', position:'fixed',top:'1vh',left:'1vw', height:'5vh', width:'10vw', zIndex:'10002'}}>
         <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
     </div>
 

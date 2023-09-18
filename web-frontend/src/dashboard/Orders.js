@@ -30,7 +30,7 @@ import engStrings from 'react-timeago/lib/language-strings/en'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 
 const formatter = buildFormatter(engStrings)
-TimeAgo.addDefaultLocale(en)
+// TimeAgo.addDefaultLocale(en)
 
 
 function preventDefault(event) {

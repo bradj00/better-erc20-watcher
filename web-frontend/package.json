@@ -21,6 +21,7 @@
     "react-chartjs-2": "^5.0.1",
     "react-datetime": "^3.2.0",
     "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.5",
     "react-force-graph": "^1.41.18",
     "react-infinite-scroll-component": "^6.1.0",
     "react-scripts": "5.0.1",

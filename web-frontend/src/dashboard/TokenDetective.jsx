@@ -42,7 +42,7 @@ import {ForceGraph3D,} from "react-force-graph";
 import  "../App.css";
 import SettingsOverscanIcon from '@mui/icons-material/SettingsOverscan';
 
-TimeAgo.addDefaultLocale(en);
+// TimeAgo.addDefaultLocale(en);
 
 const mdTheme = createTheme({
   palette: {

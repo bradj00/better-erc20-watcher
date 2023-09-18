@@ -41,9 +41,10 @@ import ChartAddysOverTime from './ChartAddysOverTime';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import LiquidityChart from './subcomponents/LiquidityChart';
+import ExamplePopUpWindow from './ExamplePopUpWindow';
 
 
-TimeAgo.addDefaultLocale(en);
+// TimeAgo.addDefaultLocale(en);
 
 
 
@@ -502,6 +503,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
             <div style={{position:'absolute', top:'8vh', left:' 5%', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
               Detected DEXs
             </div>
+            {/* <ExamplePopUpWindow /> */}
             
             <div style={{overflowY:'hidden', overflowX:'hidden', border:'1px solid rgba(150,220,255,0.5)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'47vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'11vh', }}>
               <div style={{display:'flex',position:'absolute', top:'0.5%', right:'0'}}>

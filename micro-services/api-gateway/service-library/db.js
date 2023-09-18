@@ -1,6 +1,6 @@
 // db.js
 
-require('dotenv').config();
+require('dotenv').config('../.env');
 
 const MongoClient = require('mongodb').MongoClient;
 const uri = process.env.MONGO_CONNECT_STRING;
@@ -9,9 +9,14 @@ let _client;
 
 module.exports = {
     connectToServer: function(callback) {
-        MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
+        console.log('TRYING TO CONNECT TO MONGO. uri: ',uri)
+        MongoClient.connect(uri, (err, client) => {
+            if (err) {
+                console.error("Error connecting to MongoDB:", err);
+                return callback(err);
+            }
             _client = client;  // Store the client instance
-            return callback(err);
+            console.log("Connected to MongoDB successfully!");
         });
     },
 

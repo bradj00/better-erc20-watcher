@@ -1,0 +1,85 @@
+.example-popup-window, .minimized {
+  transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.example-popup-window {
+    position: absolute;
+    top: 10vh; /* Initial position */
+    left: 10vw; /* Initial position */
+    width: 20vw;
+    height: 30vh;
+    z-index: 10;
+    background-color: #333;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.drag-bar {
+  cursor: move;
+  background-color: rgba(0,0,30,1);
+  padding: 10px;
+  font-weight: bold;
+}
+
+.minimize-btn {
+  float: right;
+  background-color: #f0f0f0;
+  border: none;
+  padding: 0.25vw 0.4vw;
+  margin-left: 0.25vw;
+  cursor: pointer;
+}
+
+.minimized {
+  position: absolute;
+  bottom: 2vh;
+  left: 0;
+  width: auto;
+  height: 5vh;
+  z-index: 6;
+  display: flex;
+}
+
+.selectedIcon:hover {
+  color: #fff;
+}
+
+.selectedIcon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1002; /* Ensure it's above the dropdown items */
+}
+
+.dropdownItems {
+  position: absolute;
+  top: 100%; /* Start just below the selected icon */
+  left: 0;
+  transform-origin: top;
+  transition: transform 0.3s, opacity 0.3s;
+  opacity: 0;
+  transform: scaleY(0);
+  max-height: 0;
+  overflow: hidden;
+  z-index: 1001; /* Ensure it's below the selected icon */
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 0.25vw;
+  width: 12vw;
+}
+
+.dropdownItems.expanded {
+  opacity: 1;
+  transform: scaleY(1);
+  max-height: 22vh;
+}
+
+.leftBarGridTopItem {
+  position:relative;
+  float: left;
+  display: flex;
+  align-items: center;
+  width:100%;
+}
+.leftBarGridTopItem:hover {
+  background-color: rgba(255,255,255,0.3);
+}

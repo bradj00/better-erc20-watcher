@@ -30,10 +30,10 @@ const WebSocketComponent = () => {
             // Handle received data here
             const data = JSON.parse(event.data);
 
-            if (data.service === 'SomeService' && data.method === 'SomeMethod') {
-                setResponseData(data.data);
-                setDataCalls(data);
-            }
+            // if (data.service === 'SomeService' && data.method === 'SomeMethod') {
+            //     setResponseData(data.data);
+            //     setDataCalls(data);
+            // }
         };
 
         socket.onclose = (event) => {

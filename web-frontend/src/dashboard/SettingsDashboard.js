@@ -35,7 +35,7 @@ import ConnectionStatusBanner from './ConnectionStatusBanner';
 import SettingsDisplayGrid from './subcomponents/SettingsDisplayGrid';
 
 
-TimeAgo.addDefaultLocale(en);
+// TimeAgo.addDefaultLocale(en);
 
 
 

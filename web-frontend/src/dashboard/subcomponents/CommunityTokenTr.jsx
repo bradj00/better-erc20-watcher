@@ -8,7 +8,7 @@ import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
 
 
 
-TimeAgo.addDefaultLocale(en);
+// TimeAgo.addDefaultLocale(en);
 
 const CommunityTokenTr = (props) => {
     const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token

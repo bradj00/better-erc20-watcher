@@ -1,16 +1,15 @@
 //re-factor this as the official api-gateway micro service
-
-import * as MongoClientQ from 'mongodb';
-import express from 'express';
-import cors from 'cors';
-import chalk from 'chalk';
-import axios from 'axios';
-import dotenv from 'dotenv';
+const MongoClientQ = require('mongodb');
+const express = require('express');
+const cors = require('cors');
+const chalk = require('chalk');
+const axios = require('axios');
+const dotenv = require('dotenv');
 dotenv.config();
-import * as h from '../helpers/h.cjs'; 
+// const h = require('../../helpers/// h.cjs');
 // console.log('API_KEY: ', process.env.API_KEY);
-import getAllPaginatedData  from '../helpers/fetchMoralisWithCursor.js';
-import getLiquidityPoolPriceFromOnChain from '../node/v3-pool-info-grabber/v3-liq-poolPrice.js';
+// const getAllPaginatedData = require('../helpers/fetchMoralisWithCursor.js');
+// const getLiquidityPoolPriceFromOnChain = require('../node/v3-pool-info-grabber/v3-liq-poolPrice.js');
 
 const MongoClient = MongoClientQ.MongoClient;
 // const mongoUrl = 'mongodb://localhost:27017';
@@ -20,9 +19,9 @@ const dbNameFN = process.env.DB_NAME_FN;
 const listenPort = process.env.API_LISTEN_PORT; 
 const moralisApiKey = process.env.API_KEY;
 const INFURA_ENDPOINT = process.env.INFURA_ENDPOINT;
+// const Web3 = require('web3');
 
-import Web3 from 'web3';
-const web3 = new Web3(new Web3.providers.HttpProvider(INFURA_ENDPOINT));
+// const web3 = new Web3(new Web3.providers.HttpProvider(INFURA_ENDPOINT));
 
 const IgnoredAddresses = ["0x333e3763085fc14854978f89261890339cb2f6a9", "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e"]
 // const IgnoredAddresses = []
@@ -53,7 +52,7 @@ app.listen(listenPort, () => {
 
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
-                    h.fancylog(err, 'error');
+                    // // h.fancylog(err, 'error');
                 }
                 const db = client.db('pivotTables');
                 const collection = db.collection('tokenUsdValues');
@@ -72,7 +71,7 @@ app.listen(listenPort, () => {
 
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
-                    h.fancylog(err, 'error');
+                    // h.fancylog(err, 'error');
                 }
                 const db = client.db('TokenTXsByAddress');
                 
@@ -112,7 +111,7 @@ app.listen(listenPort, () => {
 
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
-                    h.fancylog(err, 'error');
+                    // h.fancylog(err, 'error');
                 }
                 const db = client.db('pivotTables');
                 const collection = db.collection('tokenUsdValues');
@@ -126,14 +125,14 @@ app.listen(listenPort, () => {
 
         app.get('/latestBlock', cors(), async (req, res) => {
             
-            // const url = "https://deep-index.moralis.io/api/v2/dateToBlock?chain=eth&date="+(new Date().getTime() );
-            const block = await web3.eth.getBlock('latest')
-            try {
-                console.log('LATEST BLOCK IS: ',data)
-                res.send(data);
-            }catch (err){
-                console.log('error: ', err);
-            }
+            // // const url = "https://deep-index.moralis.io/api/v2/dateToBlock?chain=eth&date="+(new Date().getTime() );
+            // const block = await web3.eth.getBlock('latest')
+            // try {
+            //     console.log('LATEST BLOCK IS: ',data)
+            //     res.send(data);
+            // }catch (err){
+            //     console.log('error: ', err);
+            // }
 
         });
         
@@ -152,7 +151,7 @@ app.listen(listenPort, () => {
             .then(({data}) => {
                 MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                     if (err) {
-                        h.fancylog(err, 'error');
+                        // h.fancylog(err, 'error');
                     }
                     console.log('data: ', data);
                     const db = client.db('pivotTables');
@@ -202,7 +201,7 @@ app.listen(listenPort, () => {
             console.log('>>>>>> lookupAddy: ', lookupAddy);
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
-                    h.fancylog(err, 'error');
+                    // h.fancylog(err, 'error');
                 }
                 const db = client.db('pivotTables');
                 const collection = db.collection('allAddresses');
@@ -286,7 +285,7 @@ app.listen(listenPort, () => {
             console.log('>>>>>> token: ', token);
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
-                    h.fancylog(err, 'error');
+                    // h.fancylog(err, 'error');
                 }
                 const db = client.db('pivotTables');
                 const collection = db.collection('allAddresses');
@@ -322,13 +321,13 @@ app.listen(listenPort, () => {
             // console.log('5\t'); 
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 if (err) {
-                    h.fancylog(err, 'error');
+                    // h.fancylog(err, 'error');
                      
                 }
                 const db = client.db('heartbeats');
                 db.collection("chainData").find({"heartbeat": {$exists: true}}).sort({block_timestamp: -1}).limit(1).toArray(function(err, result) {
                     if (err) { 
-                        h.fancylog(err, 'error');
+                        // h.fancylog(err, 'error');
                     }
 
                     res.send(result);
@@ -344,7 +343,7 @@ app.listen(listenPort, () => {
         app.get('/system/systemStatus', cors(), async (req, res) => {
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
                 if (err) {
-                    h.fancylog(err, 'error');
+                    // h.fancylog(err, 'error');
                 }
                 const db = client.db('systemStats');
                 const collection = db.collection('messages');
@@ -395,18 +394,18 @@ app.listen(listenPort, () => {
                             //create new collection with name 'a_'+tokenAddress.
                             db.createCollection("a_"+tokenAddress, function(err, res) {
                                 if (err) {
-                                    h.fancylog(err, 'error');
+                                    // h.fancylog(err, 'error');
                                 }
                                 console.log("Collection created: a_"+tokenAddress);
-                                h.fancylog('new token added to watchedTokens database: '+tokenAddress, 'system');
+                                // h.fancylog('new token added to watchedTokens database: '+tokenAddress, 'system');
 
                                 //create an index on the collection for { transaction_hash: 1, address: 1, block_timestamp: 1, block_number: 1, block_hash: 1, from_address: 1, to_address: 1, value: 1 }, { unique: true }
                                 db.collection("a_"+tokenAddress).createIndex({ transaction_hash: 1, address: 1, block_timestamp: 1, block_number: 1, block_hash: 1, from_address: 1, to_address: 1, value: 1 }, { unique: true }, function(err, res) {
                                     if (err) {
-                                        h.fancylog(err, 'error');
+                                        // h.fancylog(err, 'error');
                                     }
                                     console.log("Index created on a_"+tokenAddress);
-                                    h.fancylog('new token added to watchedTokens database: '+tokenAddress, 'system');
+                                    // h.fancylog('new token added to watchedTokens database: '+tokenAddress, 'system');
                                 });
                             });
                         }
@@ -501,15 +500,15 @@ app.listen(listenPort, () => {
             });
         });
         
-        app.get('/getLiquidityPoolPrice', cors(), async (req, res) => {
-            const token0 = req.query.token0;
-            const token1 = req.query.token1;
-            const feeAmount = req.query.feeAmount;
+        // app.get('/getLiquidityPoolPrice', cors(), async (req, res) => {
+        //     const token0 = req.query.token0;
+        //     const token1 = req.query.token1;
+        //     const feeAmount = req.query.feeAmount;
 
             
-            const poolPrice = await getLiquidityPoolPriceFromOnChain(token0, token1, feeAmount)
-            res.send(poolPrice);
-        });
+        //     const poolPrice = await getLiquidityPoolPriceFromOnChain(token0, token1, feeAmount)
+        //     res.send(poolPrice);
+        // });
 
         app.get('/updateLiquidityPoolsHeldAmounts/:watchedToken', cors(), async (req, res) => {
             const watchedToken = req.params.watchedToken;
@@ -520,7 +519,7 @@ app.listen(listenPort, () => {
 
             MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, function(err, client) {
                 if (err){
-                    h.fancylog('error connecting to mongo: ', err);
+                    // h.fancylog('error connecting to mongo: ', err);
                 }
 
                 for (let i = 0; i < delimitedTokenIds.length; i++){
@@ -665,7 +664,7 @@ app.listen(listenPort, () => {
                     collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).skip(pageNumber * pageLimit).limit(pageLimit).toArray(function(err, result) {  
                         
                         collection.count({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }, function(err, count) {
-                        const totalPages = Math.ceil(count/pageLimit);
+                        const totalPages = Mat// h.ceil(count/pageLimit);
                         client.close();
                         res.send({totalPages: totalPages-1, result: result});
                         });
@@ -699,7 +698,7 @@ app.listen(listenPort, () => {
                     collection.find({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }).sort({block_timestamp: -1}).skip(pageNumber * pageLimit).limit(pageLimit).toArray(function(err, result) {  
                         
                         collection.count({ $and: [ { from_address: { $nin: IgnoredAddresses } }, { to_address: { $nin: IgnoredAddresses } } ] }, function(err, count) {
-                        const totalPages = Math.ceil(count/pageLimit);
+                        const totalPages = Mat// h.ceil(count/pageLimit);
                         client.close();
 
                         fetchSummaryStats(result).then((summarized)=>{
@@ -865,14 +864,14 @@ app.listen(listenPort, () => {
                 const address = req.params.address;
                 const friendlyName = req.params.friendlyName;
                     if (err) {
-                        h.fancylog(err, 'error');
+                        // h.fancylog(err, 'error');
                         
                     }
                     const db2 = client.db('friendlyNames');
                     //update or insert the friendlyName into the collection where address matches the address in the request
                     db2.collection("lookup").updateOne({address: address}, {$set: {manuallyDefined: friendlyName}}, {upsert: true}, function(err, result) {
                         if (err) { 
-                            h.fancylog(err, 'error');
+                            // h.fancylog(err, 'error');
                         }
                         console.log('updated friendlyName result: ', result);
                         client.close();
@@ -886,9 +885,14 @@ app.listen(listenPort, () => {
 
 
 
-        app.get('/watchedTokenList', cors(), async (req, res) => {
-            // console.log('6\t');
-            MongoClient.connect(mongoUrl, { useUnifiedTopology: true }, async function(err, client) {
+        app.get('/watchedTokenList', cors(), (req, res) => {
+            console.log('mongoUrl:\t',mongoUrl);
+            MongoClient.connect(mongoUrl, async function(err, client) {
+                if (err){
+                    console.error('MONGO ERROR: ',err)
+                } else {
+                    console.log('connected to mongo!')
+                }
                 const db = client.db(dbName);
                 const collectionlist = await db.listCollections().toArray();
                 //remove isSyncing from list
@@ -902,20 +906,20 @@ app.listen(listenPort, () => {
 
 
                 // let temp = [{}];
-                // for (let i = 0; i < filteredList2.length; i++) {
-                //     const tokenAddress = filteredList2[i];
-
-                //     const url = 'http://10.0.3.240:4000/tokenInfo/'+tokenAddress;
-                //     axios.get(url ,{
-                //     })
-                //     .then(({data}) => {
-                //         temp.push({tokenAddress :  data[0] });
-                //         // console.log('temp: ', temp);
-                //         if (i === filteredList2.length - 1) {
-                //             res.send(temp);
-                //         }
-                //     }) 
-                // }
+                for (let i = 0; i < filteredList2.length; i++) {
+                    const tokenAddress = filteredList2[i];
+                    console.log('getting token: ',tokenAddress)
+                    const url = 'http://10.0.3.240:4000/tokenInfo/'+tokenAddress;
+                    axios.get(url ,{
+                    })
+                    .then(({data}) => {
+                        temp.push({tokenAddress :  data[0] });
+                        // console.log('temp: ', temp);
+                        if (i === filteredList2.length - 1) {
+                            res.send(temp);
+                        }
+                    }) 
+                }
                 
                 // rewrite the above function to wait for all the axios calls to finish before sending the response
                 let temp = [{}];
@@ -932,6 +936,7 @@ app.listen(listenPort, () => {
                 Promise.all(promises).then(function(values) {
                     for(let i = 0; i < values.length; i++) {
                         temp.push({tokenAddress :  values[i].data[0] });
+                        console.log('PUSHING: ',values[i].data[0])
                     }
                     client.close();
                     res.send(temp);
@@ -957,7 +962,7 @@ function determineT0andT1HeldExists(tokenId, managerAddress){
             collection.find({tokenId: tokenId}).toArray(function(err, result) {
                 // console.log(chalk.cyan('FOUND: '), result)
                 if (err) {
-                    h.fancylog(err, 'error');
+                    // h.fancylog(err, 'error');
                     console.log('big fat error: ', err);
                     reject(err);
                 }
@@ -1052,55 +1057,55 @@ async function getUsdPrice(tokenAddress){
 
 
 async function fetchSummaryStats(transactions) {
-    if (!transactions){console.log('empty??? returning.'); return;}
-    const summary = {};
+    // if (!transactions){console.log('empty??? returning.'); return;}
+    // const summary = {};
 
-    for (let tx of transactions) {
-        if (!summary[tx.from_address]) {
-            summary[tx.from_address] = { sent: '0', received: '0', sentTxCount: 0, receivedTxCount: 0 };
-        }
-        if (!summary[tx.to_address]) {
-            summary[tx.to_address] = { sent: '0', received: '0', sentTxCount: 0, receivedTxCount: 0 };
-        }
+    // for (let tx of transactions) {
+    //     if (!summary[tx.from_address]) {
+    //         summary[tx.from_address] = { sent: '0', received: '0', sentTxCount: 0, receivedTxCount: 0 };
+    //     }
+    //     if (!summary[tx.to_address]) {
+    //         summary[tx.to_address] = { sent: '0', received: '0', sentTxCount: 0, receivedTxCount: 0 };
+    //     }
 
-        summary[tx.from_address].sent = (BigInt(summary[tx.from_address].sent) + BigInt(tx.value)).toString();
-        summary[tx.to_address].received = (BigInt(summary[tx.to_address].received) + BigInt(tx.value)).toString();
+    //     summary[tx.from_address].sent = (BigInt(summary[tx.from_address].sent) + BigInt(tx.value)).toString();
+    //     summary[tx.to_address].received = (BigInt(summary[tx.to_address].received) + BigInt(tx.value)).toString();
 
-        // Increment transaction count for sender and receiver
-        summary[tx.from_address].sentTxCount++;
-        summary[tx.to_address].receivedTxCount++;
-    }
-
-    // Convert values from Wei to Ether and parse them into integers
-    const convertedSummary = [];
-    for (let address in summary) {
-        convertedSummary.push({
-            address: address,
-            sent: parseInt(web3.utils.fromWei(summary[address].sent, 'ether')),
-            received: parseInt(web3.utils.fromWei(summary[address].received, 'ether')),
-            sentTxCount: summary[address].sentTxCount,
-            receivedTxCount: summary[address].receivedTxCount
-        });
-    }
-
-    // Sort the array by the received amount in descending order
-    convertedSummary.sort((a, b) => b.received - a.received);
-
-
-    // Sort by received value
-    const sortedAddresses = Object.keys(convertedSummary).sort((a, b) => convertedSummary[b].sentTxCount - convertedSummary[a].sentTxCount);
-
-    // Console log the summary stats in a neat table format
-    // console.log("Address".padEnd(42), "||", "SENT".padStart(20), "||", "RECEIVED".padStart(20), "||", "SENT TXs".padStart(10), "||", "RECEIVED TXs".padStart(12));
-    // console.log("-".repeat(120));
-    // for (let address of sortedAddresses) {
-    //     console.log(address, "||", 
-    //                 convertedSummary[address].sent.toString().padStart(20), "||", 
-    //                 convertedSummary[address].received.toString().padStart(20), "||", 
-    //                 convertedSummary[address].sentTxCount.toString().padStart(10), "||", 
-    //                 convertedSummary[address].receivedTxCount.toString().padStart(12));
+    //     // Increment transaction count for sender and receiver
+    //     summary[tx.from_address].sentTxCount++;
+    //     summary[tx.to_address].receivedTxCount++;
     // }
-    return convertedSummary;
+
+    // // Convert values from Wei to Ether and parse them into integers
+    // const convertedSummary = [];
+    // for (let address in summary) {
+    //     convertedSummary.push({
+    //         address: address,
+    //         sent: parseInt(web3.utils.fromWei(summary[address].sent, 'ether')),
+    //         received: parseInt(web3.utils.fromWei(summary[address].received, 'ether')),
+    //         sentTxCount: summary[address].sentTxCount,
+    //         receivedTxCount: summary[address].receivedTxCount
+    //     });
+    // }
+
+    // // Sort the array by the received amount in descending order
+    // convertedSummary.sort((a, b) => b.received - a.received);
+
+
+    // // Sort by received value
+    // const sortedAddresses = Object.keys(convertedSummary).sort((a, b) => convertedSummary[b].sentTxCount - convertedSummary[a].sentTxCount);
+
+    // // Console log the summary stats in a neat table format
+    // // console.log("Address".padEnd(42), "||", "SENT".padStart(20), "||", "RECEIVED".padStart(20), "||", "SENT TXs".padStart(10), "||", "RECEIVED TXs".padStart(12));
+    // // console.log("-".repeat(120));
+    // // for (let address of sortedAddresses) {
+    // //     console.log(address, "||", 
+    // //                 convertedSummary[address].sent.toString().padStart(20), "||", 
+    // //                 convertedSummary[address].received.toString().padStart(20), "||", 
+    // //                 convertedSummary[address].sentTxCount.toString().padStart(10), "||", 
+    // //                 convertedSummary[address].receivedTxCount.toString().padStart(12));
+    // // }
+    // return convertedSummary;
 
 }
 

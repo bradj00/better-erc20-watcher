@@ -10,7 +10,7 @@ import TxVisualizer from './dashboard/TxVisualizer.jsx';
 import TokenDetective from './dashboard/TokenDetective.jsx';
 import TestWSSComponent from './dashboard/TestWSSComponent.jsx';
 import WebsocketInfoGrabber from './dashboard/WebsocketInfoGrabber.jsx';
-
+import "./styles.css";
 
 //OLD
 /////
@@ -85,7 +85,7 @@ const [friendlyLookupResponse, setFriendlyLookupResponse] = useState();
 const [updateFriendlyName, setupdateFriendlyName] = useState();
 const [pageNumber, setpageNumber] = useState(1);
 // const [displayPanel, setdisplayPanel] = useState('watchingTokens');
-const [displayPanel, setdisplayPanel] = useState('test');
+const [displayPanel, setdisplayPanel] = useState('watchingTokens');
 
 const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
 const [defaultData, setDefaultData] = useState({ nodes: [], links: [] });
@@ -234,17 +234,14 @@ return (
           {displayPanel === 'tokenSummary'? <TokenHoldersDashboard />: <></>}
           {displayPanel === 'txVisualizer'? <TxVisualizer />: <></>}
           {displayPanel === 'tokenDetective'? <TokenDetective />: <></>}
-          {displayPanel === 'test'? 
           
-            <>
-              <WebsocketInfoGrabber />
-            </>
-            : <></>}
           
           
           
       </div>
+      <WebsocketInfoGrabber />
     {/* <DatabaseInfoGrabber /> */}
+    <div className="dock"></div>
 
     </txIngestionEngineContext.Provider>
     </tokenExternalLookupContext.Provider>

@@ -35,7 +35,7 @@ import ConnectionStatusBanner from './ConnectionStatusBanner';
 
 
 
-TimeAgo.addDefaultLocale(en);
+// TimeAgo.addDefaultLocale(en);
 
 
 

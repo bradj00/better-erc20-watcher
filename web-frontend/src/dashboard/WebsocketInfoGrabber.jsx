@@ -1,84 +1,85 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { GeneralContext } from '../App.js';
+import * as socketHandlers from './service-library/socketHandlers';
 
 const WebsocketInfoGrabber = () => {
-    const [ws, setWs] = useState(null);
+    const ws = useRef(null);
     const [status, setStatus] = useState("Disconnected");
-    const [responseData, setResponseData] = useState(null);
-    const {dataCalls, setDataCalls} = useContext(GeneralContext);
+    const hasConnectedBefore = useRef(false);
+
+    const { watchedTokenList, setWatchedTokenList } = useContext(GeneralContext);
+
+    const [dataSetterObj] = useState({
+        setWatchedTokenList,
+    });
 
     useEffect(() => {
-        if (dataCalls) {
-            console.log('dataCalls: ', dataCalls);
+        if (watchedTokenList) {
+            console.log('watchedTokenList: ', watchedTokenList);
         }
-    }, [dataCalls]);
+    }, [watchedTokenList]);
 
     const connectWebSocket = () => {
-        const socket = new WebSocket('wss://10.0.3.240:4050');
+        ws.current = new WebSocket('wss://10.0.3.240:4050');
 
-        socket.onopen = () => {
+        ws.current.onopen = () => {
             setStatus("Connected");
+
+            if (ws.current.readyState === WebSocket.OPEN && !hasConnectedBefore.current) {
+                requestWatchedTokensList();
+                hasConnectedBefore.current = true;
+            }
         };
 
-        socket.onerror = (error) => {
+        ws.current.onerror = (error) => {
             console.error(`WebSocket Error: ${error}`);
         };
 
-        socket.onmessage = (event) => {
-            // Handle received data here
+        ws.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
-
-            if (data.service === 'SomeService' && data.method === 'SomeMethod') {
-                setResponseData(data.data);
-                setDataCalls(data);
+            console.log('socket returned data: ', data);
+            if (data.service) {
+                const handlerName = `handle${data.method}`;
+                if (socketHandlers[handlerName]) {
+                    socketHandlers[handlerName](data, dataSetterObj);
+                } else {
+                    console.warn(`Handler not found for service: ${data.service}, method: ${data.method}`);
+                }
             }
         };
 
-        socket.onclose = (event) => {
+        ws.current.onclose = (event) => {
             if (event.wasClean) {
                 setStatus(`Closed cleanly, code=${event.code}, reason=${event.reason}`);
             } else {
-                // Connection died
                 setStatus('Connection died');
-
-                // Try to reconnect after 2 seconds
                 setTimeout(connectWebSocket, 2000);
             }
         };
+    }
 
-        // Set websocket to state
-        setWs(socket);
+    const requestWatchedTokensList = () => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const requestPayload = {
+                service: 'watched-tokens',
+                method: 'GetWatchedTokens',
+                data: {}
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
     }
 
     useEffect(() => {
         connectWebSocket();
-
-        // Cleanup logic
         return () => {
-            if (ws) {
-                ws.close();
+            if (ws.current) {
+                ws.current.close();
             }
         };
     }, []);
 
-    const requestData = () => {
-        if (ws) {
-            const requestPayload = {
-                service: 'watched-tokens',
-                method: 'GetWatchedTokens',
-                data: {} // Add any necessary data here
-            };
-
-            ws.send(JSON.stringify(requestPayload));
-        }
-    }
-
     return (
-        <div style={{ zIndex: '10001' }}>
-            WebSocket Status: {status}
-            <button onClick={requestData}>Request Mock Data</button>
-            {responseData && <div>Received data: {responseData}</div>}
-        </div>
+        <></>
     );
 }
 

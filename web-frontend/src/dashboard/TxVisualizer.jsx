@@ -31,7 +31,7 @@ import * as THREE from 'three';
 import Web3 from 'web3';
 
 
-TimeAgo.addDefaultLocale(en);
+// TimeAgo.addDefaultLocale(en);
 
 const mdTheme = createTheme({
     palette: {
