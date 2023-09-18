@@ -44,7 +44,8 @@ using:
 
 
 <sub>Architecture design</sub>
-![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/8adffeac-8987-4b4f-b9c1-2ce01ed1234b)
+![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/00df9568-e148-48a0-8bb1-1d6f993c498f)
+
 
 
 
