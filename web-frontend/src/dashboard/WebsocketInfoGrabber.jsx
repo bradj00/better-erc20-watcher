@@ -8,10 +8,29 @@ const WebsocketInfoGrabber = () => {
     const hasConnectedBefore = useRef(false);
 
     const { watchedTokenList, setWatchedTokenList } = useContext(GeneralContext);
+    const {searchInputLookup} = useContext(GeneralContext);
+    const {RequestFriendlyLookup} = useContext(GeneralContext);
+    const {setFriendlyLookupResponse} = useContext(GeneralContext);
 
     const [dataSetterObj] = useState({
         setWatchedTokenList,
+        setFriendlyLookupResponse,
     });
+
+
+    useEffect(() => {
+        if (searchInputLookup) {
+            console.log('searchInputLookup: ', searchInputLookup);
+            requestFnLookup(searchInputLookup)
+        }
+    }, [searchInputLookup]);
+
+    useEffect(() => {
+        if (RequestFriendlyLookup) {
+            console.log('RequestFriendlyLookup: ', RequestFriendlyLookup);
+            requestFnLookup(RequestFriendlyLookup)
+        }
+    }, [RequestFriendlyLookup]);
 
     useEffect(() => {
         if (watchedTokenList) {
@@ -56,6 +75,17 @@ const WebsocketInfoGrabber = () => {
                 setTimeout(connectWebSocket, 2000);
             }
         };
+    }
+
+    const requestFnLookup = (friendlyName) => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const requestPayload = {
+                service: 'general',
+                method: 'GetFriendlyName',
+                data: {friendlyName}
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
     }
 
     const requestWatchedTokensList = () => {

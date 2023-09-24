@@ -206,7 +206,7 @@ useEffect(()=>{
   return (
     <React.Fragment>
       {/* <Title>Displayed Txs</Title> */}
-      <div style={{fontSize:'1.25vw', color:'rgba(150,220,255,0.9)', position:'absolute', top:'-5.5vh',left:'1vw',}}>TXs and Unique Accounts</div> 
+      <div style={{fontSize:'1.25vw', color:'rgba(150,220,255,0.9)', position:'absolute', top:'-5.5vh',left:'1vw',}}>Volume and Unique Accounts</div> 
       
       <ResponsiveContainer>
         <BarChart 

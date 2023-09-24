@@ -39,7 +39,7 @@ const ConnectionStatusBanner = (props) => {
                 {displayPanel === 'tokenSummary' && (
                     <>
                         <SummarizeIcon style={{ fontSize: '2vw' }} />
-                        <span>Manage Action Rules</span>
+                        <span>Closely Watched Activity</span>
                     </>
                 )}
                 {displayPanel === 'txVisualizer' && (
@@ -70,7 +70,7 @@ const ConnectionStatusBanner = (props) => {
                             </div>
                             <div title="Manage Action Rules" className="leftBarGridTopItem" onClick={() => handleIconClick('tokenSummary')}>
                                 <SummarizeIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw' }} />
-                                Manage Action Rules
+                                Closely Watched Activity
                             </div>
                             <div title="Transaction Visualizer" className="leftBarGridTopItem" onClick={() => handleIconClick('txVisualizer')}>
                                 <ShareIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw' }} />

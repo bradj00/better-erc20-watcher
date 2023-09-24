@@ -266,7 +266,7 @@ function function66(e){
                     </div>
 
                     <div style={{position:'relative', left:'2%'}}>
-                      TX Ingestion: 
+                      TX Ingestion: sss
                       <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}>
                          <CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
                       </div>

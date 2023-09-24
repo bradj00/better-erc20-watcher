@@ -89,7 +89,7 @@ wss.on('connection', (ws, req) => {
 function handleRequest(ws, service, method, payload) {
     try {
         const serviceModule = require(`./service-library/${service}`);
-        if (serviceModule && serviceModule[method]) {
+        if (serviceModule && serviceModule[method]) { 
             serviceModule[method](payload, (response) => {
                 ws.send(JSON.stringify({
                     service: service,

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useContext, useEffect} from 'react'
 import {GeneralContext} from '../App.js'
 
@@ -10,51 +11,48 @@ const DatabaseInfoGrabber = () => {
     const [filteredAddyData, setFilteredAddyData] = useState(null)
     const [intervalQ, setintervalQ] = useState(null)
     const {txData, settxData} = useContext(GeneralContext);
-    const {TxSummaryData, setTxSummaryData} = useContext(GeneralContext); 
-    const {txDataChart, settxDataChart} = useContext(GeneralContext); 
-    const {txDataChartOverTime, settxDataChartOverTime} = useContext(GeneralContext); 
-    const {filteredtxData, setfilteredtxData} = useContext(GeneralContext);
-    const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
-    const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
+    const {setTxSummaryData} = useContext(GeneralContext); 
+    const {settxDataChart} = useContext(GeneralContext); 
+    const {settxDataChartOverTime} = useContext(GeneralContext); 
+    const {setfilteredtxData} = useContext(GeneralContext);
+    const {setlatestEthBlock} = useContext(GeneralContext); 
     const {getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList} = useContext(GeneralContext); 
     const {detectedLPs, setdetectedLPs} = useContext(GeneralContext); 
     
-    const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
-    const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+    const {viewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+    const {clickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext); 
-    const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
-    const {chainDataHeartbeatDiff, setchainDataHeartbeatDiff} = useContext(GeneralContext);
-    const {searchInputLookup, setsearchInputLookup} = useContext(GeneralContext);
-    const {selectedAddyInGameBalance, setselectedAddyInGameBalance} = useContext(GeneralContext);
+    const {setchainDataHeartbeat} = useContext(GeneralContext);
+    const {setchainDataHeartbeatDiff} = useContext(GeneralContext);
+    const {searchInputLookup} = useContext(GeneralContext);
+    const {setselectedAddyInGameBalance} = useContext(GeneralContext);
     
     // explicit context variables needed because we are watching staking and deposit behavior for these addresses
-    const {megaPriceUsd, setMegaPriceUsd} = useContext(GeneralContext);
+    const {setMegaPriceUsd} = useContext(GeneralContext);
     /////////////////////////////////////////////
     
-    const {watchedTokenPriceUsd, setwatchedTokenPriceUsd} = useContext(GeneralContext);
-    const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
-    const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
-    const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
-    const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
+    const {setwatchedTokenPriceUsd} = useContext(GeneralContext);
+    const {MinAmountFilterValue} = useContext(GeneralContext);
+    const {MaxAmountFilterValue} = useContext(GeneralContext);
     
-    const {RequestFriendlyLookup, setRequestFriendlyLookup} = useContext(GeneralContext);
-    const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
-    const {updateFriendlyName, setupdateFriendlyName} = useContext(GeneralContext);
+    const {RequestFriendlyLookup} = useContext(GeneralContext);
+    const {setFriendlyLookupResponse} = useContext(GeneralContext);
+    const {updateFriendlyName} = useContext(GeneralContext);
     const {systemStatuses, setSystemStatuses} = useContext(GeneralContext);
-    const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
-    const {heldTokensSelectedAddressFN, setheldTokensSelectedAddressFN} = useContext(GeneralContext);
-    const {selectedAddressListOfTokens, setselectedAddressListOfTokens} = useContext(GeneralContext);
+    const {heldTokensSelectedAddress} = useContext(GeneralContext);
+    const {setheldTokensSelectedAddressFN} = useContext(GeneralContext);
+    const {setselectedAddressListOfTokens} = useContext(GeneralContext);
     const {getUpdatedTokenBalance, setgetUpdatedTokenBalance} = useContext(GeneralContext);
     
-    const {communityHeldListFromSelected, setcommunityHeldListFromSelected} = useContext(GeneralContext);
-    const {communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy} = useContext(GeneralContext);
-    const {updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest} = useContext(GeneralContext);
+    const {setcommunityHeldListFromSelected} = useContext(GeneralContext);
+    const {communityHeldListFromSelectedAddy} = useContext(GeneralContext);
+    const {updateCommitFriendlyNameRequest} = useContext(GeneralContext);
     const {selectedAddressTxList, setselectedAddressTxList} = useContext(GeneralContext);
-    const {clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedAddressTxList} = useContext(GeneralContext);
+    const {setclockCountsArrayForSelectedAddressTxList} = useContext(GeneralContext);
     const {fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance} = useContext(GeneralContext);
     const {txVisualData, settxVisualData} = useContext(GeneralContext);
     const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
-    const {ShownLiqPoolPriceData, setShownLiqPoolPriceData} = useContext(GeneralContext); 
+    const {setShownLiqPoolPriceData} = useContext(GeneralContext); 
 
 
     useEffect(() => {
@@ -73,7 +71,7 @@ const DatabaseInfoGrabber = () => {
 
     useEffect(() => {
         // console.log('MinAmountFilterValue,MaxAmountFilterValue: ', MinAmountFilterValue,MaxAmountFilterValue)
-        if (MinAmountFilterValue !=1 && MaxAmountFilterValue != 1){
+        if (MinAmountFilterValue !== 1 && MaxAmountFilterValue !== 1){
             fetchTransactions( viewingTokenAddress , MinAmountFilterValue, MaxAmountFilterValue)
         }
     },[MinAmountFilterValue,MaxAmountFilterValue]);
@@ -501,8 +499,6 @@ const DatabaseInfoGrabber = () => {
 
 
     useEffect(() => {
-        let checkedMinValue = 0;
-        let checkedMaxValue = 0;
         if (dataChart && dataChart.result){
             settxDataChart(dataChart.result);
            

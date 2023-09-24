@@ -246,57 +246,7 @@ function function66(e){
          
 
           </List>
-          <div style={{border:'0px solid #0aa', color:'#999', position:'absolute',bottom:'0%', width:'100%', height:'20vh', display:'flex', justifyContent:'center', alignItems:'center'}}>
-                  
-                  <div className={chainDataHeartbeatDiff? chainDataHeartbeatDiff > 5000? "deadHeartbeat":"goodHeartbeat":""} style={{position:'absolute', width:'100%',height:'100%', fontSize:'3vh', zIndex:'9999',  display:'flex', justifyContent:'center', alignItems:'center',  backgroundColor:chainDataHeartbeatDiff? chainDataHeartbeatDiff > 1000?'rgba(150,30,30,1)': 'rgba(0,150,0,0.4)':'rgba(150,150,0,0.8)',}}>
-                      {chainDataHeartbeatDiff? chainDataHeartbeatDiff > 5000?  <>stale data</>: <>up to date</>: <>fetching data</>}
-                      {/* {chainDataHeartbeatDiff? chainDataHeartbeatDiff:<></>} */}
-
-                  </div>
-                  
-                  <div style={{position:'absolute', top:'2%',  }}>
-                    Services Health:
-                  </div>
-                  <div style={{width:'95%', textAlign:'left', }}>
-                    <div style={{position:'relative', left:'2%'}}>
-                      Latest Block: 
-                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
-                        {latestEthBlock? <a target="blank_" href={("https://etherscan.io/block/"+latestEthBlock.block)}> {commaNumber(latestEthBlock.block)} </a>:<>...</>}
-                      </div>
-                    </div>
-
-                    <div style={{position:'relative', left:'2%'}}>
-                      TX Ingestion: 
-                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}>
-                         <CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                      </div>
-                    </div>
-
-                    <div style={{position:'relative', left:'2%'}}>
-                      Address Translator: 
-                        <div style={{float:'right', position:'absolute', top:'0', right:'5%', color:'#aa0'}}> 
-                          
-                          
-                          { // find the 'translator' service in the array of services
-                            // systemStatuses? 
-                            // commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax) > 0? 
-                            // // if it's found, display "lookupIndex" / "lookupIndexMax"
-                            // <> {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndex)} / {commaNumber(systemStatuses.find((service) => service.name === 'translator').lookupIndexMax)} </>
-                          
-                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                            // :<CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                          }
-                        </div>
-                    </div>
-
-                    <div style={{position:'relative', left:'2%'}}>
-                      API: 
-                      <div style={{float:'right', position:'absolute', top:'0', right:'5%'}}> 
-                        <CheckCircleOutlineIcon style={{color:'#0a0'}}/> 
-                      </div>
-                    </div>
-                  </div>
-          </div>
+          
 
         </Drawer>
         <Box
@@ -318,7 +268,7 @@ function function66(e){
               {/* address header  */}
               <div style={{border:'1px solid rgba(100,100,120,1)', backgroundColor:'rgba(100,100,120,0.4)', width:'100%',height:'99%', textAlign:'center', borderRadius:'20px',  position:'absolute',display:'flex', justifyContent:'center',alignItems:'center'}}>
                 <div style={{position:'absolute', }}>
-                  <div style={{fontSize:'1.5vw'}}>Manage and define rules to label chain actions here</div>
+                  <div style={{fontSize:'1.5vw'}}>Manage rules and actions based on chain events here</div>
                 </div>
               </div>
 

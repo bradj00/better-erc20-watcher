@@ -1,35 +1,14 @@
 import React, {useContext, useState, useEffect} from 'react';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import MuiDrawer from '@mui/material/Drawer';
-import Box from '@mui/material/Box';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
-import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Link from '@mui/material/Link';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
-import Chart from './Chart'; 
-import TokenVolumeDash from './TokenVolumeDash';
-import Orders from './Orders';
+
 import { GeneralContext } from '../App';
 import AudioToggle from './subcomponents/AudioToggle';
 import SearchIcon from '@mui/icons-material/Search';
-import SecondaryList from './subcomponents/SecondaryList';
-import MainList from './subcomponents/MainList';
+
 import {getEllipsisTxt} from './helpers/h.js';
 import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+
 import {commaNumber} from './helpers/h.js';
 import ConnectionStatusBanner from './ConnectionStatusBanner';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
@@ -37,10 +16,21 @@ import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import tokenImage from './images/token_image.png';
 
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import FastRewindIcon from '@mui/icons-material/FastRewind';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import FastForwardIcon from '@mui/icons-material/FastForward';
+import ClearIcon from '@mui/icons-material/Clear';
+import Button from '@mui/material/Button';
+import ReactSlider from 'react-slider';
+import Datetime from 'react-datetime';
+
+
+
 const Topbanner = () => {
     const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
     const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
-    const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
@@ -136,7 +126,7 @@ const Topbanner = () => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-          console.log("Executing function after 1 second of not typing in input field");
+          console.log("Executing function after 1 second of not typing in input field: ",searchInput);
           setsearchInputLookup(searchInput);
           if (searchInput.length == 0) {
             setFriendlyLookupResponse(null);
@@ -146,6 +136,34 @@ const Topbanner = () => {
         return () => clearTimeout(timer);
       }, [searchInput]);
 
+
+
+    const [subRange, setSubRange] = useState({
+        start: new Date(),  // You can set default values here
+        end: new Date()     // You can set default values here
+    });
+
+    const [sliderValue, setSliderValue] = useState(50);  // Initial value set to 50
+
+    const handleSliderChange = (value) => {
+        setSliderValue(value);
+    };
+
+
+    const [timeRange, setTimeRange] = useState({
+        start: new Date(),
+        end: new Date()
+    });
+
+
+    const handleStartDateChange = (date) => {
+        setTimeRange(prev => ({ ...prev, start: date.toDate() }));
+    };
+    
+    const handleEndDateChange = (date) => {
+        setTimeRange(prev => ({ ...prev, end: date.toDate() }));
+    };
+    
 
     return (
     <div style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
@@ -168,7 +186,7 @@ const Topbanner = () => {
 
             </div>
         : 
-            <></>
+        clickedToken?<></>: <>Select a token to watch</>
         }
 
         
@@ -260,10 +278,97 @@ const Topbanner = () => {
         <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
     </div>
 
-    <div onClick={()=>{ setAudioEnabled(!audioEnabled) }}  style={{zIndex:'10000', cursor:'pointer', border:'0px solid #0ff', right:'5%', top:'20%', position:'absolute',}}>
+    {/* <div onClick={()=>{ setAudioEnabled(!audioEnabled) }}  style={{zIndex:'10000', cursor:'pointer', border:'0px solid #0ff', right:'5%', top:'20%', position:'absolute',}}>
         {audioEnabled? <NotificationsActiveIcon style={{fontSize:'1.5vw'}}/> : <NotificationsOffIcon style={{fontSize:'1.5vw'}}/>}
-    </div>
+    </div> */}
 
+    <div style={{ zIndex: '50', display: 'flex', backgroundColor: 'rgba(20,20,20,0.6)', borderRadius: '0.5vh', alignItems: 'center', position: 'absolute', right: '0vw', top: '0.4vh', width: '63vw', height: '6vh', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
+        <TextField 
+            label="Search" 
+            variant="outlined" 
+            size="small" 
+            style={{border:'1px solid rgba(255,255,255,0.2)',borderRadius:'0.3vw', width: '25%', marginLeft:'0.5vw', color: '#fff' }}
+            InputLabelProps={{
+                style: { color: '#fff' },
+            }}
+            inputProps={{
+                style: { color: '#fff' },
+            }}
+             
+            placeholder='enter a name or address' 
+            type="text" 
+            value={searchInput? searchInput: ''} 
+            onChange={(e) => {setsearchInput(e.target.value); }}
+        />
+        <div style={{ height:'100%', width:'100%',position:'absolute', display:'flex', alignItems:'end', paddingBottom:'0.5vh', left:'17vw', marginLeft: '1vw', marginRight: '1vw' }}>
+            {/* {timeRange.start.toLocaleDateString()} - {timeRange.end.toLocaleDateString()} */}
+            <div style={{
+                border: '0px solid #0f0',
+                position: 'absolute',
+                width: '35.4vw',
+                height: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'start',  
+                // background: 'linear-gradient(90deg, rgba(20,20,20,1) 0%, rgba(60,60,60,1) 100%)',  
+                padding: '10px 0'  
+            }}>
+                <ReactSlider
+                    min={1}
+                    max={100}
+                    value={sliderValue}
+                    onChange={handleSliderChange}
+                    className="my-slider"
+                    thumbClassName="my-slider-thumb"
+                />
+            </div>
+
+
+
+            <Datetime 
+                className="customDatetime"
+                value={timeRange.start}
+                onChange={date => setTimeRange({ ...timeRange, start: date })}
+                inputProps={{
+                    placeholder: "Start Date",
+                    style: { color: '#fff', fontSize: '1.2vw', width:'13vw', backgroundColor: 'rgba(20,20,20,0.6)', border: '1px solid #fff',   }
+                }}
+            />
+            <div style={{height:'100%', display:'flex', alignItems:'end',}}>
+                <IconButton color="primary" style={{ marginLeft: '10px', marginRight: '10px' }}>
+                    <FastRewindIcon />
+                </IconButton>
+                <IconButton color="primary" style={{ marginLeft: '10px', marginRight: '10px' }}>
+                    <PlayArrowIcon />
+                </IconButton>
+                <IconButton color="primary" style={{ marginLeft: '10px', marginRight: '10px' }}>
+                    <FastForwardIcon />
+                </IconButton>
+            </div>
+
+            <Datetime 
+                className="customDatetime"
+                value={timeRange.end}
+                onChange={date => setTimeRange({ ...timeRange, end: date })}
+                inputProps={{
+                    placeholder: "End Date",
+                    style: { color: '#fff', fontSize: '1.2vw', width:'13vw', backgroundColor: 'rgba(20,20,20,0.6)', border: '1px solid #fff' },
+                    
+                    
+                }}
+            />
+            
+        </div>
+        
+        <Button 
+            variant="contained" 
+            color="secondary" 
+            startIcon={<ClearIcon />} 
+            style={{ position:'absolute', right:'1%', marginLeft: '10px', marginRight: '10px' }}
+        >
+            Clear
+        </Button>
+    </div>
 
     </div>
     )

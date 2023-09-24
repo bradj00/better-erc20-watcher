@@ -6,7 +6,7 @@ const db = require('./db')
 module.exports = {
     GetWatchedTokens: async function(payload, callback) {
         try {
-            console.log('trying to get watched tokens..')
+            console.log('trying to get watched tokens:')
             const database = db.getDb('watchedTokens');
             const collectionlist = await database.listCollections().toArray();
     
@@ -34,7 +34,7 @@ module.exports = {
                                       data: result
                                   }));
     
-            console.log('success: ', tokens);
+            // console.log('success: ', tokens);
             callback({ status: 'success', data: tokens });
     
         } catch (error) {
@@ -57,23 +57,23 @@ module.exports = {
     GetCachedTokenInfo: function(tokenAddress) {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log('trying to get cached token info for: ',tokenAddress)
+                console.log('\ttrying to get cached token info for: ',tokenAddress)
                 const database = db.getDb('tokensMetadataCache');
                 const collection = database.collection('erc20');
     
                 const result = await collection.find({"address": tokenAddress}).toArray();
                 if (result.length > 0) {
-                    console.log('found token metadata in mongo cache');
+                    console.log('\tfound token metadata in mongo cache');
                     resolve({ status: 'success', data: [result[0]] });
                 } else {
-                    console.log('have to look up token metadata from external api..');
+                    console.log('\thave to look up token metadata from external api..');
                     // If you need to fetch from an external API, you can do so here
                     // and then resolve or reject based on the result.
                     // For now, I'll reject to indicate the data wasn't found.
                     reject({ status: 'error', message: 'Data not found' });
                 }
             } catch (error) {
-                console.error("Error:", error);
+                console.error("\tError:", error);
                 reject({ status: 'error', message: 'Internal Server Error' });
             }
         });

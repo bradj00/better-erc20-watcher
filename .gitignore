@@ -105,3 +105,6 @@ dist
 node/indexers/testing-temp/v3-liq-token0and1.js
 micro-services/api-gateway/certs/cert.pem
 micro-services/api-gateway/certs/key.pem
+web-frontend/certs/cert.pem
+web-frontend/certs/key.pem
+micro-services/tx-ingestion-engine/config/kafkaConfig.js

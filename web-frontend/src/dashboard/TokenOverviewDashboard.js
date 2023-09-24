@@ -643,13 +643,13 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
                   <ChartAddysOverTime data={txDataChartOverTime}/> 
                 </div>
 
-                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', textAlign:'center', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'0vh', width:'25%', height:'10vh',alignItems:'center', border:'1px solid rgba(100,100,100,0.4)',}}>
+                {/* <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', textAlign:'center', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'0vh', width:'25%', height:'10vh',alignItems:'center', border:'1px solid rgba(100,100,100,0.4)',}}>
                   Holders: 42,069<br></br>
                   (draw line chart over bar chart for total holders)
-                </div>
-                <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'11vh',width:'25%', height:'25vh',padding:'1.5vw', border:'1px solid rgba(100,100,100,0.4)',}}>
+                </div> */}
+                {/* <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'11vh',width:'25%', height:'25vh',padding:'1.5vw', border:'1px solid rgba(100,100,100,0.4)',}}>
                   <TokenVolumeDash />
-                </div>
+                </div> */}
                 
               </div>
 
