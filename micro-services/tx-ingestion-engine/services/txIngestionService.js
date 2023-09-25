@@ -266,21 +266,6 @@ async function insertTransferToMongo(transfer, decimals) {
 
     const valueInWei = Web3.utils.toWei(transfer.value, 'ether');
 
-    // Lookup friendly names
-    const fromAddressInfo = await lookupSingleAddress(transfer.from);
-    const toAddressInfo = await lookupSingleAddress(transfer.to);
-
-    if (fromAddressInfo) {
-        console.log(`\tFound friendly name (from):\t${transfer.from}`);
-    } else {
-        console.log(`\tNo friendly name (from):\t${transfer.from}`);
-    }
-    
-    if (toAddressInfo) {
-        console.log(`\tFound friendly name (to):\t${transfer.to}`);
-    } else {
-        console.log(`\tNo friendly name (to):\t${transfer.to}`);
-    }
     const structuredData = {
         block_number: transfer.blockNumber.toString(),
         block_timestamp: transfer.timestamp,
@@ -288,18 +273,6 @@ async function insertTransferToMongo(transfer, decimals) {
         to_address: transfer.to,
         value: valueInWei,
         transaction_hash: transfer.raw.transactionHash,
-        from_address_friendlyName: {
-            address: transfer.from,
-            MegaWorld: fromAddressInfo ? fromAddressInfo.MegaWorld : transfer.from,
-            OpenSea: fromAddressInfo ? fromAddressInfo.OpenSea : transfer.from,
-            ENS: fromAddressInfo ? fromAddressInfo.ENS : transfer.from
-        },
-        to_address_friendlyName: {
-            address: transfer.to,
-            MegaWorld: toAddressInfo ? toAddressInfo.MegaWorld : transfer.to,
-            OpenSea: toAddressInfo ? toAddressInfo.OpenSea : transfer.to,
-            ENS: toAddressInfo ? toAddressInfo.ENS : transfer.to
-        }
     };
 
     await produceTokenTransferEvent({
@@ -380,22 +353,6 @@ async function listenToNewBlocks(contractAddress) {
 }
 
 
-async function lookupSingleAddress(address) {
-    try {
-        const collection = client.db(DB_NAME).collection('lookup');
-        const result = await collection.findOne({ address: address });
-        
-        if (result) {
-            return result;
-        } else {
-            // console.warn(`No entry found for address: ${address}`);
-            return null;
-        }
-    } catch (error) {
-        console.error(`Error looking up address ${address}:`, error);
-        return null;
-    }
-}
 
 
 

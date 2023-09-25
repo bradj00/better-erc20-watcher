@@ -1,25 +1,10 @@
-const express = require('express');
-const { KafkaConsumer } = require('./src/kafka/consumer');
-const { KafkaProducer } = require('./src/kafka/producer');
-const apiRoutes = require('./src/api/routes');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware & Configurations
-app.use(express.json());
-
-// API Routes
-app.use('/api', apiRoutes);
-
-// Start the API server
-app.listen(PORT, () => {
-    console.log(`TXIE service running on port ${PORT}`);
-});
+// const { KafkaConsumer } = require('./kafka/consumer');
+const { KafkaProducer } = require('./kafka/producer');
 
 // Initialize Kafka Consumer
-const kafkaConsumer = new KafkaConsumer();
-kafkaConsumer.initialize();
+// const kafkaConsumer = new KafkaConsumer();
+// kafkaConsumer.initialize();
 
 // Initialize Kafka Producer
 const kafkaProducer = new KafkaProducer();

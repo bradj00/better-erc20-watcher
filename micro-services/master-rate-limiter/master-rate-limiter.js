@@ -9,6 +9,7 @@ const RATE_LIMIT = [
     { serviceName: 'coingecko', maxRate: 3 },
     { serviceName: 'infura', maxRate: 10 },
     { serviceName: 'etherscan', maxRate: 10 },
+    { serviceName: 'megaworld', maxRate: 3 },
 ];
 
 // In-memory storage for service call counts and queue
