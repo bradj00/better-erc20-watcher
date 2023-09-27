@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React, { useContext, useEffect, useState } from 'react';
 import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
@@ -106,6 +107,7 @@ export default function Orders() {
   },[filteredtxData])
 
   useEffect(() => {
+    console.log('TXDATA: ',txData)
     if (txData !== null){
 
       if (oldtxData && oldtxData[0] && oldtxData.length>0 && txData[0] && (txData[0].transaction_hash != oldtxData[0].transaction_hash) ){
@@ -115,7 +117,7 @@ export default function Orders() {
 
       }else {
         // console.log('no new data');
-        // console.log('txData: ', txData);
+        console.log('txData: ', txData);
       }
       setOldtxData(txData);
     }
@@ -259,26 +261,47 @@ export default function Orders() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {!filteredtxData? txData? txData.map((row, index) => {
-              const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
-              // console.log(parseInt(rowAge)+' seconds old');
-              const timeAgo = new TimeAgo('en-US')
-              // console.log('from: ', row.from_address_friendlyName, 'to: ', row.to_address_friendlyName)
-              return(
-                
-                // <TableRow className={rowAge > 100? "rowHover": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? 'rgba('+(parseInt(row.transaction_hash.substr(0,4), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(5,10), 16) %  30)+', '+(parseInt(row.transaction_hash.substr(12,19), 16) %  30)+', 1)' :'rgba(0,0,0,0)'}} key={index}>
-                <TableRow className={rowAge > 100? "rowHover": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? determineRowColor(row) :'rgba(0,0,0,0)'}} key={index}>
-                  <TableCell align="left" style={{ fontSize:'1vw', }}> <img src={ethLogo? ethLogo : <></>} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} ></img> </TableCell> 
-                  <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
-                  {/* <TableCell style={{fontSize:'1vw', }}><TimeAgo date={row.block_timestamp} formatter={formatter} /></TableCell> */}
-                  <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
-                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}  onClick={ ()=>{console.log('~~~~~'); processTableClicked(row, 'from')} }>   <ToFromCell row={row} toFrom={'from'}  clickMode={rowClickMode}/>   </TableCell>
-                  <TableCell style={{fontSize:'1vw',color: "#aaa"}}      onClick={ ()=>{processTableClicked(row, 'to') }}> <ToFromCell row={row} toFrom={'to'}    clickMode={rowClickMode}/>   </TableCell>
-                  <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a> {determineShowPoolLink(row)? <div title="explore pool on UniSwap"  style={{float:'right', right:'0', top:'0'}}> <a target="_blank" className="PoolLinkHover" href={`https://info.uniswap.org/#/pools/`+getUniSwapPoolAddy(row)}> <PoolIcon /> </a> </div> : <></>} </TableCell>
-                </TableRow>
-                
-              )})
-            : <></>
+          {!filteredtxData && txData ? (
+            txData.map((row, index) => {
+                const rowAge = (new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000;
+                const timeAgo = new TimeAgo('en-US');
+                return (
+                    <TableRow 
+                        className={rowAge > 100 ? "rowHover" : "transactionRow"} 
+                        style={{fontSize:'3vw', backgroundColor: row.transaction_hash ? determineRowColor(row) : 'rgba(0,0,0,0)'}} 
+                        key={index}
+                    >
+                        <TableCell align="left" style={{ fontSize:'1vw' }}>
+                            <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
+                        </TableCell> 
+                        <TableCell align="left" style={{fontSize:'1vw'}}>
+                            {commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}
+                        </TableCell> 
+                        <TableCell title={row.block_timestamp} style={{fontSize:'1vw'}}>
+                            {timeAgo.format(new Date(row.block_timestamp),'mini')}
+                        </TableCell>
+                        <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'from')}>
+                            <ToFromCell row={row} toFrom={'from'}  clickMode={rowClickMode}/>   
+                        </TableCell>
+                        <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'to')}>
+                            <ToFromCell row={row} toFrom={'to'} clickMode={rowClickMode}/>   
+                        </TableCell>
+                        <TableCell style={{fontSize:'1vw'}}>
+                            <a href={`https://etherscan.io/tx/${row.transaction_hash}`} target="_blank" rel="noopener noreferrer">
+                                {getEllipsisTxt(row.transaction_hash, 6)}
+                            </a> 
+                            {determineShowPoolLink(row) && (
+                                <div title="explore pool on UniSwap" style={{float:'right', right:'0', top:'0'}}>
+                                    <a target="_blank" rel="noopener noreferrer" className="PoolLinkHover" href={`https://info.uniswap.org/#/pools/${getUniSwapPoolAddy(row)}`}>
+                                        <PoolIcon />
+                                    </a>
+                                </div>
+                            )}
+                        </TableCell>
+                    </TableRow>
+                )
+            })
+          ) 
           :
           filteredtxData && filteredtxData.length > 0? filteredtxData.map((row, index) => {
             const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );

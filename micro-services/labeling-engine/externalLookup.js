@@ -28,10 +28,10 @@ async function cacheToMongo(address, data) {
 
 async function performExternalLookup(address) {
     const apiEndpoints = [
-        { url: 'https://api.coingecko.com/addressInfo1', serviceName: 'coingecko' },
-        { url: 'https://api.megaworld.io/addressInfo2', serviceName: 'megaworld' },
-        { url: 'https://api.etherscan.io/addressInfo2', serviceName: 'etherscan' },
-        { url: 'https://api.opensea.io/user/' + address + '?format=json', serviceName: 'opensea', fetchFunction: fetchFromOpenSea } 
+        { serviceName: 'coingecko' },
+        { serviceName: 'megaworld' },
+        { serviceName: 'etherscan' },
+        { serviceName: 'opensea', fetchFunction: fetchFromOpenSea } 
     ];
 
     let aggregatedData = {};
@@ -45,9 +45,10 @@ async function performExternalLookup(address) {
                 aggregatedData = { ...aggregatedData, ...data };
             } else {
                 // ... rest of the code for other endpoints ...
+                console.log('SKIPPING. There were no endpoint instructions for: ',endpoint.serviceName)
             }
         } else {
-            console.warn(`Rate limit exceeded for ${endpoint.serviceName}. Retrying later.`);
+            console.warn(`Rate limit exceeded for ${endpoint.serviceName}. Retrying later. (Make this actually retry...)`);
         }
     }
 
@@ -57,13 +58,14 @@ async function performExternalLookup(address) {
 async function processAddresses() {
     for (const address of addressesToLookup) {
         const data = await performExternalLookup(address);
-        await cacheToMongo(address, data);
+        console.log('\t final object to sling into Mongo: ',data)
+        // await cacheToMongo(address, data); // take the final object and sling it into mongo
     }
 
     addressesToLookup.length = 0;
 }
 
-setInterval(processAddresses, 30000);
+setInterval(processAddresses, 10000);
 
 module.exports = {
     addAddressForLookup: (address) => addressesToLookup.push(address)

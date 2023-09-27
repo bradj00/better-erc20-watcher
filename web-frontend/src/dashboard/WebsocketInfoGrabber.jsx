@@ -10,12 +10,24 @@ const WebsocketInfoGrabber = () => {
     const { watchedTokenList, setWatchedTokenList } = useContext(GeneralContext);
     const {searchInputLookup} = useContext(GeneralContext);
     const {RequestFriendlyLookup} = useContext(GeneralContext);
+    const {RequestTransactionList} = useContext(GeneralContext);
     const {setFriendlyLookupResponse} = useContext(GeneralContext);
+    const {settxData} = useContext(GeneralContext);
 
     const [dataSetterObj] = useState({
         setWatchedTokenList,
         setFriendlyLookupResponse,
+        settxData
+        
     });
+
+  
+    useEffect(() => {
+        if (RequestTransactionList) {
+            console.log('RequestTransactionList: ', RequestTransactionList);
+            requestGetTransactions(RequestTransactionList)
+        }
+    }, [RequestTransactionList]);
 
 
     useEffect(() => {
@@ -94,6 +106,16 @@ const WebsocketInfoGrabber = () => {
                 service: 'watched-tokens',
                 method: 'GetWatchedTokens',
                 data: {}
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
+    }
+    const requestGetTransactions = (parameters) => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const requestPayload = {
+                service: 'watched-tokens',
+                method: 'GetTransactions',
+                data: parameters
             };
             ws.current.send(JSON.stringify(requestPayload));
         }

@@ -1,5 +1,6 @@
 const { createClient } = require('@redis/client');
 const { MongoClient } = require('mongodb');
+const { addAddressForLookup } = require('./externalLookup'); // Import the function
 require('dotenv').config({ path: './.env' });
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -8,12 +9,6 @@ const DB_NAME = process.env.DB_NAME;
 
 const client = new MongoClient(MONGODB_URI);
 const redisClient = createClient(REDIS_URL);
-
-// async function connectToMongo() {
-//     if (!client.isConnected()) {
-//         await client.connect();
-//     }
-// }
 
 async function addressExistsInMongo(address) {
     const collectionName = `addresses`;
@@ -34,7 +29,6 @@ async function ensureCache(address) {
     let redisquerydata = await getAddressFromRedis(address);
 
     if (!redisquerydata) {
-        // await connectToMongo();
         const existsInMongo = await addressExistsInMongo(address);
 
         if (existsInMongo) {
@@ -42,11 +36,12 @@ async function ensureCache(address) {
             return existsInMongo;
         } else {
             console.log('[ ' + address + ' ]\tnot found in REDIS + MONGO. Need to perform external lookups.');
+            addAddressForLookup(address); // Add the address to the lookup list
             return null;
         }
     }
 
-    return JSON.parse(data);
+    return JSON.parse(redisquerydata); // Fixed a typo here. It should parse redisquerydata, not data.
 }
 
 function connectToRedis() {

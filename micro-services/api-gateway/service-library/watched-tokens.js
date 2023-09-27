@@ -17,7 +17,7 @@ module.exports = {
             const tokenAddresses = filteredList.map(item => item.name.replace('a_', ''));
     
             const promises = tokenAddresses.map(async tokenAddress => {
-                try {
+                try { 
                     const tokenInfo = await this.GetCachedTokenInfo(tokenAddress);
                     return tokenInfo.data[0];
                 } catch (error) {
@@ -42,11 +42,58 @@ module.exports = {
             callback({ status: 'error', message: 'Internal Server Error' });
         }
     },
-    GetTransactions: function(payload, callback) {
-        // make a database call directly to MongoDB here and pass the result back through the callback
-        callback(responseData);
+    GetTransactions: async function(parameters, callback) {
+        try {
+            console.log('trying to get transactions:', parameters);
+            
+            // Prefix 'a_' to the token address to get the collection name
+            const collectionName = 'a_' + parameters.tokenAddress;
+        
+            // Access the collection within the 'watchedTokens' database
+            const database = db.getDb('watchedTokens');
+            const collection = database.collection(collectionName);
+        
+            // Build the base query
+            let query = {};
+    
+            // If both dateFrom and dateTo are provided, add the date constraints to the query
+            if (parameters.dateFrom && parameters.dateTo) {
+                query.block_timestamp = {
+                    $gte: new Date(parameters.dateFrom),
+                    $lte: new Date(parameters.dateTo)
+                };
+            }
+    
+            // Fetch transactions based on the query, sort by block_number in descending order, limit to 100, and offset as provided
+            const transactions = await collection
+                    .aggregate([
+                        { $match: query },
+                        {
+                            $addFields: {
+                                int_block_number: { $toInt: "$block_number" }
+                            }
+                        },
+                        { $sort: { int_block_number: -1 } },
+                        { $limit: 100 },
+                        { $skip: parameters.offset }
+                    ])
+                    .toArray();
+        
+            if (transactions && transactions.length) {
+                callback({ status: 'success', data: transactions });
+            } else {
+                callback({ status: 'success', data: [], message: 'No transactions found' });
+            }
+        
+        } catch (error) {
+            console.error("Error fetching transactions:", error);
+            callback({ status: 'error', message: 'Internal Server Error' });
+        }
     },
-
+    
+    
+    
+    
 
     //Pass a token address and get any cached metadata on the token. If it does not exist, kick off
     //a job to the ERC Lookup Engine Micro Service

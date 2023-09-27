@@ -10,4 +10,9 @@ export const handleFriendlyNameLookupResponse = (data, dataSetterObj) => {
     
     dataSetterObj.setFriendlyLookupResponse(data);
 };
+export const handleGetTransactions = (data, dataSetterObj) => {
+    console.log('GetTransactions: ',data.data.data)
+    
+    dataSetterObj.settxData(data.data.data);
+};
 

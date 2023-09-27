@@ -95,6 +95,13 @@ const [logScaleTickBox, setLogScaleTickBox] = React.useState(false);
 /////////////////////////////////
 // MICRO SERVICE RE-FACTOR
 /////////////////////////////////
+const [RequestTransactionList, setRequestTransactionList] = React.useState({
+  // structure when populated
+  // dateFrom: 0,
+  // dateTo: 0,
+  // offset: 0,
+  // tokenAddress: 0
+});
 const [dataCalls, setDataCalls] = useState({
   pending: [],
   failed: {}
@@ -208,7 +215,8 @@ const contextObj = {
 ///////////////////////////////////////////////
 /////////MICRO SERVICE RE-FACTOR///////////////
 
-  dataCalls, setDataCalls
+  dataCalls, setDataCalls,
+  RequestTransactionList, setRequestTransactionList
 }
 
 

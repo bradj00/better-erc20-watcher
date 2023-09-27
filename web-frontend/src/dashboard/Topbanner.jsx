@@ -1,3 +1,7 @@
+/* eslint-disable jsx-a11y/alt-text */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable array-callback-return */
+/* eslint-disable no-unused-vars */
 import React, {useContext, useState, useEffect} from 'react';
 
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
@@ -30,13 +34,13 @@ import Datetime from 'react-datetime';
 
 const Topbanner = () => {
     const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
-    const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
+    const {watchedTokenList} = useContext(GeneralContext);
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
-    const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+    const {setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
     const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
-    const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
+    const {setclickedTokenSymbol} = useContext(GeneralContext);
     const {clickedToken, setclickedToken} = useContext(GeneralContext);
-    const {heldTokensSelectedAddress, setheldTokensSelectedAddress} = useContext(GeneralContext);
+    const {setheldTokensSelectedAddress} = useContext(GeneralContext);
     
     const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
     const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
@@ -44,20 +48,20 @@ const Topbanner = () => {
     const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
     const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
     const {systemStatuses, setSystemStatuses} = useContext(GeneralContext);
-    const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
-    const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
+    const {setfilteredtxDataInflow} = useContext(GeneralContext);
+    const {setfilteredtxDataOutflow} = useContext(GeneralContext);
     const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
     const [showTokenSelector, setshowTokenSelector] = React.useState(false);
     
     const [searchInput, setsearchInput] = useState("")
-    const {searchInputLookup, setsearchInputLookup} = useContext(GeneralContext);
+    const {setsearchInputLookup} = useContext(GeneralContext);
     const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
 
 
     const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
     const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
     const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
-    const timeAgo = new TimeAgo('en-US'); 
+    const {setRequestTransactionList} = useContext(GeneralContext); 
   
 
 // clipboard copy method cannot be used without HTTPS and I haven't written my API for https yet. This hack is temp.
@@ -100,14 +104,23 @@ const Topbanner = () => {
     function updateSelectedToken (token){
 
         console.log('clicked: ',token, token); 
-        setviewingTokenAddress(token.tokenAddress.address); 
+        setviewingTokenAddress(token.data.address); 
         setclickedDetailsAddress(null);
         setclickedDetailsAddressFN(null);
-        document.title = "👁️ "+token.tokenAddress.name;
-        setclickedTokenSymbol(token.tokenAddress.symbol);
+        document.title = "👁️ "+token.data.name;
+        setclickedTokenSymbol(token.data.symbol);
         setclickedToken(token); 
         setfilteredtxDataInflow(); 
         setfilteredtxDataOutflow(); 
+
+        //refactor project
+        setRequestTransactionList({
+            dateFrom: 0,
+            dateTo: 0,
+            offset: 0,
+            tokenAddress: token.data.address
+        })
+
     }
 
 
@@ -128,7 +141,7 @@ const Topbanner = () => {
         const timer = setTimeout(() => {
           console.log("Executing function after 1 second of not typing in input field: ",searchInput);
           setsearchInputLookup(searchInput);
-          if (searchInput.length == 0) {
+          if (searchInput.length === 0) {
             setFriendlyLookupResponse(null);
           }
         }, 500);
@@ -156,13 +169,7 @@ const Topbanner = () => {
     });
 
 
-    const handleStartDateChange = (date) => {
-        setTimeRange(prev => ({ ...prev, start: date.toDate() }));
-    };
     
-    const handleEndDateChange = (date) => {
-        setTimeRange(prev => ({ ...prev, end: date.toDate() }));
-    };
     
 
     return (
@@ -180,7 +187,7 @@ const Topbanner = () => {
             {    clickedToken? <>${clickedToken.tokenAddress.symbol}</> : '...'}
             </div>
 
-            <div style={{fontSize:'1vw', color:'#999',fontSize:'2vh',  bottom:'-10%', width:'100%', left:'0',position:'absolute',}}  >
+            <div style={{ color:'#999',fontSize:'2vh',  bottom:'-10%', width:'100%', left:'0',position:'absolute',}}  >
             {getEllipsisTxt(viewingTokenAddress, 6)}
             </div>
 
@@ -199,7 +206,7 @@ const Topbanner = () => {
         {watchedTokenList && Array.isArray(watchedTokenList)? watchedTokenList.map((token, index) => (
             token? token.data.address?
                 <div style={{cursor:'pointer', zIndex:'10000', position:'relative', }} onClick={()=>{ updateSelectedToken(token); setshowTokenSelector(false) }}>
-                    <div  style={{padding:'0.6vw',backgroundColor:viewingTokenAddress?token.data.address?  viewingTokenAddress == token.data.address? 'rgba(215,215,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} >
+                    <div  style={{padding:'0.6vw',backgroundColor:viewingTokenAddress?token.data.address?  viewingTokenAddress === token.data.address? 'rgba(215,215,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} >
                         <img src={token.data.logo? token.data.logo : tokenImage } style={{marginLeft:token.tokenAddress.logo?'0':'-0.5vh', height:token.data.logo?'3vh':'4vh'}} />{token.data.logo?<>&nbsp;&nbsp;</>: <>&nbsp;</>}
                         {token.data.symbol}
                     </div>

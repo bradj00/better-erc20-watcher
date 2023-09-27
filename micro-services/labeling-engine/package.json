@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@redis/client": "^1.5.11",
+    "axios": "^0.21.1",
     "dotenv": "^16.3.1",
     "kafkajs": "^2.2.4",
     "mongodb": "^6.1.0",
