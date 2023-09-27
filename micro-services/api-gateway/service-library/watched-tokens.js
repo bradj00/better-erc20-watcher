@@ -2,8 +2,53 @@
 //////////////////////////////////////////////////////////////////////////////////////
 
 const db = require('./db')
+const dbRedis = require('./dbRedis')
 
 module.exports = {
+    CacheFriendlyLabelsRequest: async function(addresses, callback) {
+        try {
+            console.log('--------------------');
+            const mongoDatabase = db.getDb('friendlyNames'); // replace with your actual MongoDB name
+            const mongoCollection = mongoDatabase.collection('lookup'); // replace with your actual collection name
+    
+            const fetchFromMongo = async (address) => {
+                const result = await mongoCollection.findOne({ address: address });
+                if (result) {
+                    console.log('match for: ',address, result,'\n')
+                    return result;
+                }
+                else {
+                    console.log('\tno MONGO match for: ', address);
+                    return { [address]: {} }; // empty value with the Ethereum address as the key
+                }
+            };
+    
+            console.log('*********');
+            const promises = addresses.map(fetchFromMongo);
+            console.log('**_____**');
+    
+            const results = await Promise.all(promises);
+    
+            const finalObject = {};
+            addresses.forEach((address, index) => {
+                if (results[index]) {
+                    finalObject[address] = results[index];
+                } else {
+                    finalObject[address] = {};  // empty value for non-existent addresses in the DB
+                }
+            });
+    
+            callback({ status: 'success', data: finalObject });
+    
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            callback({ status: 'error', message: 'Internal Server Error' });
+        }
+    },
+    
+    
+
+
     GetWatchedTokens: async function(payload, callback) {
         try {
             console.log('trying to get watched tokens:')

@@ -13,15 +13,26 @@ const WebsocketInfoGrabber = () => {
     const {RequestTransactionList} = useContext(GeneralContext);
     const {setFriendlyLookupResponse} = useContext(GeneralContext);
     const {settxData} = useContext(GeneralContext);
+    const {CacheFriendlyLabelsRequest, setCacheFriendlyLabelsRequest} = useContext(GeneralContext);
+    const {setCacheFriendlyLabels} = useContext(GeneralContext);
 
     const [dataSetterObj] = useState({
         setWatchedTokenList,
         setFriendlyLookupResponse,
-        settxData
+        settxData,
+        setCacheFriendlyLabelsRequest,
+        setCacheFriendlyLabels,
         
     });
 
   
+    useEffect(() => {
+        if (CacheFriendlyLabelsRequest) {
+            console.log('CacheFriendlyLabelsRequest: ', CacheFriendlyLabelsRequest);
+            requestCacheFriendlyLabels(CacheFriendlyLabelsRequest)
+        }
+    }, [CacheFriendlyLabelsRequest]);
+    
     useEffect(() => {
         if (RequestTransactionList) {
             console.log('RequestTransactionList: ', RequestTransactionList);
@@ -100,6 +111,16 @@ const WebsocketInfoGrabber = () => {
         }
     }
 
+    const requestCacheFriendlyLabels = (addresses) => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const requestPayload = {
+                service: 'watched-tokens',
+                method: 'CacheFriendlyLabelsRequest',
+                data: addresses
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
+    }
     const requestWatchedTokensList = () => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             const requestPayload = {

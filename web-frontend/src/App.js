@@ -95,6 +95,12 @@ const [logScaleTickBox, setLogScaleTickBox] = React.useState(false);
 /////////////////////////////////
 // MICRO SERVICE RE-FACTOR
 /////////////////////////////////
+const [CacheFriendlyLabelsRequest, setCacheFriendlyLabelsRequest] = React.useState([]); 
+const [CacheFriendlyLabels, setCacheFriendlyLabels] = React.useState({                  //probably break this one out into its own context at some point
+  // structure when populated
+  // 0x000123: {},
+  // 0x111600: {},
+});
 const [RequestTransactionList, setRequestTransactionList] = React.useState({
   // structure when populated
   // dateFrom: 0,
@@ -210,12 +216,13 @@ const contextObj = {
   LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider,
   logScaleTickBox, setLogScaleTickBox,
   TxSummaryData, setTxSummaryData,
-
+  CacheFriendlyLabels, setCacheFriendlyLabels,
 
 ///////////////////////////////////////////////
 /////////MICRO SERVICE RE-FACTOR///////////////
 
   dataCalls, setDataCalls,
+  CacheFriendlyLabelsRequest, setCacheFriendlyLabelsRequest,
   RequestTransactionList, setRequestTransactionList
 }
 

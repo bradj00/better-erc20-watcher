@@ -75,13 +75,20 @@ export default function Orders() {
   const {filteredtxDataOutflow, setfilteredtxDataOutflow} = useContext(GeneralContext);
   const {displayPanel, setdisplayPanel} = useContext(GeneralContext); 
   const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
-  
+  const {CacheFriendlyLabels} = useContext(GeneralContext);
   useEffect(() => {
     setTimeout(()=>{
       // console.log('update');
       setCurrentTime(new Date().toLocaleString());
     }, 1000);
   },[currentTime])
+
+
+  useEffect(() => {
+    if (CacheFriendlyLabels){
+      console.log('~CacheFriendlyLabels: ',CacheFriendlyLabels)
+    }
+  },[CacheFriendlyLabels])
 
 
   useEffect(() => {
@@ -229,108 +236,112 @@ export default function Orders() {
 
   return (
     <>
-    {/* <React.Fragment> */}
       <Title>Transactions</Title>
-      
-     
-
-      <div  style={{border:'1px solid rgba(255,255,255,0.2)', borderRadius:'0.5vh', padding:'0.2vw', overflowY:'scroll', width:'100%', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
-        <div style={{position:'absolute', top:'-1vh',left:'7%',width:'40%',border:'0px solid #0f0'}}>
-          <div title="click an address to filter TXs" className={rowClickMode!='filter'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('filter') }} style={{position:'absolute', zIndex:'9999', left:'15%',   padding:'0.5vh'}}> 
-            <FilterListIcon style={{fontSize:'1.5vw',}}/>
-          </div>
-          <div title="click an address to edit friendly-name" className={rowClickMode!='edit'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('edit') }} style={{position:'absolute',  zIndex:'9999', left:'22%', padding:'0.5vh'}}> 
-            <EditIcon style={{fontSize:'1.5vw',}}/>
-          </div>
-          <div title="click an address to view its summary" className={rowClickMode!='summary'?"txClickModeHover":""} onClick={()=>{ setrowClickMode('summary') }} style={{position:'absolute',  zIndex:'9999', left:'29%', padding:'0.5vh'}}> 
-            <PersonIcon style={{fontSize:'1.5vw',}}/>
-          </div>
-        </div>
-        <Table size="small" >
-          <TableHead style={{position:'sticky',top:'0',backgroundColor:'rgba(50,50,60,1)'}}>
-            
-            
-
+      <div style={{border:'1px solid rgba(255,255,255,0.2)', borderRadius:'0.5vh', padding:'0.2vw', overflowY:'scroll', width:'100%', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
+        
+        <Table size="small">
+          <TableHead style={{position:'sticky', top:'0', backgroundColor:'rgba(50,50,60,1)'}}>
             <TableRow>
-              <TableCell >chain</TableCell>
+              <TableCell>chain</TableCell>
               <TableCell align="left">amount</TableCell>
               <TableCell>age</TableCell>
               <TableCell>from</TableCell>
               <TableCell>to</TableCell>
               <TableCell>tx hash</TableCell>
+              <TableCell>action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-          {!filteredtxData && txData ? (
-            txData.map((row, index) => {
+            {!filteredtxData && txData ? (
+              txData.map((row, index) => {
                 const rowAge = (new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000;
                 const timeAgo = new TimeAgo('en-US');
+                
                 return (
-                    <TableRow 
-                        className={rowAge > 100 ? "rowHover" : "transactionRow"} 
-                        style={{fontSize:'3vw', backgroundColor: row.transaction_hash ? determineRowColor(row) : 'rgba(0,0,0,0)'}} 
-                        key={index}
-                    >
-                        <TableCell align="left" style={{ fontSize:'1vw' }}>
-                            <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
-                        </TableCell> 
-                        <TableCell align="left" style={{fontSize:'1vw'}}>
-                            {commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}
-                        </TableCell> 
-                        <TableCell title={row.block_timestamp} style={{fontSize:'1vw'}}>
-                            {timeAgo.format(new Date(row.block_timestamp),'mini')}
-                        </TableCell>
-                        <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'from')}>
-                            <ToFromCell row={row} toFrom={'from'}  clickMode={rowClickMode}/>   
-                        </TableCell>
-                        <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'to')}>
-                            <ToFromCell row={row} toFrom={'to'} clickMode={rowClickMode}/>   
-                        </TableCell>
-                        <TableCell style={{fontSize:'1vw'}}>
-                            <a href={`https://etherscan.io/tx/${row.transaction_hash}`} target="_blank" rel="noopener noreferrer">
-                                {getEllipsisTxt(row.transaction_hash, 6)}
-                            </a> 
-                            {determineShowPoolLink(row) && (
-                                <div title="explore pool on UniSwap" style={{float:'right', right:'0', top:'0'}}>
-                                    <a target="_blank" rel="noopener noreferrer" className="PoolLinkHover" href={`https://info.uniswap.org/#/pools/${getUniSwapPoolAddy(row)}`}>
-                                        <PoolIcon />
-                                    </a>
-                                </div>
-                            )}
-                        </TableCell>
+                  <TableRow className={rowAge > 100 ? "rowHover" : "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash ? determineRowColor(row) : 'rgba(0,0,0,0)'}} key={index}>
+                    <TableCell align="left" style={{ fontSize:'1vw' }}>
+                        <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
+                    </TableCell> 
+                    <TableCell align="left" style={{fontSize:'1vw'}}>
+                        {commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}
+                    </TableCell> 
+                    <TableCell title={row.block_timestamp} style={{fontSize:'1vw'}}>
+                        {timeAgo.format(new Date(row.block_timestamp),'mini')}
+                    </TableCell>
+                    <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'from')}>
+                        <ToFromCell row={row} toFrom={'from'}  clickMode={rowClickMode}/>   
+                    </TableCell>
+                    <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'to')}>
+                        <ToFromCell row={row} toFrom={'to'} clickMode={rowClickMode}/>   
+                    </TableCell>
+                    <TableCell style={{fontSize:'1vw'}}>
+                        <a href={`https://etherscan.io/tx/${row.transaction_hash}`} target="_blank" rel="noopener noreferrer">
+                            {getEllipsisTxt(row.transaction_hash, 6)}
+                        </a> 
+                        {determineShowPoolLink(row) && (
+                            <div title="explore pool on UniSwap" style={{float:'right', right:'0', top:'0'}}>
+                                <a target="_blank" rel="noopener noreferrer" className="PoolLinkHover" href={`https://info.uniswap.org/#/pools/${getUniSwapPoolAddy(row)}`}>
+                                    <PoolIcon />
+                                </a>
+                            </div>
+                        )}
+                    </TableCell>
+                    <TableCell style={{fontSize:'1vw'}}>
+                        {row.action || '-'}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              filteredtxData && filteredtxData.length > 0 ? (
+                filteredtxData.map((row, index) => {
+                  const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
+                  const timeAgo = new TimeAgo('en-US');
+                  
+                  return (
+                    <TableRow className={rowAge > 100? "rowHover" : "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash ? determineRowColor(row) : 'rgba(0,0,0,0)'}} key={index}>
+                      <TableCell align="left" style={{ fontSize:'1vw' }}>
+                          <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
+                      </TableCell> 
+                      <TableCell align="left" style={{fontSize:'1vw'}}>
+                          {commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}
+                      </TableCell> 
+                      <TableCell title={row.block_timestamp} style={{fontSize:'1vw'}}>
+                          {timeAgo.format(new Date(row.block_timestamp),'mini')}
+                      </TableCell>
+                      <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'from')}>
+                          <ToFromCell row={row} toFrom={'from'}  clickMode={rowClickMode}/>   
+                      </TableCell>
+                      <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'to')}>
+                          <ToFromCell row={row} toFrom={'to'} clickMode={rowClickMode}/>   
+                      </TableCell>
+                      <TableCell style={{fontSize:'1vw'}}>
+                          <a href={`https://etherscan.io/tx/${row.transaction_hash}`} target="_blank" rel="noopener noreferrer">
+                              {getEllipsisTxt(row.transaction_hash, 6)}
+                          </a> 
+                          {determineShowPoolLink(row) && (
+                              <div title="explore pool on UniSwap" style={{float:'right', right:'0', top:'0'}}>
+                                  <a target="_blank" rel="noopener noreferrer" className="PoolLinkHover" href={`https://info.uniswap.org/#/pools/${getUniSwapPoolAddy(row)}`}>
+                                      <PoolIcon />
+                                  </a>
+                              </div>
+                          )}
+                      </TableCell>
+                      <TableCell style={{fontSize:'1vw'}}>
+                          {row.action || '-'}
+                      </TableCell>
                     </TableRow>
-                )
-            })
-          ) 
-          :
-          filteredtxData && filteredtxData.length > 0? filteredtxData.map((row, index) => {
-            const rowAge = ((new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000 );
-            // console.log(parseInt(rowAge)+' seconds old');
-              const timeAgo = new TimeAgo('en-US')
-              
-            
-            return(
-
-              <TableRow className={rowAge > 100? "": "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash? determineRowColor(row) :'rgba(0,0,0,0)'}} key={index}>
-                <TableCell align="left" style={{ fontSize:'1vw', }}> <img src={ethLogo? ethLogo : <></>} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} ></img> </TableCell> 
-                <TableCell align="left" style={{fontSize:'1vw', }}>{commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}</TableCell> 
-                <TableCell title={row.block_timestamp} style={{fontSize:'1vw', }}> {timeAgo.format(new Date(row.block_timestamp),'mini') } </TableCell>
-                <TableCell style={{fontSize:'1vw',color: "#aaa"}}  onClick={ ()=>{console.log('~~~~~'); processTableClicked(row, 'from')} }>   <ToFromCell row={row} toFrom={'from'}  clickMode={rowClickMode}/>   </TableCell>
-                <TableCell style={{fontSize:'1vw',color: "#aaa"}}      onClick={ ()=>{processTableClicked(row, 'to') }}> <ToFromCell row={row} toFrom={'to'}    clickMode={rowClickMode}/>   </TableCell>
-                <TableCell style={{fontSize:'1vw',}}><a href={"https://etherscan.io/tx/"+row.transaction_hash} target="blank"> {getEllipsisTxt(row.transaction_hash, 6)} </a>  {determineShowPoolLink(row)? <div title="explore pool on UniSwap"  style={{float:'right', right:'0', top:'0'}}> <a target="_blank" className="PoolLinkHover" href={`https://info.uniswap.org/#/pools/`+getUniSwapPoolAddy(row)}> <PoolIcon /> </a> </div> : <></>}</TableCell>
-              </TableRow>
-            )})
-            : <></>
-          }
+                  );
+                })
+              ) : <></>
+            )}
           </TableBody>
         </Table>
       </div>
 
-
-      <Link color="primary" href="#" onClick={ ()=>{ setexpandTxView(!expandTxView) } } sx={{ mt: 3 }}>
+      <Link color="primary" href="#" onClick={() => { setexpandTxView(!expandTxView); }}>
         {!expandTxView? "See more":"See less"}
       </Link>
-    {/* </React.Fragment> */}
     </>
-  );
+);
 }

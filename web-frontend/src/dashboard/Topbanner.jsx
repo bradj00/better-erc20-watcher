@@ -219,11 +219,13 @@ const Topbanner = () => {
                         {
                             expandedAddresses[item.address] && (
                                 <div style={{marginLeft: '2vh', marginTop: '1vh'}}>
-                                    {item.OpenSea && <p>OpenSea: {item.OpenSea}</p>}
-                                    {item.ENS && <p>ENS: {Array.isArray(item.ENS) ? item.ENS.join(', ') : item.ENS}</p>}
-                                    {item.MegaWorld && <p>MegaWorld: {item.MegaWorld}</p>}
+                                    {item.manuallyDefined && item.manuallyDefined !== item.address && <p>Manual: {item.manuallyDefined}</p>}
+                                    {item.OpenSea && item.OpenSea !== item.address && <p>OpenSea: {item.OpenSea}</p>}
+                                    {item.ENS && item.ENS !== item.address && <p>ENS: {Array.isArray(item.ENS) ? item.ENS.join(', ') : item.ENS}</p>}
+                                    {item.MegaWorld && item.MegaWorld !== item.address && <p>MegaWorld: {item.MegaWorld}</p>}
                                 </div>
                             )
+                            
                         }
                     </div>
                 ))
@@ -351,21 +353,23 @@ const Topbanner = () => {
 
     <div style={{ zIndex: '50', display: 'flex', backgroundColor: 'rgba(20,20,20,0.6)', borderRadius: '0.5vh', alignItems: 'center', position: 'absolute', right: '0vw', top: '0.4vh', width: '63vw', height: '6vh', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}>
         <TextField 
-            label="Search" 
-            variant="outlined" 
-            size="small" 
-            style={{border:'1px solid rgba(255,255,255,0.2)', borderRadius:'0.3vw', width: '25%', marginLeft:'0.5vw', color: '#fff' }}
-            InputLabelProps={{
-                style: { color: '#fff' },
-            }}
-            inputProps={{
-                style: { color: '#fff' },
-            }}
-            placeholder='enter a name or address' 
-            type="text" 
-            value={searchInput ? searchInput : ''} 
-            onChange={(e) => { setsearchInput(e.target.value); }}
-        />
+        label="Search" 
+        variant="outlined" 
+        size="small" 
+        style={{border:'1px solid rgba(255,255,255,0.2)', borderRadius:'0.3vw', width: '25%', marginLeft:'0.5vw', color: '#fff' }}
+        InputLabelProps={{
+            style: { color: '#fff' },
+        }}
+        inputProps={{
+            style: { color: '#fff' },
+        }}
+        placeholder='enter a name or address' 
+        type="text" 
+        value={searchInput ? searchInput : ''} 
+        onChange={(e) => { setsearchInput(e.target.value); }}
+        onBlur={() => setsearchInput('')}
+    />
+
 
 
 

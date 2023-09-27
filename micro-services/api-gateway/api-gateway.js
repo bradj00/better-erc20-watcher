@@ -8,7 +8,7 @@
 
 
 const db = require('./service-library/db');
-
+const dbRedis = require('./service-library/dbRedis')
 
 require('dotenv').config(); // Importing dotenv to load environment variables
 console.clear();
@@ -39,13 +39,24 @@ let clientIdCounter = 1;  // Simple counter to assign unique IDs to clients
 
 
 
+dbRedis.connectToRedisServer((err) => {
+    if (err) {
+        console.error("Failed to connect to Redis:", err);
+        process.exit(1);
+    }
+    else {
+        console.log('\tconnected to Redis')
+    }
+
+    // ... rest of your server initialization code
+});
 db.connectToServer((err) => {
     if (err) {
         console.error("Failed to connect to MongoDB:", err);
         process.exit(1);
     }
     else {
-        console.log('connected to MongoDB')
+        console.log('\tconnected to MongoDB')
     }
 
     // ... rest of your server initialization code
@@ -75,7 +86,7 @@ wss.on('connection', (ws, req) => {
         }));
 
         // Process the request
-        console.log('processing request')
+        console.log('processing request: ', parsedMessage.service, parsedMessage.method)
         handleRequest(ws, parsedMessage.service, parsedMessage.method, parsedMessage.data);
     });
 
