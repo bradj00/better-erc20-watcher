@@ -5,10 +5,10 @@ export const handleGetWatchedTokens = (data, dataSetterObj) => {
     dataSetterObj.setWatchedTokenList(data.data.data);
 };
 
-export const handleFriendlyNameLookupResponse = (data, dataSetterObj) => {
-    console.log('FriendlyNameLookupResponse: ',data)
+export const handleGetFriendlyName = (data, dataSetterObj) => {
+    console.log('FriendlyNameLookupResponse: ',data.data.data)
     
-    dataSetterObj.setFriendlyLookupResponse(data);
+    dataSetterObj.setFriendlyLookupResponse(data.data.data);
 };
 export const handleGetTransactions = (data, dataSetterObj) => {
     console.log('GetTransactions: ',data.data.data)

@@ -33,6 +33,8 @@ import Datetime from 'react-datetime';
 
 
 const Topbanner = () => {
+    const [expandedAddresses, setExpandedAddresses] = useState({});
+
     const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
     const {watchedTokenList} = useContext(GeneralContext);
     const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
@@ -168,13 +170,70 @@ const Topbanner = () => {
         end: new Date()
     });
 
+    useEffect(() => {
+        // After fetching your data and setting it to friendlyLookupResponse
+        // set all addresses to be expanded by default.
+        if (friendlyLookupResponse) {
+            const initialExpandState = friendlyLookupResponse.reduce((acc, item) => {
+                acc[item.address] = true; // Set each address to be expanded
+                return acc;
+            }, {});
+            setExpandedAddresses(initialExpandState);
+        }
+    }, [friendlyLookupResponse]);
+
 
     
     
 
     return (
     <div style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
-                
+
+{
+    friendlyLookupResponse && friendlyLookupResponse.length > 0 && (
+        <div style={{
+            position: 'absolute', 
+            top: '6vh', 
+            left: '37vw', 
+            zIndex: '99999', 
+            border: '1px solid rgba(255,255,255,0.2)', 
+            borderRadius: '0.3vw', 
+            marginTop: '1vh', 
+            backgroundColor: '#2a2a2a',
+            maxHeight: '35vh', 
+            overflowY: 'scroll'
+        }}>
+            {
+                friendlyLookupResponse.map(item => (
+                    <div key={item._id} style={{padding: '1vh'}}>
+                        <strong style={{cursor: 'pointer'}} onClick={() => {
+                            // Toggle expansion logic
+                            const currentVisibility = expandedAddresses[item.address] || false;
+                            setExpandedAddresses({
+                                ...expandedAddresses,
+                                [item.address]: !currentVisibility
+                            });
+                        }}>
+                            {item.address}
+                        </strong>
+                        {
+                            expandedAddresses[item.address] && (
+                                <div style={{marginLeft: '2vh', marginTop: '1vh'}}>
+                                    {item.OpenSea && <p>OpenSea: {item.OpenSea}</p>}
+                                    {item.ENS && <p>ENS: {Array.isArray(item.ENS) ? item.ENS.join(', ') : item.ENS}</p>}
+                                    {item.MegaWorld && <p>MegaWorld: {item.MegaWorld}</p>}
+                                </div>
+                            )
+                        }
+                    </div>
+                ))
+            }
+        </div>
+    )
+}
+
+
+
                 
     <div onClick={()=>{setshowTokenSelector(!showTokenSelector) }} className="hoverWatchedTokenSelector" style={{zIndex:'10000', border:'1px solid rgba(255,255,255,0.8)', borderRadius:'1vh', display:'flex', justifyContent:'center', textAlign:'center', position:'absolute', left:'19%', width:'15%',height:'80%'}} >
         {
@@ -265,19 +324,20 @@ const Topbanner = () => {
         </div>
         
         :
-        <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-            {displayAddressFN(friendlyLookupResponse)? displayAddressFN(friendlyLookupResponse)
-            :
-            <div style={{zIndex:'9999', color:'#999', position:'absolute', left:'15%', }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-                {viewingTokenAddress? <>(click to search)</>:<></>}
-            </div>
-            }
-        </div>
+        // <div style={{zIndex:'9999', }} onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+        //     {displayAddressFN(friendlyLookupResponse)? displayAddressFN(friendlyLookupResponse)
+        //     :
+        //     <div style={{zIndex:'9999', color:'#999', position:'absolute', left:'15%', }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+        //         {viewingTokenAddress? <>(click to search)</>:<></>}
+        //     </div>
+        //     }
+        // </div>
+        <></>
         :
-        <div style={{zIndex:'9999', color:'#999', position:'absolute', left:'15%', }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
-            {viewingTokenAddress? <>(click to search)</>:<></>}
-        </div>
-
+        // <div style={{zIndex:'9999', color:'#999', position:'absolute', left:'15%', }} id="searchBox" onClick={()=>{setclickedSearchBar(!clickedSearchBar)}}>
+        //     {viewingTokenAddress? <>(click to search)</>:<></>}
+        // </div>
+            <></>
     } 
 
     </div>
@@ -294,19 +354,22 @@ const Topbanner = () => {
             label="Search" 
             variant="outlined" 
             size="small" 
-            style={{border:'1px solid rgba(255,255,255,0.2)',borderRadius:'0.3vw', width: '25%', marginLeft:'0.5vw', color: '#fff' }}
+            style={{border:'1px solid rgba(255,255,255,0.2)', borderRadius:'0.3vw', width: '25%', marginLeft:'0.5vw', color: '#fff' }}
             InputLabelProps={{
                 style: { color: '#fff' },
             }}
             inputProps={{
                 style: { color: '#fff' },
             }}
-             
             placeholder='enter a name or address' 
             type="text" 
-            value={searchInput? searchInput: ''} 
-            onChange={(e) => {setsearchInput(e.target.value); }}
+            value={searchInput ? searchInput : ''} 
+            onChange={(e) => { setsearchInput(e.target.value); }}
         />
+
+
+
+
         <div style={{ height:'100%', width:'100%',position:'absolute', display:'flex', alignItems:'end', paddingBottom:'0.5vh', left:'17vw', marginLeft: '1vw', marginRight: '1vw' }}>
             {/* {timeRange.start.toLocaleDateString()} - {timeRange.end.toLocaleDateString()} */}
             <div style={{
