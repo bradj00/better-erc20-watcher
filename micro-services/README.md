@@ -1,1 +1,1 @@
-Every Micro Service is designed in mind to be converted into a Docker Container
+Every Micro Service is designed in mind to be converted into a K8s scalable Docker Container

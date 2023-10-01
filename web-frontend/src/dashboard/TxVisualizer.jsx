@@ -40,6 +40,8 @@ const mdTheme = createTheme({
 });
 
 function determineGroup(address, TxSummaryData) {
+    if (TxSummaryData === null){return}
+    console.log('SUMMARY DATA: ',TxSummaryData)
     // Find the entry for the given address
     const entry = TxSummaryData.result.find(item => item.address === address);
 
@@ -59,6 +61,8 @@ function determineGroup(address, TxSummaryData) {
 
 
 function computeNodeRadius(address, TxSummaryData) {
+    if (TxSummaryData === null){return}
+    
     const maxReceived = TxSummaryData.result[0].received;
     const minReceived = TxSummaryData.result[TxSummaryData.result.length - 1].received;
     const maxRadius = 10;

@@ -241,7 +241,7 @@ return (
     <tokenExternalLookupContext.Provider value={tokenExternalLookup} >
     <txIngestionEngineContext.Provider   value={txIngestionEngine} >
 
-      <div style={{overflow:'hidden',display:'flex', alignItems:'center',  border:'0px solid #0f0'}}>
+      <div style={{  border:'0px solid #0f0'}}>
           {/* <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/> */}
           <Topbanner />
           {displayPanel === 'watchingTokens'? <TokenOverviewDashboard />: <></>}
@@ -256,7 +256,7 @@ return (
       </div>
       <WebsocketInfoGrabber />
     {/* <DatabaseInfoGrabber /> */}
-    <div className="dock"></div>
+   
 
     </txIngestionEngineContext.Provider>
     </tokenExternalLookupContext.Provider>

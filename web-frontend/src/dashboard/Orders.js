@@ -237,7 +237,7 @@ export default function Orders() {
   return (
     <>
       <Title>Transactions</Title>
-      <div style={{border:'1px solid rgba(255,255,255,0.2)', borderRadius:'0.5vh', padding:'0.2vw', overflowY:'scroll', width:'100%', height:expandTxView? 'auto':'44vh', cursor:'pointer'}}>
+      <div style={{border:'1px solid rgba(255,255,255,0.2)', borderRadius:'0.5vh', padding:'0.2vw', overflowY:'scroll', width:'100%', height:expandTxView? 'auto':'30vh', cursor:'pointer'}}>
         
         <Table size="small">
           <TableHead style={{position:'sticky', top:'0', backgroundColor:'rgba(50,50,60,1)'}}>

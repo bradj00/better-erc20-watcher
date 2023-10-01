@@ -30,6 +30,7 @@ export const handleGetTransactions = (data, dataSetterObj) => {
 
     dataSetterObj.setCacheFriendlyLabelsRequest(uniqueAddresses);
     dataSetterObj.settxData(data.data.data);
+    dataSetterObj.settxVisualData(data.data.data);
 };
 
 // TEST FUNCTION
@@ -65,4 +66,5 @@ export const handleAppendTransactions = (data, dataSetterObj, txData) => {
     // Append the new transaction to the existing txData and update state.
     const updatedTxData = [newTransaction, ...txData];
     dataSetterObj.settxData(updatedTxData); 
+    dataSetterObj.settxVisualData(updatedTxData);
 };

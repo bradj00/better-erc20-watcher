@@ -15,6 +15,7 @@ const WebsocketInfoGrabber = () => {
     const {RequestTransactionList} = useContext(GeneralContext);
     const {setFriendlyLookupResponse} = useContext(GeneralContext);
     const {txData, settxData} = useContext(GeneralContext);
+    const {txVisualData, settxVisualData} = useContext(GeneralContext);
     const {CacheFriendlyLabelsRequest, setCacheFriendlyLabelsRequest} = useContext(GeneralContext);
     const {setCacheFriendlyLabels} = useContext(GeneralContext);
     const {viewingTokenAddress} = useContext(GeneralContext);
@@ -24,9 +25,10 @@ const WebsocketInfoGrabber = () => {
     const [dataSetterObj] = useState({
         setWatchedTokenList,
         setFriendlyLookupResponse,
-        settxData,
+        settxData, settxVisualData,
         setCacheFriendlyLabelsRequest,
         setCacheFriendlyLabels,
+
         
     });
 

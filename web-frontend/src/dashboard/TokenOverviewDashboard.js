@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, {useContext, useState, useEffect} from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -42,73 +43,14 @@ import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import LiquidityChart from './subcomponents/LiquidityChart';
 import ExamplePopUpWindow from './ExamplePopUpWindow';
-
+import TxVisualizer from './TxVisualizer';
+import ForceGraphComponent from './TxVisualizer-WatchedTokens';
 
 // TimeAgo.addDefaultLocale(en);
 
 
 
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {/* {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'} */}
-    </Typography>
-  );
-}
 
-
-// const drawerWidth = 240;
-const drawerWidth = 320;
-
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
-
-// const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-//   ({ theme, open }) => ({
-//     '& .MuiDrawer-paper': {
-//       position: 'relative',
-//       whiteSpace: 'nowrap',
-//       width: drawerWidth,
-//       transition: theme.transitions.create('width', {
-//         easing: theme.transitions.easing.sharp,
-//         duration: theme.transitions.duration.enteringScreen,
-//       }),
-//       boxSizing: 'border-box',
-//       ...(!open && {
-//         overflowX: 'hidden',
-//         transition: theme.transitions.create('width', {
-//           easing: theme.transitions.easing.sharp,
-//           duration: theme.transitions.duration.leavingScreen,
-//         }),
-//         width: theme.spacing(7),
-//         [theme.breakpoints.up('sm')]: {
-//           width: theme.spacing(9),
-//         },
-//       }),
-//     },
-//   }),
-// );
 
 const mdTheme = createTheme({
   palette: {
@@ -118,46 +60,42 @@ const mdTheme = createTheme({
 
 function DashboardContent() {
   const [open, setOpen] = React.useState(true);
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
   const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
   const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
   const {getnewTxData, setgetnewTxData} = useContext(GeneralContext); //this is the trigger to get new data from the api. value is the address of the token
-  const {viewingTokenAddress, setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
-  const {clickedDetailsAddress, setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
-  const {clickedDetailsAddressFN, setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
-  const {clickedTokenSymbol, setclickedTokenSymbol} = useContext(GeneralContext);
-  const {clickedToken, setclickedToken} = useContext(GeneralContext);
+  const {setviewingTokenAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+  const {setclickedDetailsAddress} = useContext(GeneralContext); //this is the address of the token we are viewing
+  const {setclickedDetailsAddressFN} = useContext(GeneralContext); //this is the address of the token we are viewing
+  const {clickedTokenSymbol} = useContext(GeneralContext);
+  const {setclickedToken} = useContext(GeneralContext);
   const {LpTotalTokensHeld, setLpTotalTokensHeld} = useContext(GeneralContext);
   
-  const {chainDataHeartbeat, setchainDataHeartbeat} = useContext(GeneralContext);
+  const {chainDataHeartbeat} = useContext(GeneralContext);
   const [chainDataHeartbeatDiff, setchainDataHeartbeatDiff] = React.useState(0);
   
   const {MinAmountFilterValue, setMinAmountFilterValue} = useContext(GeneralContext);
   const {MaxAmountFilterValue, setMaxAmountFilterValue} = useContext(GeneralContext);
-  const {systemStatuses, setSystemStatuses} = useContext(GeneralContext);
-  const {filteredtxDataInflow,   setfilteredtxDataInflow} = useContext(GeneralContext);
-  const {filteredtxDataOutflow,  setfilteredtxDataOutflow} = useContext(GeneralContext);
+  const {systemStatuses} = useContext(GeneralContext);
+  const {setfilteredtxDataInflow} = useContext(GeneralContext);
+  const {setfilteredtxDataOutflow} = useContext(GeneralContext);
   const [clickedSearchBar, setclickedSearchBar] = React.useState(false);
   const [showTokenSelector, setshowTokenSelector] = React.useState(false);
   const [searchInput, setsearchInput] = useState("")
-  const {DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue} = useContext(GeneralContext);
-  const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
-  const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
-  const {detectedLPs, setdetectedLPs} = useContext(GeneralContext); 
+  const {DisplayMinAmountFilterValue} = useContext(GeneralContext);
+  const {DisplayMaxAmountFilterValue} = useContext(GeneralContext);
+  const {latestEthBlock} = useContext(GeneralContext); 
+  const {detectedLPs} = useContext(GeneralContext); 
   const {txDataChart, settxDataChart} = useContext(GeneralContext);
   const {txDataChartOverTime, settxDataChartOverTime} = useContext(GeneralContext); 
-  const {LpChartData, setLpChartData} = useContext(GeneralContext); 
+  const {setLpChartData} = useContext(GeneralContext); 
   const {LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider} = useContext(GeneralContext); 
-  const {watchedTokenPriceUsd, setwatchedTokenPriceUsd} = useContext(GeneralContext);
+  const {watchedTokenPriceUsd} = useContext(GeneralContext);
 
 
   const [toggleShowLPDiv, settoggleShowLPDiv] = React.useState(false);
-  const {logScaleTickBox, setLogScaleTickBox} = useContext(GeneralContext)
-  const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
+  const {logScaleTickBox} = useContext(GeneralContext)
+  const {setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
   
-  const timeAgo = new TimeAgo('en-US'); 
   
   const [fakeData, setfakeData] = React.useState([{poolName: 'UniSwap v3 Pool', heldAmount: 'held: 600,241', linkedPair:'MATIC',priceUsd:'$0.21'}, {poolName: 'XT.com', linkedPair: 'WBTC', heldAmount:'held: 26,402',priceUsd:'$0.18'}, {poolName: 'Pancake Swap', heldAmount: 'held: 147,062', linkedPair:'USDC',priceUsd:'$0.24'}]);
 
@@ -304,17 +242,6 @@ function DashboardContent() {
 
 
 
-
-
-
-  // function updateSelectedToken (){
-  //   // setviewingTokenAddress(); 
-  //   setclickedDetailsAddress(null);
-  //   setclickedDetailsAddressFN(null);
-  
-  //   setfilteredtxDataInflow(); 
-  //   setfilteredtxDataOutflow();
-  // }
   
   useEffect(()=>{
     if (searchInput){
@@ -335,41 +262,6 @@ function DashboardContent() {
   },[clickedSearchBar])
 
 
-
-  function updateSelectedToken (token){
-
-    console.log('clicked: ',token, token); 
-    setviewingTokenAddress(token.tokenAddress.address); 
-    setclickedDetailsAddress(null);
-    setclickedDetailsAddressFN(null);
-    document.title = "👁️ "+token.tokenAddress.name;
-    setclickedTokenSymbol(token.tokenAddress.symbol);
-    setclickedToken(token); 
-    setfilteredtxDataInflow(); 
-    setfilteredtxDataOutflow(); 
-}
-
-
-  // clipboard copy method cannot be used without HTTPS and I haven't written my API for https yet. This hack is temp.
-  /////////////////////////////////////////////////
-  const CopyToClipboard = (text) => {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-    try {
-        document.execCommand('copy')
-    } catch (err) {
-        console.error('Unable to copy to clipboard', err)
-    }
-    document.body.removeChild(textArea)
-};
-  /////////////////////////////////////////////////
-
-function function66(e){
-  console.log("function66:", e)
-}
 
 const displayAddressFN = (clickedDetailsAddressFN) => {
   let firstAddress;
@@ -462,40 +354,13 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
 }
 
   return (
-    <div style={{overflow:'hidden'}}>
+    <div style={{width:'100%', position:'absolute', border:'0px solid #ff0'}}>
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
 
 
-          
-          {/* <div style={{fontSize:'1.5vh', position:'absolute', right:'15vw', top:'0.5vh', display:'flex', justifyContent:'center', alignItems:'center', backgroundColor:'rgba(0,0,0,0.4)',width:'13vw', height:'6.5vh'}}>
-            <div style={{}}>
-              <div  style={{position:'absolute', left:'0', top:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
-                Filter Amount
-              </div>
-
-              <div style={{ bottom:'0',}}>
-                <input type="number" value={DisplayMinAmountFilterValue} onChange={(e) => setMinAmountFilterValue(e.target.value)} style={{width:'5vw',marginRight:'1vw', height:'2.5vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="Min" />
-                <input type="number" value={DisplayMaxAmountFilterValue} onChange={(e) => setMaxAmountFilterValue(e.target.value)} style={{width:'5vw', height:'2.5vh', backgroundColor:'rgba(0,0,0,0.4)', color:'white', border:'none', textAlign:'center'}} placeholder="Max" />
-              </div>
-
-              <div className="filterResetHover" onClick={() =>{setMaxAmountFilterValue(); setMinAmountFilterValue();setDisplayMaxAmountFilterValue(0); setDisplayMinAmountFilterValue(0) }} style={{position:'absolute', left:'0', bottom:'0', textAlign:'center',  display:'flex', justifyContent:'center', width:'100%', }}>
-                Reset
-              </div>
-            </div>
-          </div> */}
-
-
-             
-
-
-              {/* <div style={{position:'absolute', right: '1vw', top:'1vh',zIndex:'9999',}}>
-                <AudioToggle />
-              </div> */}
-
-          
-          {/* it went here WALRUS  */}
+        
           
        
           <Toolbar />
@@ -574,7 +439,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
                               </div>
 
 
-                        {filterToUniqueLPProvidersFN(detectedLPs.uniswap_v3_pools[item]).map((friendlyNameObj,index) => {
+                        {filterToUniqueLPProvidersFN(detectedLPs.uniswap_v3_pools[item]).map((friendlyNameObj) => {
                             // console.log(detectedLPs.uniswap_v3_pools[item]);
                             
                             return (
@@ -620,40 +485,15 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
             </div>
             
 
-
-            <div style={{position:'absolute', top:'62vh', left:'3vw', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
-              Closely Watching Activity
-            </div>
-            <div style={{overflowY:'scroll', overflowX:'hidden', border:'1px solid rgba(100,100,100,0.4)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'30vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'65vh', }}>
-              
-              {/* map of fake data array that show like placeholder cards */}
-              
-            </div>
-
-            <div onClick={()=>{setLogScaleTickBox(!logScaleTickBox)}} style={{cursor:'pointer', display:'flex', justifyContent:'center', position:'absolute', width:'1vw', height:'1vw', backgroundColor:logScaleTickBox? 'rgba(255,255,255,1)': 'rgba(255,255,255,0)', border:logScaleTickBox? '':'1px solid #fff', top:'14vh', left:'19.5vw', zIndex:'5'}}>
-              <div style={{position:'absolute', top:'-2.5vh'}}>{logScaleTickBox? <>log</>: <>linear</>}</div>
-            </div>
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
               
-              <div style={{position:'absolute', width:'100%', display:'flex',}}>
-                <div style={{position:'absolute', left:'-1vw',top:'2.98vh', width:'59.7vw', height:'35.02vh',padding:'1.5vw', border:'0px solid #f0f'}}>
-                  <Chart />
-                </div>
-                <div style={{position:'absolute', left:'-1vw', top:'-3vh', width:'62.9vw', height:'38.75vh',padding:'1.5vw', border:'0px solid #f0f'}}>
-                  <ChartAddysOverTime data={txDataChartOverTime}/> 
-                </div>
-
-                {/* <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', textAlign:'center', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'0vh', width:'25%', height:'10vh',alignItems:'center', border:'1px solid rgba(100,100,100,0.4)',}}>
-                  Holders: 42,069<br></br>
-                  (draw line chart over bar chart for total holders)
-                </div> */}
-                {/* <div style={{backgroundColor:'rgba(0,0,0,0.2)',display:'flex', justifyContent:'center', borderRadius:'0.5vw', position:'absolute', right:'0', top:'11vh',width:'25%', height:'25vh',padding:'1.5vw', border:'1px solid rgba(100,100,100,0.4)',}}>
-                  <TokenVolumeDash />
-                </div> */}
-                
+              <div style={{position:'absolute', width:'100%', height:'52vh', border:'1px solid rgba(255,255,255,0.4)',  top:'-2vh',}}>
+                <ForceGraphComponent />
               </div>
 
-              <div style={{position:'absolute', width:'100%', top:'35vh',}}>
+
+
+              <div style={{position:'absolute', width:'100%', height:'20vh',top:'50.8vh',}}>
                 <Orders />
               </div>
 
@@ -668,10 +508,6 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
       
 
 
-      {/* <List style={{overflow:'hidden'}} component="nav">
-        <MainList />
-        <SecondaryList />
-      </List> */}
     </ThemeProvider>
       </div>
   );
