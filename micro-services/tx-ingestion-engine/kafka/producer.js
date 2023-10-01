@@ -21,9 +21,24 @@ const produceTokenTransferEvent = async (eventData) => {
         { value: JSON.stringify(eventData) }
       ]
     });
-    console.log(`Sent token transfer event to Kafka: ${JSON.stringify(eventData)}`);
+    // console.log(`Sent token transfer event to Kafka: ${JSON.stringify(eventData)}`);
   } catch (error) {
     console.error(`Error producing token transfer event: ${error.message}`);
+  }
+};
+
+// raw-transactions Kafka event
+const produceTokenTransferStreamEvent = async (eventData) => {
+  try {
+    await producer.send({
+      topic: config.rawStreamedTransactions,
+      messages: [
+        { value: JSON.stringify(eventData) }
+      ]
+    });
+    // console.log(`Sent token transfer event to Kafka: ${JSON.stringify(eventData)}`);
+  } catch (error) {
+    console.error(`Error producing STREAM token transfer event: ${error.message}`);
   }
 };
 
@@ -43,6 +58,7 @@ const produceErrorEvent = async (errorData) => {
 
 module.exports = {
   initProducer,
+  produceTokenTransferStreamEvent,
   produceTokenTransferEvent,
   produceErrorEvent
 };

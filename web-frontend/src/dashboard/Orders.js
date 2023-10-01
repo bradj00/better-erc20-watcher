@@ -263,7 +263,7 @@ export default function Orders() {
                         <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
                     </TableCell> 
                     <TableCell align="left" style={{fontSize:'1vw'}}>
-                        {commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}
+                        {commaNumber(parseFloat(row.value / (10**8)).toFixed(4))}
                     </TableCell> 
                     <TableCell title={row.block_timestamp} style={{fontSize:'1vw'}}>
                         {timeAgo.format(new Date(row.block_timestamp),'mini')}
@@ -304,7 +304,7 @@ export default function Orders() {
                           <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
                       </TableCell> 
                       <TableCell align="left" style={{fontSize:'1vw'}}>
-                          {commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}
+                          {commaNumber(parseFloat(row.value / (10**8)).toFixed(4))}
                       </TableCell> 
                       <TableCell title={row.block_timestamp} style={{fontSize:'1vw'}}>
                           {timeAgo.format(new Date(row.block_timestamp),'mini')}
@@ -337,7 +337,7 @@ export default function Orders() {
             )}
           </TableBody>
         </Table>
-      </div>
+      </div> 
 
       <Link color="primary" href="#" onClick={() => { setexpandTxView(!expandTxView); }}>
         {!expandTxView? "See more":"See less"}

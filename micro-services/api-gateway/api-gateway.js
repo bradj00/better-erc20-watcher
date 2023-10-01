@@ -6,9 +6,15 @@
 // #1 expose a GET method, relaying all existing registered Micro Service URLs
 // #2 expose a POST method, updating the URL for a single Micro Service URL
 
+let subscriptions = {}; //socket clients subscribed to topics the api-gateway might receive from kafka
+
+
+
+const { initConsumer, consumeTokenTransferEvent } = require('./kafka/consumer');
+
+
 
 const db = require('./service-library/db');
-const dbRedis = require('./service-library/dbRedis')
 
 require('dotenv').config(); // Importing dotenv to load environment variables
 console.clear();
@@ -38,18 +44,10 @@ const wss = new WebSocket.Server({ server });
 let clientIdCounter = 1;  // Simple counter to assign unique IDs to clients
 
 
-
-dbRedis.connectToRedisServer((err) => {
-    if (err) {
-        console.error("Failed to connect to Redis:", err);
-        process.exit(1);
-    }
-    else {
-        console.log('\tconnected to Redis')
-    }
-
-    // ... rest of your server initialization code
+initConsumer(broadcastToTopic).catch(error => {
+    console.error("Error initializing Kafka consumer:", error);
 });
+
 db.connectToServer((err) => {
     if (err) {
         console.error("Failed to connect to MongoDB:", err);
@@ -58,9 +56,49 @@ db.connectToServer((err) => {
     else {
         console.log('\tconnected to MongoDB')
     }
-
-    // ... rest of your server initialization code
 });
+
+
+
+//called when we consume a kafka message and determine to send it to our wss subscribers
+function broadcastToSubscribers(topic, data) {
+    const subscribers = subscriptions[topic];
+    if (subscribers) {
+        subscribers.forEach(ws => {
+            ws.send(JSON.stringify(data));
+        });
+    }
+}
+
+function broadcastToTopic(topic, data) {
+    const subscribers = subscriptions[topic];
+    if (subscribers) {
+        subscribers.forEach(subscriber => {
+            subscriber.ws.send(JSON.stringify(data));
+        });
+    }
+}
+
+
+
+//test function
+function logSubscriptions() {
+    console.log("---- Subscriptions ----");
+    for (let topic in subscriptions) {
+        const clientIds = subscriptions[topic].map(sub => sub.clientId);
+        console.log(`Topic: ${topic} -> Client IDs: ${clientIds.join(', ')}`);
+    }
+    console.log("-----------------------");
+
+    // Broadcast a test message to all clients subscribed to 'testTopic'
+    // broadcastToTopic('watchedTokenTX', {
+    //     service: 'TestService',
+    //     method: 'AppendTransaction',
+    //     data: 'This is a test broadcast message!'
+    // });
+}
+
+// setInterval(logSubscriptions, 2000);
 
 
 
@@ -73,11 +111,36 @@ wss.on('connection', (ws, req) => {
     const timestamp = new Date().toISOString();  // Generate a timestamp
     console.log(`[WSS][${timestamp}] Client connected. ID: ${clientId}, IP: ${clientIp}`);
 
+
+    
+
+
     ws.on('message', (message) => {
-        console.log(`Received message from client ID: ${clientId}: ${message}`);
-        
-        // Parse the message
         const parsedMessage = JSON.parse(message);
+        // console.log(`Received message from client ID: ${clientId}: ${message}`);
+    
+
+        if (parsedMessage.type === 'subscribe') {
+            console.log('\n\n','CLIENT WANTS TO SUBSCRIBE: ',parsedMessage,'\n\n')
+            const topic = parsedMessage.topic;
+            if (!subscriptions[topic]) {
+                subscriptions[topic] = [];
+            }
+            subscriptions[topic].push({ ws: ws, clientId: ws.clientId });
+            ws.send(JSON.stringify({ status: "Subscribed", topic: topic }));
+        }
+
+        if (parsedMessage.type === 'unsubscribe') {
+            console.log('CLIENT WANTS TO UNSUBSCRIBE:', parsedMessage);
+            const topic = parsedMessage.topic;
+            if (subscriptions[topic]) {
+                subscriptions[topic] = subscriptions[topic].filter(subscriber => subscriber.ws !== ws);
+                ws.send(JSON.stringify({ status: "Unsubscribed", topic: topic }));
+            } else {
+                ws.send(JSON.stringify({ status: "Error", message: `Not subscribed to topic: ${topic}` }));
+            }
+        }
+
 
         // Acknowledge receipt and notify processing
         ws.send(JSON.stringify({
@@ -92,7 +155,13 @@ wss.on('connection', (ws, req) => {
 
     ws.on('close', () => {
         console.log(`Client with ID: ${clientId} disconnected`);
+    
+        // Remove the client from all subscription lists
+        for (let topic in subscriptions) {
+            subscriptions[topic] = subscriptions[topic].filter(subscriber => subscriber.ws !== ws);
+        }
     });
+    
 });
 
 
@@ -130,8 +199,13 @@ server.listen(PORT, () => {
 function cleanup() {
     db.getClient().close(() => {
         console.log("\n\nDatabase connection closed.");
+
+        // consumer.disconnect().then(() => {
+        //     console.log("Kafka consumer disconnected.");
+        // });
         process.exit(0);
     });
+    
 }
 
 

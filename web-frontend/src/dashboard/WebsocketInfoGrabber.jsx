@@ -3,6 +3,8 @@ import { GeneralContext } from '../App.js';
 import * as socketHandlers from './service-library/socketHandlers';
 
 const WebsocketInfoGrabber = () => {
+    const txDataRef = useRef();
+
     const ws = useRef(null);
     const [status, setStatus] = useState("Disconnected");
     const hasConnectedBefore = useRef(false);
@@ -12,9 +14,12 @@ const WebsocketInfoGrabber = () => {
     const {RequestFriendlyLookup} = useContext(GeneralContext);
     const {RequestTransactionList} = useContext(GeneralContext);
     const {setFriendlyLookupResponse} = useContext(GeneralContext);
-    const {settxData} = useContext(GeneralContext);
+    const {txData, settxData} = useContext(GeneralContext);
     const {CacheFriendlyLabelsRequest, setCacheFriendlyLabelsRequest} = useContext(GeneralContext);
     const {setCacheFriendlyLabels} = useContext(GeneralContext);
+    const {viewingTokenAddress} = useContext(GeneralContext);
+
+    const previousSubscription = useRef(null); // To keep track of the previous subscription
 
     const [dataSetterObj] = useState({
         setWatchedTokenList,
@@ -24,6 +29,31 @@ const WebsocketInfoGrabber = () => {
         setCacheFriendlyLabels,
         
     });
+
+    useEffect(() => {
+        if (viewingTokenAddress) {
+            // De-subscribe from the previous topic
+            if (previousSubscription.current && ws.current && ws.current.readyState === WebSocket.OPEN) {
+                const deSubscriptionMessage = {
+                    type: 'unsubscribe',
+                    topic: previousSubscription.current
+                };
+                ws.current.send(JSON.stringify(deSubscriptionMessage));
+            }
+
+            // Subscribe to the new topic
+            if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+                const subscriptionMessage = {
+                    type: 'subscribe',
+                    topic: viewingTokenAddress
+                };
+                ws.current.send(JSON.stringify(subscriptionMessage));
+            }
+
+            // Update the previousSubscription ref
+            previousSubscription.current = viewingTokenAddress;
+        }
+    }, [viewingTokenAddress]);
 
   
     useEffect(() => {
@@ -61,35 +91,60 @@ const WebsocketInfoGrabber = () => {
         }
     }, [watchedTokenList]);
 
+    // useEffect(() => {
+    //     txDataRef.current = txData;
+    // }, [txData]);
+
+    useEffect(() => {
+        if (txDataRef.current) {
+            console.log("Previous txData:", txDataRef.current);
+            console.log("Current txData:", txData);
+        }
+        txDataRef.current = txData;
+    }, [txData]);
+    
     const connectWebSocket = () => {
         ws.current = new WebSocket('wss://10.0.3.240:4050');
-
+    
         ws.current.onopen = () => {
             setStatus("Connected");
-
+    
+            // Subscribe to the test topic after connection is established
+            // const subscriptionMessage = {
+            //     type: 'subscribe',
+            //     topic: 'testTopic'
+            // };
+            // ws.current.send(JSON.stringify(subscriptionMessage));
+    
             if (ws.current.readyState === WebSocket.OPEN && !hasConnectedBefore.current) {
                 requestWatchedTokensList();
                 hasConnectedBefore.current = true;
             }
         };
-
+    
         ws.current.onerror = (error) => {
             console.error(`WebSocket Error: ${error}`);
         };
-
+    
         ws.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
             console.log('socket returned data: ', data);
             if (data.service) {
                 const handlerName = `handle${data.method}`;
                 if (socketHandlers[handlerName]) {
-                    socketHandlers[handlerName](data, dataSetterObj);
+                    if (handlerName === 'handleAppendTransactions') {
+                        socketHandlers[handlerName](data, dataSetterObj, txDataRef.current);
+                    }
+                     else {
+                        socketHandlers[handlerName](data, dataSetterObj);
+                    }
                 } else {
                     console.warn(`Handler not found for service: ${data.service}, method: ${data.method}`);
                 }
             }
         };
-
+        
+    
         ws.current.onclose = (event) => {
             if (event.wasClean) {
                 setStatus(`Closed cleanly, code=${event.code}, reason=${event.reason}`);
@@ -99,6 +154,7 @@ const WebsocketInfoGrabber = () => {
             }
         };
     }
+    
 
     const requestFnLookup = (friendlyName) => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {

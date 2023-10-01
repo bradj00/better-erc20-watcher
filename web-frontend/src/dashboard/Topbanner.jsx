@@ -291,9 +291,9 @@ const Topbanner = () => {
 
 
     <div style={{color:'#999', width:'30%',display:'flex', border:'0px solid #ff0', position:'absolute', top:'25%', left:'0%'}} >
-    <div onClick={()=>{setclickedSearchBar(!clickedSearchBar);}} style={{cursor:'pointer', zIndex:'10000'}}>
+    {/* <div onClick={()=>{setclickedSearchBar(!clickedSearchBar);}} style={{cursor:'pointer', zIndex:'10000'}}>
         {viewingTokenAddress? <SearchIcon />:<></>}
-    </div>
+    </div> */}
 
     {
 

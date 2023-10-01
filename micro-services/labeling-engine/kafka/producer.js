@@ -21,7 +21,7 @@ const produceTokenTransferEvent = async (eventData) => {
         { value: JSON.stringify(eventData) }
       ]
     });
-    console.log(`Sent token transfer event to Kafka: ${JSON.stringify(eventData)}`);
+    // console.log(`Sent token transfer event to Kafka: ${JSON.stringify(eventData)}`);
   } catch (error) {
     console.error(`Error producing token transfer event: ${error.message}`);
   }

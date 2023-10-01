@@ -1,6 +1,6 @@
 console.clear();
 
-const { initProducer, produceTokenTransferEvent, produceErrorEvent } = require('../kafka/producer.js');
+const { initProducer, produceTokenTransferEvent, produceTokenTransferStreamEvent, produceErrorEvent } = require('../kafka/producer.js');
 
 
 
@@ -124,6 +124,7 @@ async function getERC20Transfers(contractAddress, fromBlock, toBlock) {
             const timestamp = await getBlockTimestamp(log.blockNumber);
             return {
                 raw: log,
+                address: log.address,
                 from: '0x' + log.topics[1].slice(26),
                 to: '0x' + log.topics[2].slice(26),
                 value: web3.utils.fromWei(web3.utils.hexToNumberString(log.data), 'ether'),
@@ -242,6 +243,7 @@ async function processBlocks(contractAddress) {
 }
 
 async function getDecimals(contractAddress) {
+    console.log('GETTING DECIMALS')
     // The function signature for "decimals()"
     const functionSignature = '0x313ce567';
 
@@ -253,6 +255,7 @@ async function getDecimals(contractAddress) {
 
         // Convert the result from hex to a decimal number
         const decimals = web3.utils.hexToNumber(result);
+        console.log(contractAddress,' has ',result,' decimal places')
         return decimals;
     } catch (error) {
         console.error('Error fetching decimals:', error);
@@ -267,6 +270,7 @@ async function insertTransferToMongo(transfer, decimals) {
     const valueInWei = Web3.utils.toWei(transfer.value, 'ether');
 
     const structuredData = {
+        address: transfer.address,
         block_number: transfer.blockNumber.toString(),
         block_timestamp: transfer.timestamp,
         from_address: transfer.from,
@@ -274,30 +278,15 @@ async function insertTransferToMongo(transfer, decimals) {
         value: valueInWei,
         transaction_hash: transfer.raw.transactionHash,
     };
-
+    
     await produceTokenTransferEvent({
+        //should we flag the token_address here? If only LE picks this up probably not
         type: 'NEW_TX_CACHED',
         data: structuredData
     });
     
     await collection.insertOne(structuredData);
 }
-
-
-
-
-
-// (async () => {
-//     getDecimals(ERC20_CONTRACT_ADDRESS).then(decimals => {
-//         console.log(`Token has ${decimals} decimals.`);
-//     });
-
-//     console.log('reading last cached block from Mongo for contract ['+chalk.cyan(ERC20_CONTRACT_ADDRESS)+']')
-//     START_BLOCK = (await getLatestBlockFromMongo(ERC20_CONTRACT_ADDRESS))+1; //get the next block proceeding from the latest cached.
-//     console.log('last calculated block: ',START_BLOCK)
-//     await processBlocks(ERC20_CONTRACT_ADDRESS);
-// })();
-// // processBlocks(ERC20_CONTRACT_ADDRESS);
 
 
 async function connectToMongo() {

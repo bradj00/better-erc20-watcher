@@ -14,11 +14,11 @@ module.exports = {
             const fetchFromMongo = async (address) => {
                 const result = await mongoCollection.findOne({ address: address });
                 if (result) {
-                    console.log('match for: ',address, result,'\n')
+                    // console.log('match for: ',address, result,'\n')
                     return result;
                 }
                 else {
-                    console.log('\tno MONGO match for: ', address);
+                    // console.log('\tno MONGO match for: ', address);
                     return { [address]: {} }; // empty value with the Ethereum address as the key
                 }
             };
@@ -171,4 +171,4 @@ module.exports = {
         });
     }
 
-};
+    };

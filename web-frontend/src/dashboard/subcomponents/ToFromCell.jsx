@@ -22,7 +22,7 @@ const getFriendlyLabel = (address, cache) => {
             } else {
                 return labelObj.manuallyDefined;
             }
-        }
+        } 
 
         // Check ENS
         if (labelObj.ENS) {
@@ -60,7 +60,7 @@ const getFriendlyLabel = (address, cache) => {
     }
 
     // Handle case where no labels were found or met the criteria
-    return "Unknown"; // Or another default value
+    // return "Unknown"; // Or another default value
 
     // Return ellipsed version if no match found in cache
     return getEllipsisTxt(address, 6);
