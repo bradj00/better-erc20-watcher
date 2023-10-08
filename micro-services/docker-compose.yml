@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  react-app:
+      image: stagebox-images/react-app:latest
+      restart: always
+      ports:
+        - "80:3000"
+      networks:
+        - stagebox-network
+
+  api-gateway:
+    image: stagebox-images/api-gateway:latest
+    restart: always
+    networks:
+      - stagebox-network
+
+  tx-ingestion-engine:
+    image: stagebox-images/tx-ingestion-engine:latest
+    restart: always
+    networks:
+      - stagebox-network
+
+  labeling-engine:
+    image: stagebox-images/labeling-engine:latest
+    restart: always
+    networks:
+      - stagebox-network
+
+  master-rate-limiter:
+    image: stagebox-images/master-rate-limiter:latest
+    restart: always
+    networks:
+      - stagebox-network
+
+  token-external-lookup:
+    image: stagebox-images/token-external-lookup:latest
+    restart: always
+    networks:
+      - stagebox-network
+
+networks:
+  stagebox-network:
+    driver: bridge
