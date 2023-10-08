@@ -6,5 +6,8 @@
     "kafkajs": "^2.2.4",
     "mongodb": "^6.1.0",
     "redis": "^4.6.10"
+  },
+  "scripts": {
+    "start": "node labelingEngine.js"
   }
 }
