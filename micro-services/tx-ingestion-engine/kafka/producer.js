@@ -12,6 +12,16 @@ const initProducer = async () => {
   await producer.connect();
 };
 
+//errors topic
+const sendErrorToKafka = async (error) => {
+  await producer.send({
+    topic: 'errors',
+    messages: [
+      { value: JSON.stringify(error) }
+    ]
+  });
+};
+
 // raw-transactions Kafka event
 const produceTokenTransferEvent = async (eventData) => {
   try {

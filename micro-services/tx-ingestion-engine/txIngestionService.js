@@ -1,10 +1,10 @@
 console.clear();
 
-const { initProducer, produceTokenTransferEvent, produceTokenTransferStreamEvent, produceErrorEvent } = require('../kafka/producer.js');
+const { initProducer, produceTokenTransferEvent, produceTokenTransferStreamEvent, produceErrorEvent } = require('./kafka/producer.js');
 
 
 
-require('dotenv').config({ path: '../.env' });
+require('dotenv').config({ path: './.env' });
 const { Web3 } = require('web3');
 const { MongoClient } = require('mongodb');
 const axios = require('axios');

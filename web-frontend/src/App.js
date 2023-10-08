@@ -11,6 +11,7 @@ import TokenDetective from './dashboard/TokenDetective.jsx';
 import TestWSSComponent from './dashboard/TestWSSComponent.jsx';
 import WebsocketInfoGrabber from './dashboard/WebsocketInfoGrabber.jsx';
 import "./styles.css";
+import ServicesHealth from './dashboard/ServicesHealth.jsx';
 
 //OLD
 /////
@@ -23,6 +24,7 @@ export const rateLimiterContext                  = React.createContext({});
 export const labelingEngineContext               = React.createContext({});
 export const tokenExternalLookupContext          = React.createContext({});
 export const txIngestionEngineContext            = React.createContext({});
+export const ErrorsContext                       = React.createContext({});
 
 
 
@@ -48,7 +50,7 @@ const [communityHeldListFromSelected, setcommunityHeldListFromSelected] = useSta
 const [communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy] = useState();
 const [selectedAddyInGameBalance, setselectedAddyInGameBalance] = useState();
 const [LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider] = useState();
-
+const [ ServicesErrorMessages, setservicesErrorMessages  ] = useState([{message:'something here'},{message:'something here'},{message:'something here'},{message:'something here'},]);
 const [watchedTokenPriceUsd, setwatchedTokenPriceUsd] = useState();
 const [heldTokensSelectedAddressFNdisplayed, setheldTokensSelectedAddressFNdisplayed] = useState();
 
@@ -85,7 +87,7 @@ const [friendlyLookupResponse, setFriendlyLookupResponse] = useState();
 const [updateFriendlyName, setupdateFriendlyName] = useState();
 const [pageNumber, setpageNumber] = useState(1);
 // const [displayPanel, setdisplayPanel] = useState('watchingTokens');
-const [displayPanel, setdisplayPanel] = useState('watchingTokens');
+const [displayPanel, setdisplayPanel] = useState('servicesHealth');
 
 const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
 const [defaultData, setDefaultData] = useState({ nodes: [], links: [] });
@@ -113,7 +115,9 @@ const [dataCalls, setDataCalls] = useState({
   failed: {}
 });
 
-
+const ErrorsObject = {
+  ServicesErrorMessages, setservicesErrorMessages
+}
 
 
 
@@ -240,7 +244,8 @@ return (
     <labelingEngineContext.Provider      value={labelingEngine} >
     <tokenExternalLookupContext.Provider value={tokenExternalLookup} >
     <txIngestionEngineContext.Provider   value={txIngestionEngine} >
-
+    <ErrorsContext.Provider              value={ErrorsObject} >
+    
       <div style={{  border:'0px solid #0f0'}}>
           {/* <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/> */}
           <Topbanner />
@@ -249,6 +254,7 @@ return (
           {displayPanel === 'tokenSummary'? <TokenHoldersDashboard />: <></>}
           {displayPanel === 'txVisualizer'? <TxVisualizer />: <></>}
           {displayPanel === 'tokenDetective'? <TokenDetective />: <></>}
+          {displayPanel === 'servicesHealth'? <ServicesHealth />: <></>}
           
           
           
@@ -258,6 +264,7 @@ return (
     {/* <DatabaseInfoGrabber /> */}
    
 
+    </ErrorsContext.Provider>
     </txIngestionEngineContext.Provider>
     </tokenExternalLookupContext.Provider>
     </labelingEngineContext.Provider>

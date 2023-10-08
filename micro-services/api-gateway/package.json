@@ -3,9 +3,6 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
@@ -22,5 +19,8 @@
 		"nodemon": "^2.0.20",
 		"redis": "^4.6.10",
 		"web3": "^4.1.1"
-	}
+	},
+	"scripts": {
+		"start": "node api-gateway.js"
+	  }
 }
