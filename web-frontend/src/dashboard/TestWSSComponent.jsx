@@ -16,7 +16,7 @@ const WebSocketComponent = () => {
 
     useEffect(() => {
         // Create WebSocket connection
-        const socket = new WebSocket('wss://10.0.3.240:4050');
+        const socket = new WebSocket('wss://api-gateway:4050');
 
         socket.onopen = () => {
             setStatus("Connected");

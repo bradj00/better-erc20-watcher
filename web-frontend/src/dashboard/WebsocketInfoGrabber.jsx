@@ -106,7 +106,7 @@ const WebsocketInfoGrabber = () => {
     }, [txData]);
     
     const connectWebSocket = () => {
-        ws.current = new WebSocket('wss://10.0.3.240:4050');
+        ws.current = new WebSocket('wss://api-gateway:4050');
     
         ws.current.onopen = () => {
             setStatus("Connected");
