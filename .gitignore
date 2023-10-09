@@ -107,7 +107,6 @@ micro-services/api-gateway/certs/cert.pem
 micro-services/api-gateway/certs/key.pem
 web-frontend/certs/cert.pem
 web-frontend/certs/key.pem
-micro-services/tx-ingestion-engine/config/kafkaConfig.js
 start_screen_session.sh
 .vscode/settings.json
 web-frontend/package-lock.json
