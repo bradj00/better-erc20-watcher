@@ -1,6 +1,6 @@
 module.exports = {
     // List of broker addresses (usually the address of your Kafka server(s))
-    brokers: ['kafka.easy.local:9092'],
+    brokers: ['kafka:9092'],
   
     // Client ID to identify the instance when connecting to the Kafka cluster
     clientId: 'label-engine',
