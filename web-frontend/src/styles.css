@@ -70,7 +70,7 @@
 .dropdownItems.expanded {
   opacity: 1;
   transform: scaleY(1);
-  max-height: 22vh;
+  max-height: 26vh;
 }
 
 .leftBarGridTopItem {

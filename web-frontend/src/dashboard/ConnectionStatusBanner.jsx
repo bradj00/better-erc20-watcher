@@ -5,6 +5,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import ShareIcon from '@mui/icons-material/Share';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import TroubleshootIcon from '@mui/icons-material/Troubleshoot';
+import WifiFindIcon from '@mui/icons-material/WifiFind';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import "../styles.css"
@@ -50,8 +51,14 @@ const ConnectionStatusBanner = (props) => {
                 )}
                 {displayPanel === 'tokenDetective' && (
                     <>
-                        <TroubleshootIcon style={{ fontSize: '2vw' }} />
+                        <WifiFindIcon style={{ fontSize: '2vw' }} />
                         <span>Detect New Tokens</span>
+                    </>
+                )}
+                {displayPanel === 'servicesHealth' && (
+                    <>
+                        <TroubleshootIcon style={{ fontSize: '2vw' }} />
+                        <span>Micro Service Health</span>
                     </>
                 )}
             </div>
@@ -61,24 +68,28 @@ const ConnectionStatusBanner = (props) => {
                     {isDropdownOpen && (
                         <>
                             <div title="Watch Tokens" className="leftBarGridTopItem" onClick={() => handleIconClick('watchingTokens')}>
-                                <MonetizationOnIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw' }} />
+                                <MonetizationOnIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw', marginRight:'0.5vw' }} />
                                 Watch Tokens
                             </div>
                             <div title="Address Summaries" className="leftBarGridTopItem" onClick={() => handleIconClick('addressSummary')}>
-                                <PersonIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw' }} />
+                                <PersonIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw', marginRight:'0.5vw' }} />
                                 Address Summaries
                             </div>
                             <div title="Manage Action Rules" className="leftBarGridTopItem" onClick={() => handleIconClick('tokenSummary')}>
-                                <SummarizeIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw' }} />
+                                <SummarizeIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw', marginRight:'0.5vw' }} />
                                 Closely Watched Activity
                             </div>
                             <div title="Transaction Visualizer" className="leftBarGridTopItem" onClick={() => handleIconClick('txVisualizer')}>
-                                <ShareIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw' }} />
+                                <ShareIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw', marginRight:'0.5vw' }} />
                                 Transaction Visualizer
                             </div>
                             <div title="Detect New Tokens" className="leftBarGridTopItem" onClick={() => handleIconClick('tokenDetective')}>
-                                <TroubleshootIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw' }} />
+                                <WifiFindIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw', marginRight:'0.5vw' }} />
                                 Detect New Tokens
+                            </div>
+                            <div title="Micro Service Health" className="leftBarGridTopItem" onClick={() => handleIconClick('servicesHealth')}>
+                                <TroubleshootIcon className="leftBarGridTopItemIcon" style={{ fontSize: '2vw', marginRight:'0.5vw' }} />
+                                Micro Service Health
                             </div>
                         </>
                     )}

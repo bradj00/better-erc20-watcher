@@ -31,6 +31,7 @@ export const ErrorsContext                       = React.createContext({});
 function App() {
 //create context for the app
 const [txData, settxData] = useState(null);
+const [txDataForceGraph, settxDataForceGraph] = useState({ nodes: [], links: [] });
 const [TxSummaryData, setTxSummaryData] = useState(null);
 const [txVisualData, settxVisualData] = useState(null);
 const [txDataChart, settxDataChart] = useState(null);
@@ -87,7 +88,7 @@ const [friendlyLookupResponse, setFriendlyLookupResponse] = useState();
 const [updateFriendlyName, setupdateFriendlyName] = useState();
 const [pageNumber, setpageNumber] = useState(1);
 // const [displayPanel, setdisplayPanel] = useState('watchingTokens');
-const [displayPanel, setdisplayPanel] = useState('servicesHealth');
+const [displayPanel, setdisplayPanel] = useState('watchingTokens');
 
 const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
 const [defaultData, setDefaultData] = useState({ nodes: [], links: [] });
@@ -221,6 +222,8 @@ const contextObj = {
   logScaleTickBox, setLogScaleTickBox,
   TxSummaryData, setTxSummaryData,
   CacheFriendlyLabels, setCacheFriendlyLabels,
+  txDataForceGraph, settxDataForceGraph,
+
 
 ///////////////////////////////////////////////
 /////////MICRO SERVICE RE-FACTOR///////////////
