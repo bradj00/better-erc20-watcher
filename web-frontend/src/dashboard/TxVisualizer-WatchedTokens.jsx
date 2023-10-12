@@ -7,8 +7,20 @@ const ForceGraphComponent = () => {
     const {txDataForceGraph, settxDataForceGraph} = useContext(GeneralContext);
     const {txData} = useContext(GeneralContext);
 
+    const [highlightedNodes, setHighlightedNodes] = useState(new Set());
+
+
+    useEffect(() => {
+      if (highlightedNodes){
+        console.log('HIGHLIGHTED NODES: ',highlightedNodes)
+      }
+
+    },[highlightedNodes]);
+
     useEffect(() => {
       if (txData){
+        const newHighlightNodes = new Set([]);
+
         // Create a function to check if a node exists
         const nodeExists = (address) => txDataForceGraph.nodes.some(node => node.id === address);
     
@@ -25,6 +37,7 @@ const ForceGraphComponent = () => {
                     id: tx.from_address,
                     // ... other properties with default or calculated values
                 });
+                newHighlightNodes.add(tx.from_address);
             }
     
             // Check and add to_address node
@@ -33,6 +46,7 @@ const ForceGraphComponent = () => {
                     id: tx.to_address,
                     // ... other properties with default or calculated values
                 });
+                newHighlightNodes.add(tx.to_address);
             }
     
             // Check and add link
@@ -51,6 +65,8 @@ const ForceGraphComponent = () => {
             nodes: [...prevData.nodes, ...newNodes],
             links: [...prevData.links, ...newLinks]
         }));
+
+        setHighlightedNodes(newHighlightNodes);
     }
   }, [txData]);
 
@@ -65,24 +81,39 @@ const ForceGraphComponent = () => {
     });
 
     useEffect(() => {
-        if (fgRef.current && !bloomApplied) {
-            // Calculate the number of links connected to each node
-            const linkCount = {};
-            txDataForceGraph.links.forEach(link => {
-                linkCount[link.source.id] = (linkCount[link.source.id] || 0) + 1;
-                linkCount[link.target.id] = (linkCount[link.target.id] || 0) + 1;
-            });
-
-            // Apply the bloom effect to nodes with at least 3 links
-            const bloomPass = new UnrealBloomPass();
-            bloomPass.strength = 0.5;
-            bloomPass.radius = 1;
-            bloomPass.threshold = 0;
-            fgRef.current.postProcessingComposer().addPass(bloomPass);
-
-            setBloomApplied(true); // Set the state to indicate that the bloom effect has been applied
-        }
-    }, [txDataForceGraph]);
+      console.log('txDataForceGraph:', txDataForceGraph);
+  
+      // Remove duplicate nodes based on id
+      const uniqueNodes = txDataForceGraph.nodes.reduce((acc, node) => {
+          if (!acc.temp[node.id]) {
+              acc.temp[node.id] = true;
+              acc.result.push(node);
+          }
+          return acc;
+      }, { temp: {}, result: [] }).result;
+  
+      txDataForceGraph.nodes = uniqueNodes;
+  
+      if (fgRef.current && !bloomApplied) {
+          // Calculate the number of links connected to each node
+          const linkCount = {};
+  
+          txDataForceGraph.links.forEach(link => {
+              linkCount[link.source.id] = (linkCount[link.source.id] || 0) + 1;
+              linkCount[link.target.id] = (linkCount[link.target.id] || 0) + 1;
+          });
+  
+          // Apply the bloom effect to nodes with at least 3 links
+          const bloomPass = new UnrealBloomPass();
+          bloomPass.strength = 0.5;
+          bloomPass.radius = 1;
+          bloomPass.threshold = 0;
+          fgRef.current.postProcessingComposer().addPass(bloomPass);
+  
+          setBloomApplied(true); // Set the state to indicate that the bloom effect has been applied
+      }
+  }, [txDataForceGraph]);
+  
   
 
     const fgRef = useRef();
@@ -114,8 +145,7 @@ const ForceGraphComponent = () => {
                 ref={fgRef}
                 graphData={txDataForceGraph}
                 nodeColor={node => {
-                    const count = linkCount[node.id] || 0;
-                    return count >= 5 ? "cyan" : "purple"; // Replace "bloomColor" with the desired color for nodes with bloom
+                  return highlightedNodes.has(node.id) ? "cyan" : "red";
                 }}
                 backgroundColor="rgba(5,5,8,1)"
                 nodeLabel={d => `Name: ${d.id}`}

@@ -242,13 +242,16 @@ export default function Orders() {
         <Table size="small">
           <TableHead style={{position:'sticky', top:'0', backgroundColor:'rgba(50,50,60,1)'}}>
             <TableRow>
-              <TableCell>chain</TableCell>
-              <TableCell align="left">amount</TableCell>
-              <TableCell>age</TableCell>
-              <TableCell>from</TableCell>
-              <TableCell>to</TableCell>
-              <TableCell>tx hash</TableCell>
-              <TableCell>action</TableCell>
+              <TableCell><span title="Originating Chain">chain</span></TableCell>
+              <TableCell><span title="Block Number">block number</span></TableCell>
+              <TableCell><span title="Amount of Tokens">amount</span></TableCell>
+              <TableCell><span title="How Long Ago">age</span></TableCell>
+              <TableCell><span title="From Whom">from</span></TableCell>
+              <TableCell><span title="To Whom">to</span></TableCell>
+              <TableCell><span title="Transaction Hash">tx hash</span></TableCell>
+              <TableCell><span title="Labeling Engine Classifications for this TX">tags</span></TableCell>
+              <TableCell><span title="Estimated USD value of this transfer">value</span></TableCell>
+              <TableCell><span title="Labeling Engine Classified Action Taken">action</span></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -261,6 +264,9 @@ export default function Orders() {
                   <TableRow className={rowAge > 100 ? "rowHover" : "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash ? determineRowColor(row) : 'rgba(0,0,0,0)'}} key={index}>
                     <TableCell align="left" style={{ fontSize:'1vw' }}>
                         <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
+                    </TableCell> 
+                    <TableCell align="left" style={{fontSize:'1vw'}}>
+                       1234
                     </TableCell> 
                     <TableCell align="left" style={{fontSize:'1vw'}}>
                         {commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}
@@ -285,6 +291,12 @@ export default function Orders() {
                                 </a>
                             </div>
                         )}
+                    </TableCell>
+                    <TableCell style={{fontSize:'1vw'}}>
+                        {row.action || '-'}
+                    </TableCell>
+                    <TableCell style={{fontSize:'1vw'}}>
+                        {row.action || '-'}
                     </TableCell>
                     <TableCell style={{fontSize:'1vw'}}>
                         {row.action || '-'}

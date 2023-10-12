@@ -493,11 +493,11 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
 
 
 
-              <div style={{position:'absolute', width:'100%', height:'20vh',top:'50.8vh',}}>
-                <Orders />
-              </div>
 
             </div>
+              <div style={{position:'absolute', width:'98%',top:'62vh',}}>
+                <Orders />
+              </div>
             
            
             </div>
