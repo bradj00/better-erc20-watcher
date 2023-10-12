@@ -5,7 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.10.14",
+    "@mui/icons-material": "^5.14.13",
     "@mui/lab": "^5.0.0-alpha.144",
     "@mui/material": "^5.14.13",
     "@testing-library/jest-dom": "^5.16.5",
@@ -33,6 +33,7 @@
     "reactflow": "^11.4.2",
     "recharts": "^2.1.16",
     "styled-components": "^6.0.8",
+    "three-spritetext": "^1.8.1",
     "typescript": "^4.9.4",
     "use-sound": "^4.0.1",
     "web-vitals": "^2.1.4",

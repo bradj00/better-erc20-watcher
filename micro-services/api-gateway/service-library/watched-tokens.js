@@ -119,7 +119,7 @@ module.exports = {
                             }
                         },
                         { $sort: { int_block_number: -1 } },
-                        { $limit: 100 },
+                        { $limit: 200 },
                         { $skip: parameters.offset }
                     ])
                     .toArray();

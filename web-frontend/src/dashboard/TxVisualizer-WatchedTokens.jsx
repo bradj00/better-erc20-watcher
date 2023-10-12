@@ -1,14 +1,54 @@
 import React, { useEffect, useContext, useRef, useCallback, useState } from 'react';
+import {getEllipsisTxt} from './helpers/h.js';
 import { ForceGraph3D } from "react-force-graph";
 import { GeneralContext } from '../App';
-import { UnrealBloomPass } from './helpers/UnrealBloomPass'; // Import the required module
+import { UnrealBloomPass } from './helpers/UnrealBloomPass';
+import * as THREE from 'three';
+import person from './images/person.png';
+import personOld from './images/person-old.png';
+import '../App.css';
+
 const ForceGraphComponent = () => {
     // const [graphData, setGraphData] = useState({ nodes: [], links: [] });
     const {txDataForceGraph, settxDataForceGraph} = useContext(GeneralContext);
     const {txData} = useContext(GeneralContext);
+    const {CacheFriendlyLabels} = useContext(GeneralContext);
 
     const [highlightedNodes, setHighlightedNodes] = useState(new Set());
 
+
+    const panelStyle = `
+        padding: 0.2vw 0.4vw;
+        background-color: rgba(50, 50, 60, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0.25vh;
+        color: #FFFFFF;
+        font-size: 100%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        max-width: 15vw;
+        
+    `;
+
+    const titleStyle = `
+        font-size: 100%;
+        margin: 0;
+        padding-bottom: 1vh;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        display: flex;
+        justify-content: center;
+    `;
+
+    const paragraphStyle = `
+        margin: 10px 0;
+    `;
+
+
+    useEffect(() => {
+      if (CacheFriendlyLabels){
+        console.log('CacheFriendlyLabels: ',CacheFriendlyLabels)
+      }
+
+    },[CacheFriendlyLabels]);
 
     useEffect(() => {
       if (highlightedNodes){
@@ -55,16 +95,22 @@ const ForceGraphComponent = () => {
                     source: tx.from_address,
                     target: tx.to_address,
                     value: tx.value,
+                    newlyAdded: true, // Add this line
                     // ... other properties with default or calculated values
                 });
             }
         });
     
         // Update the graph data with the new nodes and links
-        settxDataForceGraph(prevData => ({
-            nodes: [...prevData.nodes, ...newNodes],
-            links: [...prevData.links, ...newLinks]
-        }));
+        settxDataForceGraph(prevData => {
+          const updatedLinks = [...prevData.links, ...newLinks].map(link => {
+              return { ...link, newlyAdded: false };
+          });
+          return {
+              nodes: [...prevData.nodes, ...newNodes],
+              links: updatedLinks
+          };
+      });
 
         setHighlightedNodes(newHighlightNodes);
     }
@@ -94,24 +140,24 @@ const ForceGraphComponent = () => {
   
       txDataForceGraph.nodes = uniqueNodes;
   
-      if (fgRef.current && !bloomApplied) {
-          // Calculate the number of links connected to each node
-          const linkCount = {};
+      // if (fgRef.current && !bloomApplied) {
+      //     // Calculate the number of links connected to each node
+      //     const linkCount = {};
   
-          txDataForceGraph.links.forEach(link => {
-              linkCount[link.source.id] = (linkCount[link.source.id] || 0) + 1;
-              linkCount[link.target.id] = (linkCount[link.target.id] || 0) + 1;
-          });
+      //     txDataForceGraph.links.forEach(link => {
+      //         linkCount[link.source.id] = (linkCount[link.source.id] || 0) + 1;
+      //         linkCount[link.target.id] = (linkCount[link.target.id] || 0) + 1;
+      //     });
   
-          // Apply the bloom effect to nodes with at least 3 links
-          const bloomPass = new UnrealBloomPass();
-          bloomPass.strength = 0.5;
-          bloomPass.radius = 1;
-          bloomPass.threshold = 0;
-          fgRef.current.postProcessingComposer().addPass(bloomPass);
+      //     // Apply the bloom effect to nodes with at least 3 links
+      //     const bloomPass = new UnrealBloomPass();
+      //     bloomPass.strength = 0.1;
+      //     bloomPass.radius = 1;
+      //     bloomPass.threshold = 0;
+      //     fgRef.current.postProcessingComposer().addPass(bloomPass);
   
-          setBloomApplied(true); // Set the state to indicate that the bloom effect has been applied
-      }
+      //     setBloomApplied(true); // Set the state to indicate that the bloom effect has been applied
+      // }
   }, [txDataForceGraph]);
   
   
@@ -140,21 +186,82 @@ const ForceGraphComponent = () => {
   
 
     return (
-        <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-            <ForceGraph3D
-                ref={fgRef}
-                graphData={txDataForceGraph}
-                nodeColor={node => {
-                  return highlightedNodes.has(node.id) ? "cyan" : "red";
-                }}
-                backgroundColor="rgba(5,5,8,1)"
-                nodeLabel={d => `Name: ${d.id}`}
-                enableNodeDrag={false}
-                enableNavigationControls={true}
-                showNavInfo={true}
-                onNodeClick={handleNodeClick} // Attach the handleNodeClick function here
-            />
-        </div>
+      <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+        <ForceGraph3D
+            ref={fgRef}
+            graphData={txDataForceGraph}
+            backgroundColor="rgba(5,5,8,1)"
+            nodeLabel={d => {
+              const labelData = CacheFriendlyLabels[d.id];
+              if (labelData && Object.keys(labelData).length > 1 && !labelData[d.id]) {
+                let infoString = "";
+                let title = "Node Info"; // default title
+                if (labelData["manuallyDefined"]) {
+                    title = labelData["manuallyDefined"]; // set the title if manuallyDefined exists
+                }
+            
+                const etherscanLink = `https://etherscan.io/address/${d.id}`;
+                const shortenedAddress = getEllipsisTxt(d.id, 6);
+            
+                Object.keys(labelData).forEach(key => {
+                    if (key !== "_id" && key !== "address" && key !== "manuallyDefined" && labelData[key] !== d.id && labelData[key] !== undefined) {
+                        let displayValue = labelData[key];
+                        if (typeof displayValue === "string" && displayValue.startsWith("0x")) {
+                            displayValue = getEllipsisTxt(displayValue, 6);
+                        }
+                        infoString += `
+                            <tr>
+                                <td style="text-align:left; padding-right:10px;">${key}</td>
+                                <td style="text-align:left;">${displayValue}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            
+                return `
+                    <div style="${panelStyle}">
+                        <h2 style="${titleStyle}">${title}</h2>
+                        <a href="${etherscanLink}" style="display:block; text-align:center; font-size:12px; margin-bottom:10px;" target="_blank">${shortenedAddress}</a>
+                        <table>
+                            ${infoString}
+                        </table>
+                    </div>
+                `;
+              } else {
+                return `
+                    <div style="${panelStyle}">
+                        <h2 style="${titleStyle}">Node Info</h2>
+                        <a href="https://etherscan.io/address/${d.id}" style="display:block; text-align:center; font-size:12px; margin-bottom:10px;" target="_blank">${getEllipsisTxt(d.id, 6)}</a>
+                        <p style="${paragraphStyle}">Other info: No additional information available.</p>
+                    </div>
+                `;
+              }
+            }}
+            
+          
+          
+            enableNodeDrag={false}
+            enableNavigationControls={true}
+            showNavInfo={true}
+            onNodeClick={handleNodeClick}
+            nodeThreeObject={(node) => {
+              // Conditionally choose the texture based on whether the node is highlighted or not
+              const chosenTexture = highlightedNodes.has(node.id) ? person : personOld;
+              const imgTexture = new THREE.TextureLoader().load(chosenTexture);
+          
+              const material = new THREE.SpriteMaterial({ map: imgTexture });
+              const sprite = new THREE.Sprite(material);
+              sprite.scale.set(12, 12); // Adjust the scale as needed
+
+              // Set a high renderOrder to ensure the sprite is always at the front
+              sprite.renderOrder = 9999;
+
+              return sprite;
+          }}
+          linkWidth={link => link.newlyAdded ? 10 : 1}
+          linkColor={link => link.newlyAdded ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,1)'}
+        />
+    </div>
     );
 }
 

@@ -417,3 +417,27 @@ tr:nth-child(odd) {
 /* ------------------------------------------ */
 
 
+.node-info-panel {
+  position: fixed;
+  padding: 10px 20px;
+  background-color: rgba(50, 50, 60, 0.9); /* Dark theme background */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  color: #FFFFFF; /* White text */
+  font-size: 14px;
+  display: none; /* Initially hidden */
+  z-index: 1000; /* Ensure it's on top of other elements */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 250px;
+}
+
+.node-info-panel h2 {
+  font-size: 18px;
+  margin: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.node-info-panel p {
+  margin: 10px 0;
+}
