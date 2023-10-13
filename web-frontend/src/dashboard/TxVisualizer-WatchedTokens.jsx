@@ -16,7 +16,10 @@ const ForceGraphComponent = () => {
 
     const [highlightedNodes, setHighlightedNodes] = useState(new Set());
 
-
+    // const [bloomApplied, setBloomApplied] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
+    const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+  
     const panelStyle = `
         padding: 0.2vw 0.4vw;
         background-color: rgba(50, 50, 60, 0.9);
@@ -117,7 +120,7 @@ const ForceGraphComponent = () => {
   }, [txData]);
 
 
-  const [bloomApplied, setBloomApplied] = useState(false);
+ 
 
     // Calculate the number of links connected to each node
     const linkCount = {};
@@ -160,6 +163,19 @@ const ForceGraphComponent = () => {
       // }
   }, [txDataForceGraph]);
   
+  useEffect(() => {
+    const closeMenu = (e) => {
+        if (showMenu && e.button === 0) { // Check for left click
+            setShowMenu(false);
+        }
+    };
+
+    document.addEventListener('mousedown', closeMenu);
+
+    return () => {
+        document.removeEventListener('mousedown', closeMenu);
+    };
+}, [showMenu]);
   
 
     const fgRef = useRef();
@@ -187,6 +203,35 @@ const ForceGraphComponent = () => {
 
     return (
       <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+
+{showMenu? <div 
+    style={{
+        position: 'absolute',
+        top: `${menuPosition.y}px`,
+        left: `${menuPosition.x}px`,
+        backgroundColor: '#222',
+        color:'#fff',
+        border: '1px solid black',
+        zIndex: 1000
+    }}
+    onClick={() => setShowMenu(false)}
+>
+    <table className="menu-table">
+        <tbody onClick={() => setShowMenu(false)}>
+            <tr >
+                <td>Action 1</td>
+            </tr>
+            <tr>
+                <td>Action 2</td>
+            </tr>
+            <tr>
+                <td>Action 3</td>
+            </tr>
+        </tbody>
+    </table>
+</div> : <></>}
+
+
         <ForceGraph3D
             ref={fgRef}
             graphData={txDataForceGraph}
@@ -238,6 +283,15 @@ const ForceGraphComponent = () => {
               }
             }}
             
+            onNodeRightClick={(node, event) => {
+              setShowMenu(true);
+              setMenuPosition({
+                  x: event.pageX - 200,  // Adjust the value as needed
+                  y: event.pageY - 50   // Adjust the value as needed
+              });
+            }}
+          
+          
           
           
             enableNodeDrag={false}

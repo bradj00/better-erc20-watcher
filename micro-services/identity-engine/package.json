@@ -8,6 +8,6 @@
     "redis": "^4.6.10"
   },
   "scripts": {
-    "start": "node labelingEngine.js"
+    "start": "node identityEngine.js"
   }
 }

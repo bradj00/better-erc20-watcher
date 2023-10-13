@@ -441,3 +441,22 @@ tr:nth-child(odd) {
 .node-info-panel p {
   margin: 10px 0;
 }
+
+
+/* Style for the table */
+.menu-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Style for each table cell */
+.menu-table td {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #ddd; /* Optional: To add a divider line between menu items */
+}
+
+/* Hover effect for the menu items */
+.menu-table tr:hover {
+  background-color: #666;
+}

@@ -11,7 +11,7 @@ const client = new MongoClient(MONGODB_URI);
 let addressesToCheck = [];
 
 const startLabelingEngine = async () => {
-  console.log('Starting Labeling Engine...');
+  console.log('Starting Identity Engine...');
 
   //Mongo connection
   await connectToMongo();
@@ -19,7 +19,7 @@ const startLabelingEngine = async () => {
   // Initialize and start the Kafka consumer
   await initConsumer();
 
-  console.log('Labeling Engine is now listening for events...');
+  console.log('Identity Engine is now listening for events...');
 };
 
 

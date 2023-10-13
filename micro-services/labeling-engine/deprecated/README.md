@@ -1,1 +1,0 @@
-These folders will be refactored into the Labeling Engine micro service
