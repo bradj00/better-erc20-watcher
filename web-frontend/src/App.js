@@ -4,7 +4,7 @@ import SettingsDashboard from './dashboard/SettingsDashboard.js';
 import AddressSummaryDashboard from './dashboard/AddressSummaryDashboard.js';
 import DatabaseInfoGrabber from './dashboard/DatabaseInfoGrabber.js';
 import React, {useContext, useEffect, useState} from 'react';
-import ConnectionStatusBanner from './dashboard/ConnectionStatusBanner.jsx';
+import ConnectionStatusBanner from './dashboard/NavigatorDropdown.jsx';
 import Topbanner from './dashboard/Topbanner.jsx';
 import TxVisualizer from './dashboard/TxVisualizer.jsx';
 import TokenDetective from './dashboard/TokenDetective.jsx';
@@ -12,6 +12,7 @@ import TestWSSComponent from './dashboard/TestWSSComponent.jsx';
 import WebsocketInfoGrabber from './dashboard/WebsocketInfoGrabber.jsx';
 import "./styles.css";
 import ServicesHealth from './dashboard/ServicesHealth.jsx';
+import CloselyWatchAddresses from './dashboard/CloselyWatchAddresses.js';
 
 //OLD
 /////
@@ -254,7 +255,7 @@ return (
           <Topbanner />
           {displayPanel === 'watchingTokens'? <TokenOverviewDashboard />: <></>}
           {displayPanel === 'addressSummary'? <AddressSummaryDashboard />: <></>}
-          {displayPanel === 'tokenSummary'? <TokenHoldersDashboard />: <></>}
+          {displayPanel === 'closelyWatchAddresses'? <CloselyWatchAddresses />: <></>}
           {displayPanel === 'txVisualizer'? <TxVisualizer />: <></>}
           {displayPanel === 'tokenDetective'? <TokenDetective />: <></>}
           {displayPanel === 'servicesHealth'? <ServicesHealth />: <></>}

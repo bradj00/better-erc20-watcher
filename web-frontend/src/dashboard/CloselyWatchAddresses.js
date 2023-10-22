@@ -58,7 +58,7 @@ const mdTheme = createTheme({
   },
 });
 
-function DashboardContent() {
+function CloselyWatched() {
   const [open, setOpen] = React.useState(true);
   const {audioEnabled, setAudioEnabled} = React.useContext(GeneralContext);
   const {watchedTokenList, setWatchedTokenList} = useContext(GeneralContext);
@@ -513,6 +513,6 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
   );
 }
 
-export default function Dashboard() {
-  return <DashboardContent />;
+export default function CloselyWatchAddresses() {
+  return <CloselyWatched />;
 }

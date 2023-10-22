@@ -31,7 +31,7 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import {commaNumber} from './helpers/h.js';
-import ConnectionStatusBanner from './ConnectionStatusBanner';
+import ConnectionStatusBanner from './NavigatorDropdown';
 
 
 

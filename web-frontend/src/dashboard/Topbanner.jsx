@@ -14,7 +14,7 @@ import {getEllipsisTxt} from './helpers/h.js';
 import TimeAgo from 'javascript-time-ago'
 
 import {commaNumber} from './helpers/h.js';
-import ConnectionStatusBanner from './ConnectionStatusBanner';
+import NavigatorDropdown from './NavigatorDropdown';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -98,32 +98,43 @@ const Topbanner = () => {
   }
 
   useEffect(()=>{
+    if (clickedToken){
+        console.log('clickedToken: ',clickedToken)
+    }
+  },[clickedToken]);
+
+  useEffect(()=>{
     if (clickedDetailsAddressFN){
         console.log('clickedDetailsAddressFN: ',clickedDetailsAddressFN);
     }
   },[clickedDetailsAddressFN])
 
-    function updateSelectedToken (token){
-
-        console.log('clicked: ',token, token); 
-        setviewingTokenAddress(token.data.address); 
-        setclickedDetailsAddress(null);
-        setclickedDetailsAddressFN(null);
-        document.title = "👁️ "+token.data.name;
-        setclickedTokenSymbol(token.data.symbol);
-        setclickedToken(token); 
-        setfilteredtxDataInflow(); 
-        setfilteredtxDataOutflow(); 
-
-        //refactor project
-        setRequestTransactionList({
-            dateFrom: 0,
-            dateTo: 0,
-            offset: 0,
-            tokenAddress: token.data.address
-        })
-
+  function updateSelectedToken(token) {
+    // Check if token and token.data are defined before proceeding
+    if (!token || !token.data) {
+        console.error('Token or token.data is not defined');
+        return;
     }
+
+    console.log('clicked: ', token, token); 
+    setviewingTokenAddress(token.data.address); 
+    setclickedDetailsAddress(null);
+    setclickedDetailsAddressFN(null);
+    document.title = "👁️ " + token.data.name;
+    setclickedTokenSymbol(token.data.symbol);
+    setclickedToken(token); 
+    setfilteredtxDataInflow(); 
+    setfilteredtxDataOutflow(); 
+
+    //refactor project
+    setRequestTransactionList({
+        dateFrom: 0,
+        dateTo: 0,
+        offset: 0,
+        tokenAddress: token.data.address
+    });
+}
+
 
 
     function doTheUpdate(nameItem){
@@ -245,7 +256,7 @@ const Topbanner = () => {
                 <img src={clickedToken && clickedToken.tokenAddress.logo? clickedToken.tokenAddress.logo : tokenImage } style={{width:'90%'}} />
             </div>
             <div style={{fontSize:'1.5vw', zIndex:'1', position:'absolute', width:'100%', left:'0', top:'-10%',}} onClick={() => {updateSelectedToken();setclickedSearchBar(false);setshowTokenSelector(false) }}>
-            {    clickedToken? <>${clickedToken.tokenAddress.symbol}</> : '...'}
+            {    clickedToken? <>${clickedToken.data.symbol}</> : '...'}
             </div>
 
             <div style={{ color:'#999',fontSize:'2vh',  bottom:'-10%', width:'100%', left:'0',position:'absolute',}}  >
@@ -262,25 +273,70 @@ const Topbanner = () => {
 
     </div>
 
-    { showTokenSelector  ?
-        <div style={{zIndex:'9999', width:'15%', height:'20vh', top:'5.5vh', border:'1px solid rgba(255,255,255,0.2)', borderTop:'0px solid #000', backgroundColor:'rgba(0,0,5,0.99)', left:'19vw', paddingTop:'1vh', position:'absolute'}}>
-        {watchedTokenList && Array.isArray(watchedTokenList)? watchedTokenList.map((token, index) => (
-            token? token.data.address?
-                <div style={{cursor:'pointer', zIndex:'10000', position:'relative', }} onClick={()=>{ updateSelectedToken(token); setshowTokenSelector(false) }}>
-                    <div  style={{padding:'0.6vw',backgroundColor:viewingTokenAddress?token.data.address?  viewingTokenAddress === token.data.address? 'rgba(215,215,255,0.2)':'rgba(0,0,0,0)':'rgba(0,0,0,0)':'rgba(0,0,0,0)'}} key={index} >
-                        <img src={token.data.logo? token.data.logo : tokenImage } style={{marginLeft:token.tokenAddress.logo?'0':'-0.5vh', height:token.data.logo?'3vh':'4vh'}} />{token.data.logo?<>&nbsp;&nbsp;</>: <>&nbsp;</>}
-                        {token.data.symbol}
+    {showTokenSelector && (
+    <div 
+        style={{
+            zIndex: '9999', 
+            width: '15%', 
+            minHeight: '20vh', // Changed from height to minHeight
+            maxHeight: '30vh', // Added a maximum height
+            overflowY: 'auto', // Allow vertical scrolling if content exceeds maxHeight
+            top: '5.5vh', 
+            border: '1px solid rgba(255,255,255,0.2)', 
+            borderTop: '0px solid #000', 
+            backgroundColor: 'rgba(0,0,5,0.99)', 
+            left: '19vw', 
+            paddingTop: '1vh', 
+            position: 'absolute'
+        }}
+    >
+        {watchedTokenList && Array.isArray(watchedTokenList) && 
+            watchedTokenList.map((token, index) => (
+                token && token.data && token.data.address ? (
+                    <div 
+                        key={index}
+                        style={{
+                            cursor: 'pointer', 
+                            zIndex: '10000', 
+                            position: 'relative',
+                            backgroundColor: viewingTokenAddress && token.data.address && viewingTokenAddress === token.data.address 
+                                ? 'rgba(215,215,255,0.2)' 
+                                : 'rgba(0,0,0,0)'
+                        }}
+                        onClick={() => {
+                            updateSelectedToken(token);
+                            setshowTokenSelector(false);
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = '#666'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = viewingTokenAddress && token.data.address && viewingTokenAddress === token.data.address ? 'rgba(215,215,255,0.2)' : 'rgba(0,0,0,0)'}
+                    >
+                        <div
+                            style={{
+                                padding: '0.6vw',
+                            }}
+                        >
+                            <img 
+                                src={token.data.logo ? token.data.logo : tokenImage}
+                                style={{
+                                    marginLeft: token.data.logo ? '0' : '-0.5vh',
+                                    height: token.data.logo ? '3vh' : '4vh'
+                                }}
+                                alt={`${token.data.symbol} logo`}
+                            />
+                            {token.data.logo ? <>&nbsp;&nbsp;</> : <>&nbsp;</>}
+                            {token.data.symbol}
+                        </div>
                     </div>
-                    {/* <div style={{border:'0px solid #0f0', textAlign:'left', fontSize:'1.3vh', left:'3vw', bottom:'-2%', position:'absolute',color:'#999',fontStyle:'italic', width:'100%',}}>
-                        re-indexing database in progress
-                    </div> */}
+                ) : (
+                    <div key={index} style={{marginBottom: '1vh'}}></div>
+                )
+            ))
+        }
+    </div>
+)}
 
-                </div> 
-            : <div style={{marginBottom:'1vh'}} key={index}></div> : <div key={index}></div>
-            
-        )) : <></>}
-        </div>: <></>
-    }
+
+
 
 
 
@@ -344,7 +400,7 @@ const Topbanner = () => {
 
     </div>
     <div style={{border:'0px solid #0ff', position:'fixed',top:'1vh',left:'1vw', height:'5vh', width:'10vw', zIndex:'10002'}}>
-        <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/>
+        <NavigatorDropdown diff={chainDataHeartbeatDiff}/>
     </div>
 
     {/* <div onClick={()=>{ setAudioEnabled(!audioEnabled) }}  style={{zIndex:'10000', cursor:'pointer', border:'0px solid #0ff', right:'5%', top:'20%', position:'absolute',}}>
