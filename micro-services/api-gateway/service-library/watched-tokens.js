@@ -159,10 +159,10 @@ module.exports = {
                     resolve({ status: 'success', data: [result[0]] });
                 } else {
                     console.log('\thave to look up token metadata from external api..');
-                    // If you need to fetch from an external API, you can do so here
-                    // and then resolve or reject based on the result.
-                    // For now, I'll reject to indicate the data wasn't found.
-                    reject({ status: 'error', message: 'Data not found' });
+                    // For now, reject to indicate the data wasn't found and must be looked up
+                    reject({ status: 'error', message: 'Building Token Cache' });
+
+                    // produce to Kafka to lookup token contract. to be consumed and processed by token-external-lookup
                 }
             } catch (error) {
                 console.error("\tError:", error);

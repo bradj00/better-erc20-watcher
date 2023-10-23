@@ -2,7 +2,6 @@ import React, {useContext, useEffect,useState} from 'react';
 import { useTheme } from '@mui/material/styles';
 // import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Label, ResponsiveContainer } from 'recharts';
-import ReactSlider from 'react-slider';
 import Title from './Title';
 import {GeneralContext} from '../App.js'
 

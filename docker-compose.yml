@@ -2,14 +2,14 @@ version: '3'
 
 services:
   zookeeper:
-    image: wurstmeister/zookeeper
+    image: ubuntu/zookeeper
     ports:
       - "2181:2181"
     networks:
         - better-erc20-watcher-network
         
   kafka:
-    image: wurstmeister/kafka
+    image: ubuntu/kafka
     ports:
       - "9092:9092"
     environment:
@@ -32,8 +32,22 @@ services:
       networks:
         - better-erc20-watcher-network
 
+  kafka-manager:
+    image: radarbase/kafka-manager
+    depends_on:
+      - kafka
+    ports:
+      - "9000:9000"
+    restart: always
+    networks:
+      - better-erc20-watcher-network
+      
   api-gateway:
     image: better-erc20-watcher/api-gateway:latest
+    depends_on:
+      - kafka
+    ports:
+      - "4050:4050"
     restart: always
     networks:
       - better-erc20-watcher-network
@@ -41,26 +55,28 @@ services:
   tx-ingestion-engine:
     image: better-erc20-watcher/tx-ingestion-engine:latest
     restart: always
+    depends_on:
+      - kafka
     networks:
       - better-erc20-watcher-network
 
-  labeling-engine:
-    image: better-erc20-watcher/labeling-engine:latest
-    restart: always
-    networks:
-      - better-erc20-watcher-network
+        #  labeling-engine:
+        #image: better-erc20-watcher/labeling-engine:latest
+        #    restart: always
+        #    networks:
+        #      - better-erc20-watcher-network
 
-  master-rate-limiter:
-    image: better-erc20-watcher/master-rate-limiter:latest
-    restart: always
-    networks:
-      - better-erc20-watcher-network
+        #  master-rate-limiter:
+        #    image: better-erc20-watcher/master-rate-limiter:latest
+        #    restart: always
+        #    networks:
+        #      - better-erc20-watcher-network
 
-  token-external-lookup:
-    image: better-erc20-watcher/token-external-lookup:latest
-    restart: always
-    networks:
-     - better-erc20-watcher-network
+        #  token-external-lookup:
+        #    image: better-erc20-watcher/token-external-lookup:latest
+        #    restart: always
+        #    networks:
+        #     - better-erc20-watcher-network
 
 networks:
   better-erc20-watcher-network:
