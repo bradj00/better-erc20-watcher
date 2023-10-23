@@ -109,4 +109,3 @@ web-frontend/certs/cert.pem
 web-frontend/certs/key.pem
 start_screen_session.sh
 .vscode/settings.json
-web-frontend/package-lock.json
