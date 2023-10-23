@@ -21,7 +21,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
 import Chart from './Chart';
 import TokenVolumeDash from './TokenVolumeDash';
-import Orders from './Orders';
+import Orders from './TokenTransactions';
 import { GeneralContext } from '../App';
 import AudioToggle from './subcomponents/AudioToggle';
 import SearchIcon from '@mui/icons-material/Search';
@@ -45,6 +45,7 @@ import LiquidityChart from './subcomponents/LiquidityChart';
 import ExamplePopUpWindow from './ExamplePopUpWindow';
 import TxVisualizer from './TxVisualizer';
 import ForceGraphComponent from './TxVisualizer-WatchedTokens';
+import TokenTransactions from './TokenTransactions';
 
 // TimeAgo.addDefaultLocale(en);
 
@@ -496,7 +497,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
 
             </div>
               <div style={{position:'absolute', width:'98%',top:'62vh',}}>
-                <Orders />
+                <TokenTransactions />
               </div>
             
            

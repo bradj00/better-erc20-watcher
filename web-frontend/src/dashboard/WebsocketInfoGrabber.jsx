@@ -19,8 +19,13 @@ const WebsocketInfoGrabber = () => {
     const {CacheFriendlyLabelsRequest, setCacheFriendlyLabelsRequest} = useContext(GeneralContext);
     const {setCacheFriendlyLabels} = useContext(GeneralContext);
     const {viewingTokenAddress} = useContext(GeneralContext);
+    const {updateCommitFriendlyNameRequest} = useContext(GeneralContext);
 
     const previousSubscription = useRef(null); // To keep track of the previous subscription
+
+    const hasOpenedCertPage = useRef(false);  // Add this ref to track the certificate acceptance page
+
+
 
     const [dataSetterObj] = useState({
         setWatchedTokenList,
@@ -31,6 +36,14 @@ const WebsocketInfoGrabber = () => {
 
         
     });
+
+
+    useEffect(() => {
+        if (updateCommitFriendlyNameRequest){
+            // console.log('~~~~ updateCommitFriendlyNameRequest: ', updateCommitFriendlyNameRequest);
+            updateAFriendlyName(updateCommitFriendlyNameRequest.address, updateCommitFriendlyNameRequest.friendlyName)
+        }
+    },[updateCommitFriendlyNameRequest]);
 
     useEffect(() => {
         if (viewingTokenAddress) {
@@ -106,7 +119,10 @@ const WebsocketInfoGrabber = () => {
     }, [txData]);
     
     const connectWebSocket = () => {
-        ws.current = new WebSocket('wss://api-gateway:4050');
+        const hostIP = window.location.hostname;
+
+        // ws.current = new WebSocket('wss://api-gateway:4050');
+        ws.current = new WebSocket('wss://'+hostIP+':4050');
     
         ws.current.onopen = () => {
             setStatus("Connected");
@@ -145,7 +161,15 @@ const WebsocketInfoGrabber = () => {
                 }
             }
         };
-        
+        ws.current.onerror = (error) => {
+            console.error(`WebSocket Error: ${error}`);
+            
+            // If WebSocket fails due to the certificate and the cert page hasn't been opened yet
+            if (!hasOpenedCertPage.current) {
+                hasOpenedCertPage.current = true;
+                window.open(`https://${hostIP}:4050`, '_blank');  // Open the certificate acceptance page in a new tab
+            }
+        };
     
         ws.current.onclose = (event) => {
             if (event.wasClean) {
@@ -168,6 +192,23 @@ const WebsocketInfoGrabber = () => {
             ws.current.send(JSON.stringify(requestPayload));
         }
     }
+
+    
+    
+
+    const updateAFriendlyName = (address, friendlyName) => {
+        console.log('updating address '+address+' with manually defined label: ', friendlyName)
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const requestPayload = {
+                service: 'general',
+                method: 'SetManualLabel',
+                data: {address, friendlyName}
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
+    }
+
+
 
     const requestCacheFriendlyLabels = (addresses) => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {

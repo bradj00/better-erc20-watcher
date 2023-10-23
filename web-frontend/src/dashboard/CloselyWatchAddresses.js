@@ -21,7 +21,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
 import Chart from './Chart';
 import TokenVolumeDash from './TokenVolumeDash';
-import Orders from './Orders';
+import Orders from './TokenTransactions';
 import { GeneralContext } from '../App';
 import AudioToggle from './subcomponents/AudioToggle';
 import SearchIcon from '@mui/icons-material/Search';
@@ -45,6 +45,7 @@ import LiquidityChart from './subcomponents/LiquidityChart';
 import ExamplePopUpWindow from './ExamplePopUpWindow';
 import TxVisualizer from './TxVisualizer';
 import ForceGraphComponent from './TxVisualizer-WatchedTokens';
+import AddressTransactions from './AddressTransactions';
 
 // TimeAgo.addDefaultLocale(en);
 
@@ -364,25 +365,14 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
           
        
           <Toolbar />
-          <div style={{position:'absolute', width:"100%", height:'100%',display:'flex',justifyContent:'center',}}>
-            <div style={{position:'absolute', top:'8vh', left:' 5%', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
-              Detected DEXs
+          <div style={{position:'absolute', width:"100%", height:'100%',display:'flex',justifyContent:'left',}}>
+            <div style={{position:'absolute', top:'8vh', marginLeft:'1vw', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
+              Address Tags  
             </div>
-            {/* <ExamplePopUpWindow /> */}
+            
             
             <div style={{overflowY:'hidden', overflowX:'hidden', border:'1px solid rgba(150,220,255,0.5)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'47vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'11vh', }}>
-              <div style={{display:'flex',position:'absolute', top:'0.5%', right:'0'}}>
-                <div className="hoverOpacity">
-                  <ArrowCircleLeftIcon style={{fontSize:'0.9vw'}}/>
-                </div>
-                <div style={{color:'rgba(255,255,255,0.4)', marginTop:'-0.25vh', marginLeft:'0.5vh', marginRight:'0.5vh'}}>
-                  1/3
-                </div>
-                <div className="hoverOpacity">
-                  <ArrowCircleRightIcon style={{fontSize:'0.9vw'}}/>
-                </div>
-              </div>
-                      
+              
             
               <div style={{position:'absolute',  top:'8%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
                 {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
@@ -495,8 +485,9 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
 
 
             </div>
-              <div style={{position:'absolute', width:'98%',top:'62vh',}}>
-                <Orders />
+              <div style={{position:'absolute', width:'99vw',left:'0.5vw', top:'62vh',}}>
+                {/* <Orders /> */}
+                <AddressTransactions />
               </div>
             
            

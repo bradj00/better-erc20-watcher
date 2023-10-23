@@ -91,7 +91,7 @@ const [pageNumber, setpageNumber] = useState(1);
 // const [displayPanel, setdisplayPanel] = useState('watchingTokens');
 const [displayPanel, setdisplayPanel] = useState('watchingTokens');
 
-const [rowClickMode, setrowClickMode] = useState('filter'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
+const [rowClickMode, setrowClickMode] = useState('edit'); //default mode when clicking on an address in TX list (filter, edit, walletSummary)
 const [defaultData, setDefaultData] = useState({ nodes: [], links: [] });
 const [ShownLiqPoolPriceData, setShownLiqPoolPriceData] = useState({});
 const [logScaleTickBox, setLogScaleTickBox] = React.useState(false);

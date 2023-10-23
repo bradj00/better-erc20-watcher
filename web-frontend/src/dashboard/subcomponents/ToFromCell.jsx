@@ -72,12 +72,7 @@ const ToFromCell = (props) => {
     const { updateCommitFriendlyNameRequest, setUpdateCommitFriendlyNameRequest, CacheFriendlyLabels } = useContext(GeneralContext);
 
     const handleKeyDown = (e) => {
-        let addressToUpdate;
-        if (props.toFrom === 'to') {
-            addressToUpdate = props.row.to_address;
-        } else if (props.toFrom === 'from') {
-            addressToUpdate = props.row.from_address;
-        }
+        let addressToUpdate = props.toFrom === 'to' ? props.row.to_address : props.row.from_address;
 
         if (e.key === 'Enter' && addressToUpdate) {
             console.log('commit update friendly name: ', e.target.value, addressToUpdate);
