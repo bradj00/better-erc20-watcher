@@ -27,8 +27,6 @@ echo "\n
                                                            "
 echo "installation wizard\n\n\n"
 
-#!/bin/bash
-
 echo "Checking installation prerequisites for Single Node mode..."
 echo "This can be altered to use Kubernetes if you know what you are doing."
 echo "Basic installation on a single host will work just fine too and that is what this script does.  :D \n\n"
@@ -70,7 +68,7 @@ read -p "Do you want to use MongoDB locally or from an external provider? (defau
 if [ -z "$choice" ] || [ "$choice" = "local" ]; then
 
     # Check if mongodb is installed
-    if command -v mongod &> /dev/null; then
+     if systemctl list-units --full -all | grep -Fq 'mongod.service'; then
         echo "\t✓ MongoDB is already installed."
     else
         read -p "MongoDB is not installed. Do you want to install it now? (y/n, default is y): " confirm
@@ -147,12 +145,32 @@ EOL
 
 echo ".env file has been created/updated!"
 
-# cp ./.env
 
-#check to make sure docker is installed. if not, install it.
+project_folder="."
+global_env_file="./.env"
 
-#generate a self-signed cert and place it in the root project directory ./certs/
+# Find all .env.example files in the project folder and its subdirectories
+find "$project_folder" -type f -name ".env.example" | while read -r env_example_file; do
+    # Define the path to the new .env file
+    env_file="$(dirname "$env_example_file")/.env"
+    
+    # Copy the .env.example file to the new .env file
+    cp "$env_example_file" "$env_file"
+    
+    # Read the global .env file and update the new .env file with matching values
+    while IFS= read -r line; do
+        key=$(echo "$line" | cut -d '=' -f 1)
+        value=$(echo "$line" | cut -d '=' -f 2)
+        if grep -q "^$key=" "$env_file"; then
+            sed -i "s/^$key=.*/$key=$value/" "$env_file"
+        fi
+    done < "$global_env_file"
+done
 
+
+
+
+echo "\n\t✓ creating self-signed certificate..." 
 # Check if the 'certs' directory exists, if not, create it
 if [ ! -d "./certs" ]; then
   mkdir ./certs
@@ -165,47 +183,50 @@ echo "Self-signed certificate and key have been generated and placed in ./certs/
 
 
 
-echo "\t✓ building docker images...\n\n"
-
-
+echo "\t✓ building web-frontend docker image"
 cd web-frontend
 cp ../certs/* ./certs/
 docker build -t better-erc20-watcher/react-app:latest .
 
+echo "\t✓ building api-gateway docker image"
 cd ../micro-services/api-gateway
 cp ../../certs/* ./certs/
-cp ../../.env .
+# cp ../../.env .
 docker build -t better-erc20-watcher/api-gateway:latest .
 
+echo "\t✓ building tx-ingestion-engine docker image"
 cd ../tx-ingestion-engine
-cp ../../.env .
+# cp ../../.env .
 docker build -t better-erc20-watcher/tx-ingestion-engine:latest .
 
+echo "\t✓ building labeling-engine docker image"
 cd ../labeling-engine
-cp ../../.env .
+# cp ../../.env .
 docker build -t better-erc20-watcher/labeling-engine:latest .
 
+echo "\t✓ building master-rate-limiter docker image"
 cd ../master-rate-limiter
-cp ../../.env .
+# cp ../../.env .
 docker build -t better-erc20-watcher/master-rate-limiter:latest .
 
+echo "\t✓ building token-external-lookup docker image"
 cd ../token-external-lookup
-cp ../../.env .
+# cp ../../.env .
 docker build -t better-erc20-watcher/token-external-lookup:latest .
 
 
 #optionally prune images at the end
 #docker image prune -f
 
-#delete root project .env file now that we have copied it everywhere it needs to go.
-# rm ./.env
-
-# if no errors, signal SUCCESS! 
-
-
 
 #before we start our micro-services, ensure mongo database is set up properly 
 #.....
+
+#copy all .env.example files into a .env file of the same location. Map values we defined in our written-out .env master file to each of the copied .env files
+# Define the path to the project folder and the global .env file
+
+
+
 
 
 # attempt to start the docker-compose.yml group

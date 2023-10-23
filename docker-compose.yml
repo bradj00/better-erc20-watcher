@@ -1,37 +1,31 @@
-version: '3.8'
+version: '3'
 
 services:
-
   zookeeper:
-    image: wurstmeister/zookeeper:3.4.6
+    image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
     networks:
-      - better-erc20-watcher-network
-
+        - better-erc20-watcher-network
+        
   kafka:
-    image: wurstmeister/kafka:latest
+    image: wurstmeister/kafka
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     depends_on:
       - zookeeper
     networks:
-      - better-erc20-watcher-network
+        - better-erc20-watcher-network
 
   react-app:
       image: better-erc20-watcher/react-app:latest
       restart: always
       ports:
-        - "80:3000"
+        - "3000:3000"
       networks:
         - better-erc20-watcher-network
 
@@ -63,7 +57,7 @@ services:
     image: better-erc20-watcher/token-external-lookup:latest
     restart: always
     networks:
-      - better-erc20-watcher-network
+     - better-erc20-watcher-network
 
 networks:
   better-erc20-watcher-network:
