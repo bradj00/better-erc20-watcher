@@ -133,7 +133,7 @@ INFURA_ENDPOINT_URL=https://mainnet.infura.io/v3/$INFURA_API_KEY
 INFURA_WS_ENDPOINT_URL=wss://mainnet.infura.io/ws/v3/$INFURA_API_KEY
 MONGODB_URI=mongodb://$MONGO_IP:27017
 REDIS_URL=redis://$REDIS_IP:6379
-
+MONGO_CONNECT_STRING=mongodb://$MONGO_IP:27017
 # Static configurations
 DB_NAME=watchedTokens
 DB_NAME_FN=friendlyNames
@@ -146,6 +146,7 @@ EOL
 echo ".env file has been created/updated!"
 
 
+# Define the path to the project folder and the global .env file
 project_folder="."
 global_env_file="./.env"
 
@@ -154,19 +155,11 @@ find "$project_folder" -type f -name ".env.example" | while read -r env_example_
     # Define the path to the new .env file
     env_file="$(dirname "$env_example_file")/.env"
     
-    # Copy the .env.example file to the new .env file
-    cp "$env_example_file" "$env_file"
-    
-    # Read the global .env file and update the new .env file with matching values
-    while IFS= read -r line; do
-        key=$(echo "$line" | cut -d '=' -f 1)
-        value=$(echo "$line" | cut -d '=' -f 2)
-        if grep -q "^$key=" "$env_file"; then
-            sed -i "s/^$key=.*/$key=$value/" "$env_file"
-        fi
-    done < "$global_env_file"
+    # Check if a .env file already exists in the subdirectory, if not, copy the global .env file to the subdirectory
+    if [[ ! -f "$env_file" ]]; then
+        cp "$global_env_file" "$env_file"
+    fi
 done
-
 
 
 
