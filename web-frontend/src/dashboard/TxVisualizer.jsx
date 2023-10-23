@@ -1,5 +1,3 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable react-hooks/exhaustive-deps */
 
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -28,7 +26,7 @@ import "../App.css";
 import SettingsOverscanIcon from '@mui/icons-material/SettingsOverscan';
 import * as THREE from 'three';
 // import * as d3 from 'd3';
-import Web3 from 'web3';
+// import Web3 from 'web3';
 
 
 // TimeAgo.addDefaultLocale(en);
@@ -82,7 +80,7 @@ function DashboardContent() {
     const { filteredtxData } = useContext(GeneralContext);
     const { txVisualData } = useContext(GeneralContext);
     const { TxSummaryData} = useContext(GeneralContext);
-    const web3 = new Web3(Web3.givenProvider);
+    // const web3 = new Web3(Web3.givenProvider);
 
     // Assuming you have state for the time range:
     const [timeRange, setTimeRange] = useState({
@@ -178,7 +176,8 @@ function DashboardContent() {
             let to_address_friendlyName = data[i].to_address_friendlyName;
             let from_address_exists = false;
             let to_address_exists = false;
-            let txValue = web3.utils.fromWei(data[i].value, 'ether');
+            // let txValue = web3.utils.fromWei(data[i].value, 'ether');
+            let txValue = 555
 
             for (let j = 0; j < temp.nodes.length; j++) {
                 if (temp.nodes[j].id === from_address_friendlyName) {

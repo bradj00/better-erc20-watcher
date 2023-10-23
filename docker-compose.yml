@@ -22,6 +22,9 @@ services:
         - better-erc20-watcher-network
 
   react-app:
+      build:
+        context: .
+        dockerfile: Dockerfile
       image: better-erc20-watcher/react-app:latest
       restart: always
       ports:

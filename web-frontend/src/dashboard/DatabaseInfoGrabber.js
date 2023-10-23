@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useContext, useEffect} from 'react'
 import {GeneralContext} from '../App.js'
 

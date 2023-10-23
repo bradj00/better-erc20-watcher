@@ -38,7 +38,6 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import CommunityTokenTr from './subcomponents/CommunityTokenTr';
 import ModeEditOutlineIcon from '@mui/icons-material/ModeEditOutline';
 import TxTimeOfDayChart from './subcomponents/TxTimeOfDayChart.tsx';
-import LoadingTableSpinner from './subcomponents/LoadingTableSpinner.tsx';
 import ethLogo from './images/eth-logo.png';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 TimeAgo.addDefaultLocale(en);
@@ -655,7 +654,7 @@ function determineWhichFNtoShow(tokenObj){
                     systemStatuses.erc20TransfersForSelectedAddy.statusMsg != "idle" ?
                       <div style={{zIndex:'9999', backgroundColor:'rgba(0,0,0,0.6)', padding:'2vw', position:'absolute', width:'100%', height:'100%', display:'flex', justifyContent:'center', alignItems:'center'}}>
                         {/* {systemStatuses.erc20TransfersForSelectedAddy.statusMsg} : {systemStatuses.erc20TransfersForSelectedAddy.page} / {systemStatuses.erc20TransfersForSelectedAddy.maxPage} */}
-                        <LoadingTableSpinner msg={ <>&nbsp; {systemStatuses.erc20TransfersForSelectedAddy.statusMsg} : {systemStatuses.erc20TransfersForSelectedAddy.page} / {systemStatuses.erc20TransfersForSelectedAddy.maxPage}</> }/>
+                        {/* <LoadingTableSpinner msg={ <>&nbsp; {systemStatuses.erc20TransfersForSelectedAddy.statusMsg} : {systemStatuses.erc20TransfersForSelectedAddy.page} / {systemStatuses.erc20TransfersForSelectedAddy.maxPage}</> }/> */}
                       </div>
                     : 
                     

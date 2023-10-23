@@ -1,7 +1,4 @@
-/* eslint-disable jsx-a11y/alt-text */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable array-callback-return */
-/* eslint-disable no-unused-vars */
+
 import React, {useContext, useState, useEffect} from 'react';
 
 // import { mainListItems, secondaryListItems } from './listItems.js.back';

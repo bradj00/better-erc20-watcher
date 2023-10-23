@@ -1,4 +1,4 @@
-/* eslint-disable jsx-a11y/alt-text */
+
 import React, { useContext, useEffect, useState } from 'react';
 import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
