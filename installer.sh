@@ -220,6 +220,19 @@ docker build -t better-erc20-watcher/token-external-lookup:latest .
 
 
 
+#make sure MONGODB is bound on our external network so these docker images can communicate. Adjust as desired as it is probably not optimal. 
+
+# Backup the original configuration file
+sudo cp /etc/mongod.conf /etc/mongod.conf.bak
+
+# Update the bindIp option to 0.0.0.0 to listen on all network interfaces
+sudo sed -i 's/bindIp: 127.0.0.1/bindIp: 0.0.0.0/' /etc/mongod.conf
+
+# Restart the MongoDB service to apply the changes
+sudo systemctl restart mongod
+
+echo "Configuration updated and MongoDB restarted."
+
 
 
 # attempt to start the docker-compose.yml group
