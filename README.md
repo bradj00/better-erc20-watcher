@@ -5,24 +5,41 @@ Categorize on-chain actions and give friendly labels to addresses.
 
 Step into a tokenized community and rapidly gain analytical insight.
 
+Very alpha and in active development.
 
-## Coming soon: Install instructions and pre-requisites to use this tool.
+## Requirements:
 
+- Ubuntu (tested on)
+- Chrome (tested on)
+- Node.js
+- MongoDB
+- Docker
+- API keys for enabling data retrieval from third-party services (Infura, Coingecko, Etherscan, etc.)
 
-using:
+## Installation
 
--MERNS stack (mongo, express, react, node, solidity)
+1. Clone the repository:
+   ```
+   git clone [<repository_url>](https://github.com/bradj00/better-erc20-watcher)
+   ```
 
--openAI to prototype scaffold faster
+2. Run the installer script and follow the prompts for initial setup:
+   ```
+   bash installer.sh
+   ```
 
--Third Party External APIs for blockchain and market data
+3. The installer will configure your .env files and build the docker images. It will also generate your self-signed certificate.
 
--React webUI frontend for better visualization and management
+4. After the installation is complete, you should be able to access the web UI at `https://<host>:3000`.
 
+   **Note**: During the first run, a second window may pop up in your browser to prompt acceptance of the self-signed certificate.
+
+5. The backend of this project is containerized and managed via Docker.
 
 
 <sub>( Feature rich front-end UI with live data updates )</sub>
-![image](https://user-images.githubusercontent.com/99688245/215305627-7dff968a-9350-4022-abd8-1ce0293d93a8.png)
+![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/ed7e346a-32d7-4f4a-b410-3f4336a26aff)
+
 
 
 <sub>( Address Summary stats, includes held tokens common to the existing database of watched addresses )</sub>
