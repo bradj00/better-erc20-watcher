@@ -20,7 +20,7 @@ Very alpha and in active development.
 
 1. Clone the repository:
    ```
-   git clone [<repository_url>](https://github.com/bradj00/better-erc20-watcher)
+   git clone https://github.com/bradj00/better-erc20-watcher
    ```
 
 2. Run the installer script and follow the prompts for initial setup:
