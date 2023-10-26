@@ -193,6 +193,19 @@ const WebsocketInfoGrabber = () => {
         }
     }
 
+
+    // tell the API GW we want to start caching tx's for a new token
+    const requestWatchNewToken = (contractAddress) => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const requestPayload = {
+                service: 'general',
+                method: 'WatchNewToken',
+                data: {contractAddress}
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
+    }
+
     
     
 

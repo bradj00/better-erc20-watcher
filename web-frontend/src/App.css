@@ -28,6 +28,15 @@ body {
   color: white;
 }
 
+.watchNewTokenButton {
+  background-color: #333;
+  border:1px solid #;
+}
+.watchNewTokenButton:hover{
+  background-color: #669;
+
+}
+
 .App-link {
   color: #61dafb;
 }

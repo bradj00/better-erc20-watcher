@@ -26,7 +26,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import Button from '@mui/material/Button';
 import ReactSlider from 'react-slider';
 import Datetime from 'react-datetime';
-
+import "../App.css"
 
 
 const Topbanner = () => {
@@ -62,6 +62,7 @@ const Topbanner = () => {
     const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
     const {setRequestTransactionList} = useContext(GeneralContext); 
   
+    const [isAddWatchedButtonClicked, setisAddWatchedButtonClicked] = useState(false);
 
 // clipboard copy method cannot be used without HTTPS and I haven't written my API for https yet. This hack is temp.
   /////////////////////////////////////////////////
@@ -275,9 +276,9 @@ const Topbanner = () => {
         style={{
             zIndex: '9999', 
             width: '15%', 
-            minHeight: '20vh', // Changed from height to minHeight
-            maxHeight: '30vh', // Added a maximum height
-            overflowY: 'auto', // Allow vertical scrolling if content exceeds maxHeight
+            minHeight: '20vh',
+            maxHeight: '30vh',
+            overflowY: 'auto',
             top: '5.5vh', 
             border: '1px solid rgba(255,255,255,0.2)', 
             borderTop: '0px solid #000', 
@@ -310,27 +311,127 @@ const Topbanner = () => {
                         <div
                             style={{
                                 padding: '0.6vw',
+                                display: 'flex',  // Set to flex layout
+                                alignItems: 'center'  // Center items vertically
                             }}
                         >
                             <img 
                                 src={token.data.logo ? token.data.logo : tokenImage}
                                 style={{
-                                    marginLeft: token.data.logo ? '0' : '-0.5vh',
                                     height: token.data.logo ? '3vh' : '4vh'
                                 }}
                                 alt={`${token.data.symbol} logo`}
                             />
-                            {token.data.logo ? <>&nbsp;&nbsp;</> : <>&nbsp;</>}
-                            {token.data.symbol}
+                            <div
+                                style={{
+                                    marginLeft: '1vw'  // Space to the right of the logo
+                                }}
+                            >
+                                {token.data.symbol}
+                            </div>
+                        </div>
+                        <div
+                            style={{
+                                textAlign: 'end',
+                                fontSize: '0.5vw',
+                                color: '#999',
+                                marginRight: '0.5vw' ,
+                                position: 'absolute',
+                                right: '0',
+                                bottom: '0.25vh',
+                            }}
+                        >
+                            Status: SYNCED
                         </div>
                     </div>
                 ) : (
                     <div key={index} style={{marginBottom: '1vh'}}></div>
                 )
             ))
+            
         }
+        <div className="container">
+            {!isAddWatchedButtonClicked ? (
+                <div
+                    className="watchNewTokenButton"
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        color: '#fff',
+                        borderRadius: '4px',
+                        margin: '1vh 0.6vw',
+                        padding: '0.5vh 0',
+                    }}
+                    onClick={() => {
+                        setisAddWatchedButtonClicked(true);
+                    }}
+                >
+                    <div style={{ fontSize: '1vw', marginRight: '0.5vw' }}>+</div>
+                    Watch New Token
+                </div>
+            ) : (
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    border: '1px solid #0f0',
+                    minHeight: '7vh',
+                    position: 'relative',
+                    padding: '0.5vh 0.5vw',
+                }}>
+                    <select name="network" id="network-select" style={{
+                        marginBottom: '0.5vh',
+                    }}>
+                        <option value="" disabled selected>Chain</option>
+                        <option value="auto">Auto</option>
+                        <option value="eth">Ethereum</option>
+                        <option value="polygon">Polygon</option>
+                    </select>
+
+                    <input
+                        type="text"
+                        placeholder="Enter token"
+                        style={{
+                            width: '85%',
+                            height: '35%',
+                            padding: '0.5vh 0.5vw',
+                            borderRadius: '4px',
+                            background: '#333',
+                            border: 'none',
+                            color: '#fff',
+                            position:'absolute',
+                            bottom:'0.5vh'
+                        }}
+                    />
+
+                    <div
+                        style={{
+                            cursor: 'pointer',
+                            padding: '0.25vh 0.7vh',
+                            borderRadius: '0.25vw',
+                            background: '#aa0000',
+                            color: '#fff',
+                            textAlign: 'center',
+                            position: 'absolute',
+                            right: '0.2vw',
+                            top: '0.2vw',
+                            fontSize: '0.5vw',
+                        }}
+                        onClick={() => {
+                            setisAddWatchedButtonClicked(false);
+                        }}
+                    >
+                        X
+                    </div>
+                </div>
+            )}
+        </div>
+
     </div>
 )}
+
 
 
 

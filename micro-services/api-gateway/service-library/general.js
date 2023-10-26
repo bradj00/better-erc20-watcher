@@ -1,6 +1,15 @@
 const db = require('./db')
 
 module.exports = {
+    
+    WatchNewToken: async function(payload, callback) {
+        // .. 
+        // validate that we are not already watching this token
+        // produce to kafka an external-token-lookup request, consumed by the etle. Distinguish this request from a standard token lookup.
+        // produce to kafka a txie-wrangler-control request, consumed by txie-wrangler. will start up a new txie instance and 
+        // write new config state to db
+    },
+
     GetFriendlyName: async function(payload, callback) {
         try {
             console.log('trying to get friendly names for:', payload.friendlyName);
