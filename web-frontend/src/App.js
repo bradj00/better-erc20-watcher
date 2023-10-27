@@ -74,6 +74,7 @@ const [MaxAmountFilterValue, setMaxAmountFilterValue] = useState(999999999999999
 const [DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue] = useState();
 const [DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue] = useState();
 
+const [tokenLookupRequestAddy, settokenLookupRequestAddy] = useState();
 const [systemStatuses, setSystemStatuses] = useState();
 const [clickedToken, setclickedToken] = useState();
 const [searchInputLookup, setsearchInputLookup] = useState();
@@ -186,7 +187,7 @@ const contextObj = {
   chainDataHeartbeatDiff, setchainDataHeartbeatDiff,
   latestEthBlock, setlatestEthBlock,
   LpChartData, setLpChartData,
-
+  tokenLookupRequestAddy, settokenLookupRequestAddy,
   MinAmountFilterValue, setMinAmountFilterValue,
   MaxAmountFilterValue, setMaxAmountFilterValue,
   DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue,

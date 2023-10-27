@@ -11,6 +11,7 @@ let subscriptions = {}; //socket clients subscribed to topics the api-gateway mi
 
 
 const { initConsumer, consumeTokenTransferEvent } = require('./kafka/consumer');
+const { initProducer } = require('./kafka/producer');
 
 
 
@@ -46,6 +47,9 @@ let clientIdCounter = 1;  // Simple counter to assign unique IDs to clients
 
 initConsumer(broadcastToTopic).catch(error => {
     console.error("Error initializing Kafka consumer:", error);
+});
+initProducer().catch(error => {
+    console.error("Error initializing Kafka producer:", error);
 });
 
 db.connectToServer((err) => {

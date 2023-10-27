@@ -1,6 +1,5 @@
 const { Kafka } = require('kafkajs');
 const config = require('../config/kafkaConfig');
-const { ensureCache, connectToRedis } = require('../ensureCache'); // Import the ensureCache function
 
 const kafka = new Kafka({
   clientId: config.clientId,
@@ -9,18 +8,17 @@ const kafka = new Kafka({
 
 const consumer = kafka.consumer({ groupId: config.consumerGroup });
 
-const initConsumer = async () => {
-    // Ensure Redis is connected before initializing the Kafka consumer
-    await connectToRedis();
-
+const initConsumer = async (PENDING_JOBS) => {
     await consumer.connect();
-    await consumer.subscribe({ topic: config.rawTransactions, fromBeginning: true });
+    await consumer.subscribe({ topic: config.lookupExternalToken });
+    await consumer.subscribe({ topic: config.errorTopic });
+
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
             switch (topic) {
-                case config.rawTransactions:
-                    await consumeTokenTransferEvent(message);
+                case config.lookupExternalToken:
+                    await consumeLookupTokenEvent(message, PENDING_JOBS);
                     break;
                 case config.errorTopic:
                     consumeErrorEvent(message);
@@ -32,19 +30,28 @@ const initConsumer = async () => {
     });
 };
 
-const consumeManageTxieEvent = async (message) => {
+
+
+const consumeLookupTokenEvent = async (message, PENDING_JOBS) => {
   try {
     const eventData = JSON.parse(message.value.toString());
-    console.log(`Received request to manage TXIE instance:`);
-    console.log(eventData);
-    
-    // based on  {eventData} command, control the docker subsystem. 
-    // validate that we are not already watching this token
-    // 
+    console.log(`Consumed Lookup Token Event from Kafka:`);
+    console.log(message);
+    console.log('value (decoded): ',eventData)
+    console.log('\n\n')
+
+    const jobID = {
+      id: Date.now().toString(),
+      contractAddress: eventData.token,
+      status: 'Pending'
+    };
+
+    console.log('requesting lookup for: ', jobID);
+    PENDING_JOBS.push(jobID);
 
     return eventData;
   } catch (error) {
-    console.error(`Error consuming txie-wrangler event: ${error.message}`);
+    console.error(`Error consuming token transfer event: ${error.message}`);
     return null;
   }
 };
@@ -61,4 +68,4 @@ const consumeErrorEvent = (message) => {
 
 module.exports = {
   initConsumer
-};
+}

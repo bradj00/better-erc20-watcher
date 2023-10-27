@@ -72,11 +72,13 @@ services:
         #    networks:
         #      - better-erc20-watcher-network
 
-        #  token-external-lookup:
-        #    image: better-erc20-watcher/token-external-lookup:latest
-        #    restart: always
-        #    networks:
-        #     - better-erc20-watcher-network
+  external-token-lookup-engine:
+    image:  better-erc20-watcher/external-token-lookup-engine:latest
+    restart: always
+    depends_on:
+      - kafka
+    networks:
+    - better-erc20-watcher-network
 
 networks:
   better-erc20-watcher-network:

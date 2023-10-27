@@ -1,5 +1,5 @@
 
-import React, {useContext, useState, useEffect} from 'react';
+import React, {useContext, useState, useRef, useEffect} from 'react';
 
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
 
@@ -63,6 +63,12 @@ const Topbanner = () => {
     const {setRequestTransactionList} = useContext(GeneralContext); 
   
     const [isAddWatchedButtonClicked, setisAddWatchedButtonClicked] = useState(false);
+    const {tokenLookupRequestAddy, settokenLookupRequestAddy} = useContext(GeneralContext);
+
+    const [timer, setTimer] = useState(null);
+    const [placeholder, setPlaceholder] = useState('Enter token');
+    const inputRef = useRef(null);
+
 
 // clipboard copy method cannot be used without HTTPS and I haven't written my API for https yet. This hack is temp.
   /////////////////////////////////////////////////
@@ -191,7 +197,26 @@ const Topbanner = () => {
         }
     }, [friendlyLookupResponse]);
 
+    const handleInputChange = () => {
+  
+        // Clear the existing timer (if any)
+        if (timer) {
+          clearTimeout(timer);
+        }
+    
+        // Set up a new timer
+        const newTimer = setTimeout(() => {
+          if (inputRef.current.value === '') {
+            setPlaceholder('Please enter a token'); // or any other placeholder message you want
+          }
 
+        //   console.log('value is: ',inputRef.current.value)
+          settokenLookupRequestAddy(inputRef.current.value);
+        }, 500); // 0.5 second delay
+    
+        // Save the timer
+        setTimer(newTimer);
+      };
     
     
 
@@ -391,8 +416,11 @@ const Topbanner = () => {
                     </select>
 
                     <input
+                        ref={inputRef}
                         type="text"
-                        placeholder="Enter token"
+                        placeholder={placeholder}
+                        onChange={handleInputChange}
+
                         style={{
                             width: '85%',
                             height: '35%',

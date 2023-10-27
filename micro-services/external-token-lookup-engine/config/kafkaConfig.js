@@ -3,7 +3,7 @@ module.exports = {
     brokers: ['kafka:9092'],
   
     // Client ID to identify the instance when connecting to the Kafka cluster
-    clientId: 'api-gateway',
+    clientId: 'external-token-lookup-engine',
   
     // Topic names that the service will be producing to or consuming from
     // tokenTransferTopic: 'token-transfer-events',
@@ -19,6 +19,6 @@ module.exports = {
     // sasl: { mechanism: 'plain', username: 'your-username', password: 'your-password' },
     
     // Consumer group for your microservice
-    consumerGroup: 'api-gateway-consumer-group'
+    consumerGroup: 'external-token-lookup-engine'
   };
   

@@ -3,7 +3,7 @@ console.clear();
 import express from 'express';
 
 const app = express();
-const PORT = 4020;
+const PORT = 4000;
 
 const RATE_LIMIT = [
     { serviceName: 'coingecko', maxRate: 3 },

@@ -20,6 +20,7 @@ const WebsocketInfoGrabber = () => {
     const {setCacheFriendlyLabels} = useContext(GeneralContext);
     const {viewingTokenAddress} = useContext(GeneralContext);
     const {updateCommitFriendlyNameRequest} = useContext(GeneralContext);
+    const {tokenLookupRequestAddy} = useContext(GeneralContext);
 
     const previousSubscription = useRef(null); // To keep track of the previous subscription
 
@@ -36,6 +37,14 @@ const WebsocketInfoGrabber = () => {
 
         
     });
+
+
+    useEffect(() => {
+        if (tokenLookupRequestAddy  ){
+            console.log('tokenLookupRequestAddy: ',tokenLookupRequestAddy)
+            requestTokenLookup(tokenLookupRequestAddy)           
+        }
+    },[tokenLookupRequestAddy]);
 
 
     useEffect(() => {
@@ -195,12 +204,33 @@ const WebsocketInfoGrabber = () => {
 
 
     // tell the API GW we want to start caching tx's for a new token
-    const requestWatchNewToken = (contractAddress) => {
+    const requestWatchNewToken = (requestObj) => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             const requestPayload = {
                 service: 'general',
                 method: 'WatchNewToken',
-                data: {contractAddress}
+                data: {
+                    // action: 'add',          
+                    // chain: 'mainnet', 
+                    // token: '0x000000'
+                    action: requestObj.action,          // these values should feed in from our validated form data
+                    chain:  requestObj.chain, 
+                    token:  requestObj.contractAddress
+                }
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
+    }
+
+    // lookup function when we enter a token address to possibly start watching. api gw tells external lookup service.
+    const requestTokenLookup = (contractAddress) => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const requestPayload = {
+                service: 'general',
+                method: 'LookupTokenRequest',
+                data: {
+                    token: contractAddress
+                }
             };
             ws.current.send(JSON.stringify(requestPayload));
         }
