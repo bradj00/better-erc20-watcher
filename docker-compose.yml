@@ -20,20 +20,10 @@ services:
       - zookeeper
     networks:
         - better-erc20-watcher-network
-
-  react-app:
-      build:
-        context: .
-        dockerfile: Dockerfile
-      image: better-erc20-watcher/react-app:latest
-      restart: always
-      ports:
-        - "3000:3000"
-      networks:
-        - better-erc20-watcher-network
-
   kafka-manager:
-    image: radarbase/kafka-manager
+    image: kafkamanager/kafka-manager
+    environment:
+      ZK_HOSTS: zookeeper
     depends_on:
       - kafka
     ports:
@@ -41,7 +31,14 @@ services:
     restart: always
     networks:
       - better-erc20-watcher-network
-      
+  # transaction-ingestion-engine:
+    # image: better-erc20-watcher/tx-ingestion-engine
+    # depends_on:
+      # - kafka
+    # restart: always
+    # networks:
+      # - better-erc20-watcher-network      
+  
   api-gateway:
     image: better-erc20-watcher/api-gateway:latest
     depends_on:
@@ -50,28 +47,17 @@ services:
       - "4050:4050"
     restart: always
     networks:
-      - better-erc20-watcher-network
-
-  tx-ingestion-engine:
-    image: better-erc20-watcher/tx-ingestion-engine:latest
+      - better-erc20-watcher-network 
+       
+  external-token-lookup-engine:
+    image:  better-erc20-watcher/external-token-lookup-engine:latest
     restart: always
     depends_on:
       - kafka
+      - master-rate-limiter
     networks:
-      - better-erc20-watcher-network
-
-        #  labeling-engine:
-        #image: better-erc20-watcher/labeling-engine:latest
-        #    restart: always
-        #    networks:
-        #      - better-erc20-watcher-network
-
-        #  master-rate-limiter:
-        #    image: better-erc20-watcher/master-rate-limiter:latest
-        #    restart: always
-        #    networks:
-        #      - better-erc20-watcher-network
-
+    - better-erc20-watcher-network 
+  
   txie-wrangler:
     image:  better-erc20-watcher/txie-wrangler:latest
     restart: always
@@ -81,15 +67,15 @@ services:
       - better-erc20-watcher-network
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-
     
-  external-token-lookup-engine:
-    image:  better-erc20-watcher/external-token-lookup-engine:latest
+
+  master-rate-limiter:
+    image: better-erc20-watcher/master-rate-limiter:latest
     restart: always
     depends_on:
       - kafka
     networks:
-    - better-erc20-watcher-network
+      - better-erc20-watcher-network
 
 networks:
   better-erc20-watcher-network:
