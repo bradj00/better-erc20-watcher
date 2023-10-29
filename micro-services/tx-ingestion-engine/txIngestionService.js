@@ -29,7 +29,11 @@ let currentBlock = START_BLOCK;
 
 const client = new MongoClient(MONGODB_URI);
 
-
+// Check if ERC20_CONTRACT_ADDRESS is defined
+if (!ERC20_CONTRACT_ADDRESS) {
+    console.error("Error: ERC20_CONTRACT_ADDRESS is not defined!");
+    process.exit(1);
+}
 
 async function getLatestBlockFromMongo(contractAddress) {
     const collectionName = `a_${contractAddress}`;

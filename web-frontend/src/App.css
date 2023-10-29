@@ -469,3 +469,112 @@ tr:nth-child(odd) {
 .menu-table tr:hover {
   background-color: #666;
 }
+
+
+.spinner {
+  border: 4px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top: 4px solid #fff;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+
+.info-pane {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background-color: rgba(10,10,30,0.6);
+  position: relative;
+}
+
+/* .info-pane {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 1vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: ;
+  z-index: 9999;
+  position:absolute;
+  top: 102%;
+  left:0vw;
+} */
+
+.header {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1vw;
+}
+
+.subheaders {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.thumbnail {
+  position:absolute;
+  left:0.2vw;
+  top:0.2vh;
+}
+
+.disabled-watch-button {
+  grid-column: 1 / 3; /* Span both columns */
+  background-color: #222;
+  color: #ddd;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+  align-self: center;
+}
+
+.watch-button {
+  grid-column: 1 / 3; /* Span both columns */
+  background-color: #335;
+  color: #fff;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+  align-self: center;
+}
+
+.watch-button:hover {
+  background-color: #555;
+}
+  
+.data-point {
+  margin-bottom: 5px;
+}

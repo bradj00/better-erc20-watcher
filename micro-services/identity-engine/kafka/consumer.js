@@ -32,24 +32,6 @@ const initConsumer = async () => {
     });
 };
 
-const consumeTokenTransferEvent = async (message) => {
-  try {
-    const eventData = JSON.parse(message.value.toString());
-    console.log(`Received token transfer event from Kafka:`);
-    console.log(eventData);
-    // console.log('____________ our job is now to ensure these are looked up and cached from all external identity APIs ________________');
-
-    // Ensure the addresses are cached
-    const { from_address, to_address } = eventData.data;
-    await ensureCache(from_address);
-    await ensureCache(to_address);
-
-    return eventData;
-  } catch (error) {
-    console.error(`Error consuming token transfer event: ${error.message}`);
-    return null;
-  }
-};
 
 const consumeErrorEvent = (message) => {
   try {

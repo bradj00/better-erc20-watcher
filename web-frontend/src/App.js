@@ -55,7 +55,9 @@ const [LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider] = useState
 const [ ServicesErrorMessages, setservicesErrorMessages  ] = useState([{message:'something here'},{message:'something here'},{message:'something here'},{message:'something here'},]);
 const [watchedTokenPriceUsd, setwatchedTokenPriceUsd] = useState();
 const [heldTokensSelectedAddressFNdisplayed, setheldTokensSelectedAddressFNdisplayed] = useState();
+const [submitvalidatedTokenToAddToWatchlist, setsubmitvalidatedTokenToAddToWatchlist] = useState();
 
+const [validatedTokenToAddToWatchlist, setvalidatedTokenToAddToWatchlist] = useState();
 const [filteredtxDataInflow,   setfilteredtxDataInflow] = useState();
 const [filteredtxDataOutflow,   setfilteredtxDataOutflow] = useState();
 const [chainDataHeartbeat, setchainDataHeartbeat] = useState();
@@ -67,6 +69,7 @@ const [clockCountsArrayForSelectedAddressTxList, setclockCountsArrayForSelectedA
 const [getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList] = useState();
 const [fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance] = useState();
 const [txDataChartOverTime, settxDataChartOverTime] = useState();
+const [cachedErc20TokenMetadata, setcachedErc20TokenMetadata] = useState({});
 
 
 const [MinAmountFilterValue, setMinAmountFilterValue] = useState(1);
@@ -226,7 +229,9 @@ const contextObj = {
   CacheFriendlyLabels, setCacheFriendlyLabels,
   txDataForceGraph, settxDataForceGraph,
 
-
+  cachedErc20TokenMetadata, setcachedErc20TokenMetadata,
+  validatedTokenToAddToWatchlist, setvalidatedTokenToAddToWatchlist,
+  submitvalidatedTokenToAddToWatchlist, setsubmitvalidatedTokenToAddToWatchlist,
 ///////////////////////////////////////////////
 /////////MICRO SERVICE RE-FACTOR///////////////
 

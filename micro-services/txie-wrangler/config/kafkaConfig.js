@@ -10,6 +10,7 @@ module.exports = {
     // errorTopic: 'txie-errors',
     rawTransactions: 'raw-transactions',
     rawStreamedTransactions: 'raw-streamed-transactions',
+    txieWranglerControl: 'txie-wrangler-control',
     errorTopic: 'txie-errors',
   
     // If you require any additional configurations such as SSL, authentication, etc., you can add them here.

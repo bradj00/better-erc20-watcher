@@ -27,7 +27,7 @@ client.on("close", () => {
 
 function initKafkaConsumer(){
         // Init the Kafka consumer
-    initConsumer().then(() => {
+    initConsumer(client).then(() => {
         console.log('Kafka consumer initialized successfully.');
     }).catch((error) => {
         console.error(`Failed to initialize Kafka consumer: ${error.message}`);

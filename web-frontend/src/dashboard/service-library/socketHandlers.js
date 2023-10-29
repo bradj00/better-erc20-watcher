@@ -42,6 +42,25 @@ export const handleAppendTransaction = (data) => {
 
 }
 
+// so far this is used both when looking up a new token to watch, and in the future looking up bulk token info to cache.
+export const handleLookupTokenRequest = (data, cachedErc20TokenMetadata, setcachedErc20TokenMetadata) => {
+    
+    // console.log("Received Lookup Token Info:", data.data.data);
+    
+    // Extracting the contract address and converting it to lowercase
+    const contractAddress = data.data.data.contractAddress.toLowerCase();
+    
+
+    // Updating the cachedErc20TokenMetadata object
+    const updatedMetadata = {
+        ...cachedErc20TokenMetadata, 
+        [contractAddress]: data.data.data  // add/update the token data using the contract address as the key
+    };
+    
+    // Updating the context with the new token data
+    setcachedErc20TokenMetadata(updatedMetadata);
+}
+
 //when a new TX comes in, or we need to feed the TX to the client 
 export const handleAppendTransactions = (data, dataSetterObj, txData) => {
     console.log('AppendTransactions: ', data);

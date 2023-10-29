@@ -72,6 +72,17 @@ services:
         #    networks:
         #      - better-erc20-watcher-network
 
+  txie-wrangler:
+    image:  better-erc20-watcher/txie-wrangler:latest
+    restart: always
+    depends_on:
+      - kafka
+    networks:
+      - better-erc20-watcher-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    
   external-token-lookup-engine:
     image:  better-erc20-watcher/external-token-lookup-engine:latest
     restart: always

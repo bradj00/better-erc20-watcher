@@ -150,10 +150,10 @@ module.exports = {
         return new Promise(async (resolve, reject) => {
             try {
                 console.log('\ttrying to get cached token info for: ',tokenAddress)
-                const database = db.getDb('tokensMetadataCache');
-                const collection = database.collection('erc20');
+                const database = db.getDb('coingecko_tokens');
+                const collection = database.collection('tokens');
     
-                const result = await collection.find({"address": tokenAddress}).toArray();
+                const result = await collection.find({"contractAddress": tokenAddress}).toArray();
                 if (result.length > 0) {
                     console.log('\tfound token metadata in mongo cache');
                     resolve({ status: 'success', data: [result[0]] });

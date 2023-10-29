@@ -34,14 +34,12 @@ module.exports = {
 
     WatchNewToken: async function(payload, callback) {
         // produce to kafka a txie-wrangler-control request, consumed by txie-wrangler. will start up a new txie instance and 
-        
+        // console.log('____________________')
+        // console.log(payload);
+        // console.log('____________________')
         produceWatchNewTokenRequest({
-            // action: 'add',
-            // chain: 'ethereum',
-            // token: '0x0000000'
             action: payload.action,
-            chain: payload.chain,
-            token: payload.token
+            address: payload.address.contractAddress
         })
 
         // write new config state to db

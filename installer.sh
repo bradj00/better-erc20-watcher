@@ -106,10 +106,6 @@ fi
 # GATHER ENVIRONMENT VARIABLE INFO TO BE COPIED INTO EACH MICRO-SERVICE .env FILE
 #######################################
 
-# Prompt for ERC20 token address
-echo "\nWhich ERC20 token contract do you want to begin watching?"
-read -p "You can add more later from the web UI: " ERC20_CONTRACT_ADDRESS
-
 # Prompt for Infura API key
 echo ""
 read -p "What is your Infura API key? This can be changed later from the web UI: " INFURA_API_KEY
@@ -123,12 +119,8 @@ echo "$IP_ADDRESSES\n"
 # Confirm the IP address for MongoDB
 read -p "Please confirm the IP address for MongoDB from the above list, or specify a reachable Mongo host IP: " MONGO_IP
 
-# Confirm the IP address for Redis
-read -p "Please confirm the IP address for Redis from the above list, or specify a reachable Redis host IP: " REDIS_IP
-
 # Output to .env file
 cat <<EOL > .env
-ERC20_CONTRACT_ADDRESS=$ERC20_CONTRACT_ADDRESS
 INFURA_ENDPOINT_URL=https://mainnet.infura.io/v3/$INFURA_API_KEY
 INFURA_WS_ENDPOINT_URL=wss://mainnet.infura.io/ws/v3/$INFURA_API_KEY
 MONGODB_URI=mongodb://$MONGO_IP:27017
@@ -196,6 +188,11 @@ echo "\t✓ building labeling-engine docker image"
 cd ../labeling-engine
 # cp ../../.env .
 docker build -t better-erc20-watcher/labeling-engine:latest .
+
+echo "\t✓ building txie-wrangler docker image"
+cd ../txie-wrangler
+# cp ../../.env .
+docker build -t better-erc20-watcher/txie-wrangler:latest .
 
 echo "\t✓ building master-rate-limiter docker image"
 cd ../master-rate-limiter

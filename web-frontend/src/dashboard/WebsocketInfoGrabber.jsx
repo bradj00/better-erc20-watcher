@@ -21,6 +21,9 @@ const WebsocketInfoGrabber = () => {
     const {viewingTokenAddress} = useContext(GeneralContext);
     const {updateCommitFriendlyNameRequest} = useContext(GeneralContext);
     const {tokenLookupRequestAddy} = useContext(GeneralContext);
+    const { validatedTokenToAddToWatchlist } = useContext(GeneralContext);
+    const { submitvalidatedTokenToAddToWatchlist, setsubmitvalidatedTokenToAddToWatchlist } = useContext(GeneralContext);
+    const { cachedErc20TokenMetadata, setcachedErc20TokenMetadata } = useContext(GeneralContext);
 
     const previousSubscription = useRef(null); // To keep track of the previous subscription
 
@@ -38,6 +41,11 @@ const WebsocketInfoGrabber = () => {
         
     });
 
+    useEffect(() => {
+        if (validatedTokenToAddToWatchlist){
+            //send token watch request to api-gw
+        }
+    },[validatedTokenToAddToWatchlist]);
 
     useEffect(() => {
         if (tokenLookupRequestAddy  ){
@@ -80,6 +88,14 @@ const WebsocketInfoGrabber = () => {
     }, [viewingTokenAddress]);
 
   
+    useEffect(() => {
+        if ( submitvalidatedTokenToAddToWatchlist ) {
+            requestWatchNewToken(validatedTokenToAddToWatchlist)
+            setsubmitvalidatedTokenToAddToWatchlist(false);
+        }
+    }, [submitvalidatedTokenToAddToWatchlist]);
+
+
     useEffect(() => {
         if (CacheFriendlyLabelsRequest) {
             console.log('CacheFriendlyLabelsRequest: ', CacheFriendlyLabelsRequest);
@@ -162,6 +178,18 @@ const WebsocketInfoGrabber = () => {
                     if (handlerName === 'handleAppendTransactions') {
                         socketHandlers[handlerName](data, dataSetterObj, txDataRef.current);
                     }
+                    else if (handlerName === 'handleLookupTokenRequest'){
+                        // socketHandlers[handlerName](data, dataSetterObj, cachedErc20TokenMetadata, setcachedErc20TokenMetadata());
+                        console.log('~~~~~',data.data)
+                        if (data.data.status == 'success'){
+                            const contractAddress = data.data.data.contractAddress.toLowerCase();
+                            const updatedMetadata = {
+                                ...cachedErc20TokenMetadata, 
+                                [contractAddress]: data.data.data  // add/update the token data using the contract address as the key
+                            };
+                            setcachedErc20TokenMetadata(updatedMetadata);
+                        }
+                    }
                      else {
                         socketHandlers[handlerName](data, dataSetterObj);
                     }
@@ -204,19 +232,16 @@ const WebsocketInfoGrabber = () => {
 
 
     // tell the API GW we want to start caching tx's for a new token
-    const requestWatchNewToken = (requestObj) => {
+    const requestWatchNewToken = (address) => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {
             const requestPayload = {
                 service: 'general',
                 method: 'WatchNewToken',
                 data: {
-                    // action: 'add',          
-                    // chain: 'mainnet', 
-                    // token: '0x000000'
-                    action: requestObj.action,          // these values should feed in from our validated form data
-                    chain:  requestObj.chain, 
-                    token:  requestObj.contractAddress
+                    action: 'add',
+                    address: address
                 }
+                
             };
             ws.current.send(JSON.stringify(requestPayload));
         }

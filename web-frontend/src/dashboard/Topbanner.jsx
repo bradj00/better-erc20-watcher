@@ -61,13 +61,19 @@ const Topbanner = () => {
     const {DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue} = useContext(GeneralContext);
     const {latestEthBlock, setlatestEthBlock} = useContext(GeneralContext); 
     const {setRequestTransactionList} = useContext(GeneralContext); 
+    const {validatedTokenToAddToWatchlist, setvalidatedTokenToAddToWatchlist } = useContext(GeneralContext); 
+    const { submitvalidatedTokenToAddToWatchlist, setsubmitvalidatedTokenToAddToWatchlist } = useContext(GeneralContext); 
   
     const [isAddWatchedButtonClicked, setisAddWatchedButtonClicked] = useState(false);
     const {tokenLookupRequestAddy, settokenLookupRequestAddy} = useContext(GeneralContext);
+    
+    const {cachedErc20TokenMetadata} = useContext(GeneralContext);
 
     const [timer, setTimer] = useState(null);
     const [placeholder, setPlaceholder] = useState('Enter token');
     const inputRef = useRef(null);
+    
+    const [showSpinner, setShowSpinner] = useState(false);
 
 
 // clipboard copy method cannot be used without HTTPS and I haven't written my API for https yet. This hack is temp.
@@ -120,12 +126,12 @@ const Topbanner = () => {
         return;
     }
 
-    console.log('clicked: ', token, token); 
-    setviewingTokenAddress(token.data.address); 
+    console.log('clicked: ', token); 
+    setviewingTokenAddress(token.tokenAddress); 
     setclickedDetailsAddress(null);
     setclickedDetailsAddressFN(null);
-    document.title = "👁️ " + token.data.name;
-    setclickedTokenSymbol(token.data.symbol);
+    document.title = "👁️ " + token.data.data.name;
+    setclickedTokenSymbol(token.data.data.symbol);
     setclickedToken(token); 
     setfilteredtxDataInflow(); 
     setfilteredtxDataOutflow(); 
@@ -135,7 +141,7 @@ const Topbanner = () => {
         dateFrom: 0,
         dateTo: 0,
         offset: 0,
-        tokenAddress: token.data.address
+        tokenAddress: token.data.contractAddress
     });
 }
 
@@ -166,7 +172,20 @@ const Topbanner = () => {
         return () => clearTimeout(timer);
       }, [searchInput]);
 
+      useEffect(() => {
+        if (tokenLookupRequestAddy) {
+            setShowSpinner(true);
+        }
+    }, [tokenLookupRequestAddy]);
 
+      useEffect(() => {
+        console.log('cachedErc20TokenMetadata:',cachedErc20TokenMetadata)
+        if (cachedErc20TokenMetadata[tokenLookupRequestAddy]) {
+            setShowSpinner(false);
+            setvalidatedTokenToAddToWatchlist(cachedErc20TokenMetadata[tokenLookupRequestAddy])
+        }
+    }, [cachedErc20TokenMetadata]);
+    
 
     const [subRange, setSubRange] = useState({
         start: new Date(),  // You can set default values here
@@ -218,7 +237,10 @@ const Topbanner = () => {
         setTimer(newTimer);
       };
     
-    
+    const handleWatchClick = () => {
+        console.log('Start Watching button clicked!'); // Placeholder handler, replace with your actual functionality
+        setsubmitvalidatedTokenToAddToWatchlist(true)
+    };
 
     return (
     <div style={{backgroundColor:'rgba(0,0,0,0.5)', position:'absolute', height:'7vh', width:'100vw',  borderBottom:'1px solid #222', display:'flex', justifyContent:'center', alignItems:'center', top:'0',}}>
@@ -301,9 +323,8 @@ const Topbanner = () => {
         style={{
             zIndex: '9999', 
             width: '15%', 
-            minHeight: '20vh',
-            maxHeight: '30vh',
-            overflowY: 'auto',
+            
+            
             top: '5.5vh', 
             border: '1px solid rgba(255,255,255,0.2)', 
             borderTop: '0px solid #000', 
@@ -315,14 +336,14 @@ const Topbanner = () => {
     >
         {watchedTokenList && Array.isArray(watchedTokenList) && 
             watchedTokenList.map((token, index) => (
-                token && token.data && token.data.address ? (
+                token && token.data && token.data.contractAddress ? (
                     <div 
                         key={index}
                         style={{
                             cursor: 'pointer', 
                             zIndex: '10000', 
                             position: 'relative',
-                            backgroundColor: viewingTokenAddress && token.data.address && viewingTokenAddress === token.data.address 
+                            backgroundColor: viewingTokenAddress && token.data.contractAddress && viewingTokenAddress === token.data.contractAddress 
                                 ? 'rgba(215,215,255,0.2)' 
                                 : 'rgba(0,0,0,0)'
                         }}
@@ -331,7 +352,7 @@ const Topbanner = () => {
                             setshowTokenSelector(false);
                         }}
                         onMouseEnter={e => e.currentTarget.style.backgroundColor = '#666'}
-                        onMouseLeave={e => e.currentTarget.style.backgroundColor = viewingTokenAddress && token.data.address && viewingTokenAddress === token.data.address ? 'rgba(215,215,255,0.2)' : 'rgba(0,0,0,0)'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = viewingTokenAddress && token.data.contractAddress && viewingTokenAddress === token.data.contractAddress ? 'rgba(215,215,255,0.2)' : 'rgba(0,0,0,0)'}
                     >
                         <div
                             style={{
@@ -341,18 +362,18 @@ const Topbanner = () => {
                             }}
                         >
                             <img 
-                                src={token.data.logo ? token.data.logo : tokenImage}
+                                src={token.data.data.image.small ? token.data.data.image.small : tokenImage}
                                 style={{
-                                    height: token.data.logo ? '3vh' : '4vh'
+                                    height: token.data.data.image.small ? '3vh' : '4vh'
                                 }}
-                                alt={`${token.data.symbol} logo`}
+                                alt={`${token.data.data.image.small} logo`}
                             />
                             <div
                                 style={{
                                     marginLeft: '1vw'  // Space to the right of the logo
                                 }}
                             >
-                                {token.data.symbol}
+                                {token.data.data.image.small}
                             </div>
                         </div>
                         <div
@@ -397,65 +418,107 @@ const Topbanner = () => {
                     Watch New Token
                 </div>
             ) : (
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    border: '1px solid #0f0',
-                    minHeight: '7vh',
-                    position: 'relative',
-                    padding: '0.5vh 0.5vw',
-                }}>
-                    <select name="network" id="network-select" style={{
-                        marginBottom: '0.5vh',
-                    }}>
-                        <option value="" disabled selected>Chain</option>
-                        <option value="auto">Auto</option>
-                        <option value="eth">Ethereum</option>
-                        <option value="polygon">Polygon</option>
-                    </select>
 
-                    <input
-                        ref={inputRef}
-                        type="text"
-                        placeholder={placeholder}
-                        onChange={handleInputChange}
-
-                        style={{
-                            width: '85%',
-                            height: '35%',
-                            padding: '0.5vh 0.5vw',
-                            borderRadius: '4px',
-                            background: '#333',
-                            border: 'none',
-                            color: '#fff',
-                            position:'absolute',
-                            bottom:'0.5vh'
-                        }}
-                    />
-
-                    <div
-                        style={{
-                            cursor: 'pointer',
-                            padding: '0.25vh 0.7vh',
-                            borderRadius: '0.25vw',
-                            background: '#aa0000',
-                            color: '#fff',
-                            textAlign: 'center',
-                            position: 'absolute',
-                            right: '0.2vw',
-                            top: '0.2vw',
-                            fontSize: '0.5vw',
-                        }}
-                        onClick={() => {
-                            setisAddWatchedButtonClicked(false);
-                        }}
-                    >
-                        X
+                <div className="info-pane">
+                <div className="header">
+                    {cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.name ?? '...'}
+                </div>
+            
+                <input
+                    ref={inputRef}
+                    type="text"
+                    placeholder={placeholder}
+                    onChange={handleInputChange}
+                    style={{
+                        width: '75%',
+                        height: '18%',
+                        padding: '0.5vh 0.5vw',
+                        borderRadius: '4px',
+                        background: '#333',
+                        border: 'none',
+                        color: '#fff',
+                        marginTop: '10px'
+                    }}
+                />
+            
+                <div className="grid-layout">
+                    <img className="thumbnail" src={cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.data.image.small ?? '#'} alt="Thumbnail" />
+                    <div className="subheaders">
+                        <span>{cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.symbol ?? '...'}</span>
+                        <span>{getEllipsisTxt(cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.contractAddress, 6) ?? '...'}</span>
+                    </div>
+                    <div className="data-point">
+                        Watchers: {cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.watchlist_portfolio_users ?? '...'}
+                    </div>
+                    <div className="data-point">
+                        Chain: {cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.asset_platform_id ?? '...'}
                     </div>
                 </div>
+            
+                <button className={validatedTokenToAddToWatchlist? "watch-button" : "disabled-watch-button"} onClick={handleWatchClick}>Start Watching</button>
+            
+                <div
+                    style={{
+                        cursor: 'pointer',
+                        padding: '0.25vh 0.7vh',
+                        borderRadius: '0.25vw',
+                        background: '#aa0000',
+                        color: '#fff',
+                        textAlign: 'center',
+                        position: 'absolute',
+                        right: '0.2vw',
+                        top: '0.2vw',
+                        fontSize: '0.5vw',
+                    }}
+                    onClick={() => {
+                        setisAddWatchedButtonClicked(false);
+                    }}
+                >
+                    X
+                </div>
+            </div>
+            
+
+
+
+
+
+                // <div style={{
+                //     display: 'flex',
+                //     flexDirection: 'column',
+                //     alignItems: 'flex-start',
+                //     border: '1px solid #0f0',
+                //     minHeight: '7vh',
+                //     position: 'relative',
+                //     padding: '0.5vh 0.5vw',
+                // }}>
+                //     <select name="network" id="network-select" style={{
+                //         marginBottom: '0.5vh',
+                //     }}>
+                //         <option value="" disabled selected>Chain</option>
+                //         <option value="auto">Auto</option>
+                //         <option value="eth">Ethereum</option>
+                //         <option value="polygon">Polygon</option>
+                //     </select>
+
+                    
+
+                    
+                    
+
+                // </div>
+
+                
             )}
+            {/* {showSpinner?<div className="spinner">
+            </div>
+            :
+            
+              
+            
+        } */}
         </div>
+        
 
     </div>
 )}
