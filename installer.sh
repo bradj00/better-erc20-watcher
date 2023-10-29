@@ -199,10 +199,10 @@ cd ../master-rate-limiter
 # cp ../../.env .
 docker build -t better-erc20-watcher/master-rate-limiter:latest .
 
-echo "\t✓ building token-external-lookup docker image"
-cd ../token-external-lookup
+echo "\t✓ building external-token-lookup-engine docker image"
+cd ../external-token-lookup-engine
 # cp ../../.env .
-docker build -t better-erc20-watcher/token-external-lookup:latest .
+docker build -t better-erc20-watcher/external-token-lookup-engine:latest .
 
 
 #optionally prune images at the end
