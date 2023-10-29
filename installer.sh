@@ -176,32 +176,32 @@ docker build -t better-erc20-watcher/react-app:latest .
 echo "\t✓ building api-gateway docker image"
 cd ../micro-services/api-gateway
 cp ../../certs/* ./certs/
-# cp ../../.env .
+cp ../../.env .
 docker build -t better-erc20-watcher/api-gateway:latest .
 
 echo "\t✓ building tx-ingestion-engine docker image"
 cd ../tx-ingestion-engine
-# cp ../../.env .
+cp ../../.env .
 docker build -t better-erc20-watcher/tx-ingestion-engine:latest .
 
 echo "\t✓ building labeling-engine docker image"
 cd ../labeling-engine
-# cp ../../.env .
+cp ../../.env .
 docker build -t better-erc20-watcher/labeling-engine:latest .
 
 echo "\t✓ building txie-wrangler docker image"
 cd ../txie-wrangler
-# cp ../../.env .
+cp ../../.env .
 docker build -t better-erc20-watcher/txie-wrangler:latest .
 
 echo "\t✓ building master-rate-limiter docker image"
 cd ../master-rate-limiter
-# cp ../../.env .
+cp ../../.env .
 docker build -t better-erc20-watcher/master-rate-limiter:latest .
 
 echo "\t✓ building external-token-lookup-engine docker image"
 cd ../external-token-lookup-engine
-# cp ../../.env .
+cp ../../.env .
 docker build -t better-erc20-watcher/external-token-lookup-engine:latest .
 
 
@@ -234,4 +234,4 @@ echo "Configuration updated and MongoDB restarted."
 
 # attempt to start the docker-compose.yml group
 cd ../../
-docker-compose up -d
+docker-compose up 
