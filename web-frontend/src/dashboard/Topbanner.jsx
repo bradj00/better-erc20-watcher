@@ -442,7 +442,7 @@ const Topbanner = () => {
                 />
             
                 <div className="grid-layout">
-                    <img className="thumbnail" src={cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.data.image.small ?? '#'} alt="Thumbnail" />
+                    <img className="thumbnail" src={cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.image.small ?? '#'} alt="Thumbnail" />
                     <div className="subheaders">
                         <span>{cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.symbol ?? '...'}</span>
                         <span>{getEllipsisTxt(cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.contractAddress, 6) ?? '...'}</span>

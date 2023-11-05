@@ -26,6 +26,8 @@ const RETRY_INTERVAL = 1000; // 1 minute, adjust as needed for retrying rate-lim
 //     console.error("Error initializing Kafka consumer:", error);
 // });
 
+console.log("MONGO_URI: ",MONGO_URI)
+
 const client = new MongoClient(MONGO_URI);
 
 async function initialize() {

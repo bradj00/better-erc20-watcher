@@ -578,3 +578,56 @@ tr:nth-child(odd) {
 .data-point {
   margin-bottom: 5px;
 }
+.address-container {
+  height: 20vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  position: absolute;
+  bottom: 80%;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  padding-left: 0.1vw;
+  padding-right: 0.1vw;
+  z-index: 1; 
+  border: 1px solid rgba(150,150,150,0.4);
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  width: 95%;
+  margin: 0.25vh;
+  padding: 1vh;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cell:hover {
+  transform: scale(1.1);
+}
+
+.icon {
+  border: 1px solid rgba(255,255,255,0.3);
+  background-color: rgba(5,5,5,0.4);
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+
+.descriptor {
+  color: white;
+  text-align: center;
+  font-size: 0.6vw;
+  padding-left: 0.5vw;
+  padding-right: 0.5vw;
+}

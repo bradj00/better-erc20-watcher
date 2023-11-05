@@ -32,6 +32,14 @@ export const handleGetTransactions = (data, dataSetterObj) => {
     dataSetterObj.settxData(data.data.data);
     dataSetterObj.settxVisualData(data.data.data);
 };
+export const handleSetAddressTags = (data, dataSetterObj) => {
+    console.log('SetAddressTags: ', data.data.data);
+    
+    //LOGIC GOES HERE...
+
+    dataSetterObj.setAddressTags();
+    
+};
 
 // TEST FUNCTION
 export const handleAppendTransaction = (data) => {

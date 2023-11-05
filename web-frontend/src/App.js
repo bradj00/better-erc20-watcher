@@ -30,7 +30,13 @@ export const ErrorsContext                       = React.createContext({});
 
 
 function App() {
-//create context for the app
+
+const [addressTags, setAddressTags] = useState([]); //array of addresses and their assigned category tags
+
+
+
+
+
 const [txData, settxData] = useState(null);
 const [txDataForceGraph, settxDataForceGraph] = useState({ nodes: [], links: [] });
 const [TxSummaryData, setTxSummaryData] = useState(null);
@@ -169,6 +175,7 @@ const txIngestionEngine = {
 
 
 const contextObj = {
+  addressTags, setAddressTags,
   txData, settxData,
   LpTotalTokensHeld, setLpTotalTokensHeld,
   defaultData, setDefaultData,

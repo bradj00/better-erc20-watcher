@@ -25,6 +25,9 @@ const WebsocketInfoGrabber = () => {
     const { submitvalidatedTokenToAddToWatchlist, setsubmitvalidatedTokenToAddToWatchlist } = useContext(GeneralContext);
     const { cachedErc20TokenMetadata, setcachedErc20TokenMetadata } = useContext(GeneralContext);
 
+    //write the fetcher to get status of all addresses we have cached so far
+    const {addressTags, setAddressTags} = useContext(GeneralContext); 
+
     const previousSubscription = useRef(null); // To keep track of the previous subscription
 
     const hasOpenedCertPage = useRef(false);  // Add this ref to track the certificate acceptance page
@@ -37,6 +40,7 @@ const WebsocketInfoGrabber = () => {
         settxData, settxVisualData,
         setCacheFriendlyLabelsRequest,
         setCacheFriendlyLabels,
+        setAddressTags,
 
         
     });

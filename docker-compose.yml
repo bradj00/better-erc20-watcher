@@ -20,6 +20,7 @@ services:
       - zookeeper
     networks:
         - better-erc20-watcher-network
+          
   kafka-manager:
     image: kafkamanager/kafka-manager
     environment:
@@ -31,6 +32,7 @@ services:
     restart: always
     networks:
       - better-erc20-watcher-network
+
   # transaction-ingestion-engine:
     # image: better-erc20-watcher/tx-ingestion-engine
     # depends_on:
@@ -77,16 +79,16 @@ services:
     networks:
       - better-erc20-watcher-network
   
-  react-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: better-erc20-watcher/react-app:latest
-    restart: always
-    ports:
-      - "3000:3000"
-    networks:
-      - better-erc20-watcher-network
+        #  react-app:
+        #    build:
+        #      context: .
+        #      dockerfile: Dockerfile
+        #    image: better-erc20-watcher/react-app:latest
+        #    restart: always
+        #    ports:
+        #      - "3000:3000"
+        #    networks:
+        #      - better-erc20-watcher-network
 
 networks:
   better-erc20-watcher-network:
