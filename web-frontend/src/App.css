@@ -631,3 +631,62 @@ tr:nth-child(odd) {
   padding-left: 0.5vw;
   padding-right: 0.5vw;
 }
+
+/* Token Holder Stats Table Styles */
+.token-holder-stats {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #2a2a2e;
+}
+
+.token-holder-stats thead th {
+  padding: 10px 15px;
+  background-color: #1e1e23;
+  color: #c5c5c5;
+  border-bottom: 2px solid #3f3f44;
+}
+
+.token-holder-stats tbody tr {
+  border-bottom: 1px solid #3f3f44;
+}
+
+.token-holder-stats tbody td {
+  padding: 10px 15px;
+  color: #c5c5c5;
+  background-color: #2a2a2e;
+}
+
+
+.tabs-container {
+  display: flex;
+  gap: 1vh;
+  position: absolute;
+  top: -3.5vh;
+}
+
+.tab {
+  padding: 0.35vh 0.5vh;
+  background-color: rgba(50,50,50,0.8);
+  border: 1px solid rgba(110,150,255,0.5);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: rgba(150,220,255,1);
+  height: 1.4vw;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab:hover {
+
+  background-color: rgba(100,100,100,1);
+  color: rgba(180,240,255,0.7);
+}
+
+.tab.active {
+  background-color: rgba(80,80,80,0.9);
+  color: rgba(200,250,255,0.8);
+  border: 1px solid rgba(180,240,255,1);
+}

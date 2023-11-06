@@ -46,6 +46,10 @@ import ExamplePopUpWindow from './ExamplePopUpWindow';
 import TxVisualizer from './TxVisualizer';
 import ForceGraphComponent from './TxVisualizer-WatchedTokens';
 import TokenTransactions from './TokenTransactions';
+import WidgetPanelDistribution from './TokenOverviewWidgetPanel/WidgetPanelDistribution';
+import WidgetPanelStats from './TokenOverviewWidgetPanel/WidgetPanelStats';
+import WidgetPanelSocial from './TokenOverviewWidgetPanel/WidgetPanelSocial';
+
 
 // TimeAgo.addDefaultLocale(en);
 
@@ -354,6 +358,8 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
   return lpHeldCount;
 }
 
+const [activeWidgetTab, setActiveWidgetTab] = useState('Stats');
+
   return (
     <div style={{width:'100%', position:'absolute', border:'0px solid #ff0'}}>
     <ThemeProvider theme={mdTheme}>
@@ -366,124 +372,44 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
        
           <Toolbar />
           <div style={{position:'absolute', width:"100%", height:'100%',display:'flex',justifyContent:'center',}}>
-            <div style={{position:'absolute', top:'8vh', left:' 5%', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
-              Detected DEXs
-            </div>
+            {/* <div style={{position:'absolute', top:'8vh', left:'6.5%', color:'rgba(150,220,255,0.9)', fontSize:'1vw', }}>
+              Token Info
+            </div> */}
             {/* <ExamplePopUpWindow /> */}
             
-            <div style={{overflowY:'hidden', overflowX:'hidden', border:'1px solid rgba(150,220,255,0.5)',  position:'absolute', width:'16vw', borderRadius: '0.5vw', display:'flex', justifyContent:'center', alignItems:'center', height:'47vh', backgroundColor:'rgba(0,0,0,0.2)', left:'1vw', top:'11vh', }}>
-              <div style={{display:'flex',position:'absolute', top:'0.5%', right:'0'}}>
-                <div className="hoverOpacity">
-                  <ArrowCircleLeftIcon style={{fontSize:'0.9vw'}}/>
-                </div>
-                <div style={{color:'rgba(255,255,255,0.4)', marginTop:'-0.25vh', marginLeft:'0.5vh', marginRight:'0.5vh'}}>
-                  1/3
-                </div>
-                <div className="hoverOpacity">
-                  <ArrowCircleRightIcon style={{fontSize:'0.9vw'}}/>
-                </div>
-              </div>
-                      
-            
-              <div style={{position:'absolute',  top:'8%',  width:'90%', color:'#fff', fontSize:'1vw', }}>
-                {detectedLPs? detectedLPs.uniswap_v3_pools? Object.keys(detectedLPs.uniswap_v3_pools).map((item,index) => { 
-                  return (
-                    <div style={{padding:'0.5vw', display:'flex', justifyContent:'center', height:'42vh', backgroundColor:'rgba(0,0,0,0.4)', border:determineExchangeColorMockup('Uniswap'), marginBottom:'0.3vh', borderRadius: '0.5vw',position:'relative', top: index*5+'%', left:' 0%', color:'#fff', fontSize:'1vw',  }}>
-                      
-                      <div style={{position:'absolute', display:'flex', justifyContent:'center', alignItems:'center', borderRadius:'0.5vw', border:'1px solid rgba(255,255,255,0.6)', height:'40%', width:'95%', top: '13%', color:'#fff', fontSize:'1vw', }}>
-                        {/* liquidity chart  */}
-                        <LiquidityChart />
-                      </div>
-                      <div style={{position:'relative', top: '0%', left:' 0%', color:'#fff', fontSize:'1vw', }}>
-                        Uniswap v3
-                      </div>
-                      <div onClick={()=>{ settoggleShowLPDiv(true) }} className="hoverOpacity" style={{ position:'absolute', bottom: '31%',  fontSize:'0.75vw', fontStyle:'italic' }}>
-                        {filterToUniqueLPProviders(detectedLPs.uniswap_v3_pools[item])} unique providers ({detectedLPs.uniswap_v3_pools[item].length} LP tokens)
-                      </div>
-                      <div style={{position:'absolute', top:'0vh',  right:'2%', color:'rgba(0,255,0,0.8)', fontSize:'1vw', }}>
-                        ${watchedTokenPriceUsd? parseFloat(watchedTokenPriceUsd).toFixed(3) : '...'}
-                      </div>
-                      
-                      <div title="exit liquidity" style={{display:'flex', justifyContent:'center', alignItems:'center', lineHeight:'0.5', textAlign:'left', position:'absolute', top:'55%', border:'0px solid #0f0', width:'100%', fontSize:'0.85vw',  color:'#aaa', fontStyle:'italic',  }}>
-                        <div style={{}}>
-                          {/* put decimals in here from token info pull from api - WALRUS */}
-                          {LpTotalTokensHeld? commaNumber(parseInt(LpTotalTokensHeld.token0Held / 10 ** 18)): '...'} {clickedTokenSymbol? clickedTokenSymbol : 'nullll'}
-                        </div>
-                        <div style={{}}>
-                        &nbsp;<LinkIcon />&nbsp;
-                        </div>
-                        <div style={{}}>
-                        {LpTotalTokensHeld? parseFloat(LpTotalTokensHeld.token1Held / 10 ** 18).toFixed(3): '...'} {determineExitPair(detectedLPs.uniswap_v3_pools[item][0], clickedTokenSymbol? clickedTokenSymbol : 'nullll')}
-                        </div>
-                      </div>
 
-                      {/* <div style={{position:'absolute', left:'2%',fontStyle:'italic', fontSize:'0.75vw',top:'30%',color:'#666'}}>
-                        {getEllipsisTxt(item,6)}
-                      </div> */} 
-                      <div style={{zIndex:'10001', overflowX:'hidden', overflowY:'scroll', position:'absolute',  bottom:'1%', width:'95%', height:'30%', alignItems:'center', backgroundColor:'rgba(255,255,255,0.1)', color:'#fff', borderRadius:'0.5vw', padding:'0.2vw', display:'flex', justifyContent:'center', }}>
-                        <div style={{ width:'100%', height:'100%',  position:'absolute', top:'0' }}>
+           
 
-                        <div style={{ fontSize:'0.75vw', padding:'0.5vh', display:'grid',height:'2vh', gridTemplateColumns:'repeat(4, 1fr)', justifyContent:'center', alignItems:'center', width:'100%',  }}>
-                                
-                                <div style={{textDecoration:'underline', fontSize:'0.6vw', gridColumn:'span 2', border:'0px solid #0f0', width:'100%', textAlign:'left', float:'left', lineHeight:'1.5vh',  color:'#fff', }}>
-                                  Active Provider
-                                </div>
-
-                                <div style={{textAlign:'right', textDecoration:'underline'}}>
-                                  {clickedTokenSymbol? clickedTokenSymbol : <></>}
-                                </div>
-
-                                <div style={{textAlign:'right', textDecoration:'underline'}}>
-                                  {determineExitPair(detectedLPs.uniswap_v3_pools[item][0], clickedTokenSymbol? clickedTokenSymbol : 'nullll')}
-                                </div>
-
-                              </div>
-
-
-                        {filterToUniqueLPProvidersFN(detectedLPs.uniswap_v3_pools[item]).map((friendlyNameObj) => {
-                            // console.log(detectedLPs.uniswap_v3_pools[item]);
-                            
-                            return (
-                              LpToken0Token1HeldByProvider && LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)] && (LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token0 != 0 || LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token1 != 0) ? 
-                              
-                              <div style={{ fontSize:'0.75vw', padding:'0.5vh', display:'grid',height:'2vh', gridTemplateColumns:'repeat(4, 1fr)', justifyContent:'center', alignItems:'center', width:'100%',  }}>
-                                
-                                <div style={{fontSize:'0.6vw', gridColumn:'span 2', border:'0px solid #0f0', width:'100%', textAlign:'left', float:'left', lineHeight:'1.5vh',  color:'#fff', }}>
-                                  <span style={{color:'#0ff'}}>(x{ detectedLPs.uniswap_v3_pools[item] ? determineLpHeldCount(friendlyNameObj, detectedLPs.uniswap_v3_pools[item]) : '0' })</span> {displayAddressFN(friendlyNameObj)}
-                                </div>
-
-                                <div style={{textAlign:'right' }}>
-                                  {
-                                    LpToken0Token1HeldByProvider? 
-                                    LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token0 == 0 ? <></>:
-                                    commaNumber(parseFloat(LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token0 / 10 ** 18).toFixed(0) )
-                                    : <>1</>
-                                  }
-                                </div>
-                                <div style={{textAlign:'right'}}>
-                                {
-                                    LpToken0Token1HeldByProvider? 
-                                    LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token1 == 0 ? <></>:
-                                    parseFloat(LpToken0Token1HeldByProvider[displayAddressFN(friendlyNameObj)].token1 / 10 ** 18).toFixed(3)
-                                    : <>2</>
-                                  }
-                                </div>
-
-                              </div>
-                              :<></>
-
-                            )
-                          })
-                        }
-
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })
-                : null : null}
-              </div>
+            <div 
+            style={{
+              
+              
+              border: '1px solid rgba(150,220,255,0.5)',
+              position: 'absolute',
+              width: '16vw',
+              borderRadius: '0.5vw',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '49vh',
+              backgroundColor: 'rgba(0,0,0,0.2)',
+              left: '1vw',
+              top: '11vh',
+              zIndex: '2'
+            }}
+          > 
+           <div className="tabs-container">
+                <div className={activeWidgetTab === 'Stats' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Stats')}>Stats</div>
+                <div className={activeWidgetTab === 'Distribution' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Distribution')}>Distribution</div>
+                <div className={activeWidgetTab === 'Social' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Social')}>Social</div>
             </div>
+
+            {activeWidgetTab === 'Stats' && <WidgetPanelStats />}
+            {activeWidgetTab === 'Distribution' && <WidgetPanelDistribution />}
+            {activeWidgetTab === 'Social' && <WidgetPanelSocial />}
+
+          </div>
             
 
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
