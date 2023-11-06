@@ -44,7 +44,7 @@ import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import LiquidityChart from './subcomponents/LiquidityChart';
 import ExamplePopUpWindow from './ExamplePopUpWindow';
 import TxVisualizer from './TxVisualizer';
-import ForceGraphComponent from './TxVisualizer-WatchedTokens';
+import ForceGraphComponent from './TokenOverview/StagePanel/TxVisualizer';
 import AddressTransactions from './AddressTransactions';
 
 // TimeAgo.addDefaultLocale(en);

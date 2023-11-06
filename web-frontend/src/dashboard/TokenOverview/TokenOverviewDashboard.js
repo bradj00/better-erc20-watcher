@@ -19,36 +19,38 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 // import { mainListItems, secondaryListItems } from './listItems.js.back';
-import Chart from './Chart';
-import TokenVolumeDash from './TokenVolumeDash';
-import Orders from './TokenTransactions';
-import { GeneralContext } from '../App';
-import AudioToggle from './subcomponents/AudioToggle';
+import Chart from '../Chart';
+import TokenVolumeDash from '../TokenVolumeDash';
+import Orders from '../TokenTransactions';
+import { GeneralContext } from '../../App';
+import AudioToggle from '../subcomponents/AudioToggle';
 import SearchIcon from '@mui/icons-material/Search';
-import SecondaryList from './subcomponents/SecondaryList';
-import MainList from './subcomponents/MainList';
-import {getEllipsisTxt} from './helpers/h.js';
+import SecondaryList from '../subcomponents/SecondaryList';
+import MainList from '../subcomponents/MainList';
+import {getEllipsisTxt} from '../helpers/h.js';
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import {commaNumber} from './helpers/h.js';
-import ConnectionStatusBanner from './NavigatorDropdown';
+import {commaNumber} from '../helpers/h.js';
+import ConnectionStatusBanner from '../NavigatorDropdown';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import NotificationsOffIcon from '@mui/icons-material/NotificationsOff';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import tokenImage from './images/token_image.png';
+import tokenImage from '../images/token_image.png';
 import LinkIcon from '@mui/icons-material/Link';
-import ChartAddysOverTime from './ChartAddysOverTime';
+import ChartAddysOverTime from '../ChartAddysOverTime';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
-import LiquidityChart from './subcomponents/LiquidityChart';
-import ExamplePopUpWindow from './ExamplePopUpWindow';
-import TxVisualizer from './TxVisualizer';
-import ForceGraphComponent from './TxVisualizer-WatchedTokens';
-import TokenTransactions from './TokenTransactions';
-import WidgetPanelDistribution from './TokenOverviewWidgetPanel/WidgetPanelDistribution';
-import WidgetPanelStats from './TokenOverviewWidgetPanel/WidgetPanelStats';
-import WidgetPanelSocial from './TokenOverviewWidgetPanel/WidgetPanelSocial';
+import LiquidityChart from '../subcomponents/LiquidityChart';
+import ExamplePopUpWindow from '../ExamplePopUpWindow';
+import TxVisualizer from '../TxVisualizer';
+import ForceGraphComponent from './StagePanel/TxVisualizer';
+import TokenTransactions from '../TokenTransactions';
+import WidgetPanelDistribution from './WidgetPanel/WidgetPanelDistribution';
+import WidgetPanelStats from './WidgetPanel/WidgetPanelStats';
+import WidgetPanelSocial from './WidgetPanel/WidgetPanelSocial';
+import TokenDetective from '../TokenDetective';
+import VolumeGraph from './StagePanel/VolumeGraph';
 
 
 // TimeAgo.addDefaultLocale(en);
@@ -359,6 +361,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
 }
 
 const [activeWidgetTab, setActiveWidgetTab] = useState('Stats');
+const [activeStageTab, setActiveStageTab] = useState('Visualizer');
 
   return (
     <div style={{width:'100%', position:'absolute', border:'0px solid #ff0'}}>
@@ -392,14 +395,14 @@ const [activeWidgetTab, setActiveWidgetTab] = useState('Stats');
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              height: '49vh',
+              height: '50vh',
               backgroundColor: 'rgba(0,0,0,0.2)',
               left: '1vw',
               top: '11vh',
               zIndex: '2'
             }}
           > 
-           <div className="tabs-container">
+           <div className="tabs-widget-container">
                 <div className={activeWidgetTab === 'Stats' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Stats')}>Stats</div>
                 <div className={activeWidgetTab === 'Distribution' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Distribution')}>Distribution</div>
                 <div className={activeWidgetTab === 'Social' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Social')}>Social</div>
@@ -413,9 +416,17 @@ const [activeWidgetTab, setActiveWidgetTab] = useState('Stats');
             
 
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
-              
-              <div style={{position:'absolute', width:'100%', height:'52vh', border:'1px solid rgba(255,255,255,0.4)',  top:'-2vh',}}>
-                <ForceGraphComponent />
+              <div className="tabs-stage-container">
+                  <div className={activeStageTab === 'Visualizer' ? "tab active" : "tab"} onClick={() => setActiveStageTab('Visualizer')}>Visualizer</div>
+                  <div className={activeStageTab === 'Volume' ? "tab active" : "tab"} onClick={() => setActiveStageTab('Volume')}>Volume</div>
+              </div>
+
+
+              <div style={{position:'absolute', width:'100%', height:'50vh', border:'1px solid rgba(255,255,255,0.4)',  top:'1vh',borderRadius: '0.5vw',overflow:'hidden'}}>
+                
+                {activeStageTab === 'Visualizer' && <ForceGraphComponent />}
+                {activeStageTab === 'Volume' && <VolumeGraph />}
+
               </div>
 
 

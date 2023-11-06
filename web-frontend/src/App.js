@@ -1,4 +1,4 @@
-import TokenOverviewDashboard from './dashboard/TokenOverviewDashboard.js';
+import TokenOverviewDashboard from './dashboard/TokenOverview/TokenOverviewDashboard.js';
 import TokenHoldersDashboard from './dashboard/TokenHoldersDashboard.js';
 import SettingsDashboard from './dashboard/SettingsDashboard.js';
 import AddressSummaryDashboard from './dashboard/AddressSummaryDashboard.js';

@@ -16,24 +16,25 @@ const WidgetPanelDistribution = () => {
             
             <table className="token-holder-stats">
                 <thead>
-                <tr style={{position:'sticky', top:'0'}}>
-                    <th>Rank</th>
-                    <th>Address</th>
-                    <th>Amount</th>
-                    <th>Percentage</th>
-                </tr>
+                    <tr style={{position:'sticky', top:'0'}}>
+                        <th>Rank</th>
+                        <th>Address</th>
+                        <th>Amount</th>
+                        <th>Percentage</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {holdersData.map((holder, index) => (
-                    <tr key={index}>
-                    <td style={{textAlign:'center', }}>{index+1}</td>
-                    <td style={{textAlign:'center', }}>{holder.address}</td>
-                    <td style={{textAlign:'center', }}>{holder.amount.toLocaleString()}</td>
-                    <td style={{textAlign:'center', }}>{holder.percentage}</td>
-                    </tr>
-                ))}
+                    {holdersData.map((holder, index) => (
+                        <tr key={index}>
+                            <td style={{textAlign:'center'}}>{index+1}</td>
+                            <td style={{textAlign:'center'}}>{holder.address}</td>
+                            <td style={{textAlign:'center'}}>{holder.amount.toLocaleString()}</td>
+                            <td style={{textAlign:'center'}}>{holder.percentage}</td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
+
     </div>
     )
 }

@@ -4,21 +4,15 @@ const WidgetPanelStats = () => {
     const percentages =                 ["+2.5%", "-1.2%", "+3.8%", "-62.8%"];
     const percentagesHolders =          ["+1.2%", "+2.5%", "+3.2%", "+70%"];
     const percentagesTwitterFollowers = ["-1.5%", "+3.3%", "+14.2%", "+21.6%"];
-    
+
     return (
         <>
         <div style={{width:'100%', marginLeft:'auto'}}>
             <span style={{ color: 'rgba(150,220,255,0.5)',  fontSize:'150%', padding:'1vw',}}>Price:</span>
-            <span style={{ color: 'rgba(150,220,255,0.5)',  fontSize:'100%', color:'rgba(255,255,0,1)'}}>$0.07521</span>
+            <span style={{ color: 'rgba(150,220,255,0.5)',  fontSize:'150%', color:'rgba(255,255,0,1)', position:'absolute', right:'5%', }}>$0.07521</span>
             
         </div>
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1px',
-            width: '90%',
-            marginBottom:'1vh',
-        }}>
+        <div className="grid-container" style={{}}>
             {["1 hour", "24 hours", "7 days", "30 days"].map((time, index) => (
             <div 
                 key={index}
@@ -54,16 +48,10 @@ const WidgetPanelStats = () => {
         
         <div style={{width:'100%', marginLeft:'auto'}}>
             <span style={{ color: 'rgba(150,220,255,0.5)',  fontSize:'150%', padding:'1vw',}}>Active Addresses:</span>
-            <span style={{ color: 'rgba(150,220,255,0.5)',  fontSize:'100%', color:'rgba(255,255,0,1)'}}>42.8k</span>
+            <span style={{ color: 'rgba(150,220,255,0.5)',  fontSize:'150%', color:'rgba(255,255,0,1)', position:'absolute', right:'5%', }}>42.8k</span>
             
         </div>
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1px',
-            width: '90%',
-            marginBottom:'1vh',
-        }}>
+        <div className="grid-container" style={{}}>
             {["1 day", "30 days", "90 days", "180 days"].map((time, index) => (
             <div 
                 key={index}
@@ -99,16 +87,10 @@ const WidgetPanelStats = () => {
 
         <div style={{width:'100%', marginLeft:'auto'}}>
             <span style={{ color: 'rgba(150,220,255,0.5)',  fontSize:'150%', padding:'1vw',}}>Twitter Followers: </span>
-            <span style={{ color: 'rgba(150,220,255,0.5)',  fontSize:'100%', color:'rgba(255,255,0,1)'}}> 16.3k </span>
+            <span style={{ color: 'rgba(150,220,255,0.5)',  fontSize:'150%', color:'rgba(255,255,0,1)', position:'absolute', right:'5%', }}> 16.3k </span>
             
         </div>
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '1px',
-            width: '90%',
-            marginBottom:'1vh',
-        }}>
+        <div className="grid-container" style={{}}>
             {["1 day", "7 days", "30 days", "180 days"].map((time, index) => (
             <div 
                 key={index}

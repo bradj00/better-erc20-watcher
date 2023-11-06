@@ -1,12 +1,12 @@
 import React, { useEffect, useContext, useRef, useCallback, useState } from 'react';
-import {getEllipsisTxt} from './helpers/h.js';
+import {getEllipsisTxt} from '../../helpers/h.js';
 import { ForceGraph3D } from "react-force-graph";
-import { GeneralContext } from '../App';
-import { UnrealBloomPass } from './helpers/UnrealBloomPass';
+import { GeneralContext } from '../../../App.js';
+import { UnrealBloomPass } from '../../helpers/UnrealBloomPass.js';
 import * as THREE from 'three';
-import person from './images/person.png';
-import personOld from './images/person-old.png';
-import '../App.css';
+import person from '../../images/person.png';
+import personOld from '../../images/person-old.png';
+import '../../../App.css';
 
 const ForceGraphComponent = () => {
     // const [graphData, setGraphData] = useState({ nodes: [], links: [] });
@@ -202,7 +202,7 @@ const ForceGraphComponent = () => {
   
 
     return (
-      <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+      <div style={{ width: '100%', height: '100%', overflow: 'hidden', }}>
 
 {showMenu? <div 
     style={{

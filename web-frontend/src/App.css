@@ -598,7 +598,7 @@ tr:nth-child(odd) {
 .grid-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
+  gap: 0.1vw;
   width: 95%;
   margin: 0.25vh;
   padding: 1vh;
@@ -650,18 +650,31 @@ tr:nth-child(odd) {
   border-bottom: 1px solid #3f3f44;
 }
 
-.token-holder-stats tbody td {
-  padding: 10px 15px;
-  color: #c5c5c5;
-  background-color: #2a2a2e;
+
+.token-holder-stats tbody tr:nth-child(odd) {
+  background-color: rgba(50, 50, 80, 0.8); /* Adjust the color as desired for odd rows */
+}
+
+.token-holder-stats tbody tr:nth-child(even) {
+  background-color: rgba(10, 10, 30, 0.6); /* Adjust the color as desired for even rows */
 }
 
 
-.tabs-container {
+
+
+.tabs-widget-container {
   display: flex;
   gap: 1vh;
   position: absolute;
   top: -3.5vh;
+  left:1vw;
+}
+.tabs-stage-container {
+  display: flex;
+  gap: 1vh;
+  position: absolute;
+  top: -2.5vh;
+  left:1vw;
 }
 
 .tab {
