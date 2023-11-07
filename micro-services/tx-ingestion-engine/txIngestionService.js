@@ -310,6 +310,14 @@ client.on("close", () => {
 async function listenToNewBlocks(contractAddress) {
     const ws = new WebSocket(INFURA_WS_ENDPOINT);
 
+    const cleanupListeners = () => {
+        ws.removeAllListeners('open');
+        ws.removeAllListeners('message');
+        ws.removeAllListeners('error');
+        ws.removeAllListeners('close');
+    };
+
+
     ws.on('open', () => {
         console.log('WebSocket connection opened. Subscribing to newHeads.');
         ws.send(JSON.stringify({
@@ -350,9 +358,14 @@ async function listenToNewBlocks(contractAddress) {
     ws.on('close', () => {
         console.log('WebSocket connection closed.');
 
-        
-        setTimeout(listenToNewBlocks, 5000);
+        cleanupListeners(); // Remove all listeners.
+        setTimeout(listenToNewBlocks(ERC20_CONTRACT_ADDRESS), 5000);
     });
+
+
+
+
+
 }
 
 
@@ -386,15 +399,17 @@ function initKafkaProducer(){
     await connectToMongo();
     await initKafkaProducer();
 
-    setInterval(()=>{
-        produceErrorEvent(
-            {
-                errorType: 'tx-ingestion-engine-TEST-MESSAGE-TYPE',
-                errorMsg: 'test error message:',
-                txieContract: ERC20_CONTRACT_ADDRESS,
-            }
-        )
-    },5000)
+
+    //test error message generation to kafka
+    // setInterval(()=>{
+    //     produceErrorEvent(
+    //         {
+    //             errorType: 'tx-ingestion-engine-TEST-MESSAGE-TYPE',
+    //             errorMsg: 'test error message:',
+    //             txieContract: ERC20_CONTRACT_ADDRESS,
+    //         }
+    //     )
+    // },5000)
 
     const decimals = await getDecimals(ERC20_CONTRACT_ADDRESS);
     console.log(`Token has ${decimals} decimals.`);

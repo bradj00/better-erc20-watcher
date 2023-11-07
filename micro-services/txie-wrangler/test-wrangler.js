@@ -51,7 +51,7 @@ async function startDockerContainer(address) {
     }
 
     const image = 'better-erc20-watcher/tx-ingestion-engine';
-    const network = 'better-erc20-watcher_better-erc20-watcher-network';
+    const network = 'better-erc20-watcher-network';
     const envVar = `ERC20_CONTRACT_ADDRESS=${address}`;
     const label = `erc20_contract_address=${address}`;
 

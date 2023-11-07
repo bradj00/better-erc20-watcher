@@ -9,6 +9,11 @@ const kafka = new Kafka({
 
 const consumer = kafka.consumer({ groupId: config.consumerGroup });
 
+
+let containerIds = []; // This will hold the IDs of the spawned Docker containers
+
+
+
 const initConsumer = async (client) => {
     // Ensure Redis is connected before initializing the Kafka consumer
 
@@ -31,8 +36,45 @@ const initConsumer = async (client) => {
     });
 
 
+    setInterval(()=>{
+      console.log('running docker containers: ',containerIds)
+    },2000)
+
+
     //on cold start, check desired:actual state of ingestion engines running
     startDockerContainersFromDB(client);
+
+
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM signal received. Shutting down gracefully.');
+      shutdownFunction();
+    });
+    
+
+
+
+    function shutdownFunction() {
+      console.log('Performing cleanup...');
+    
+      const stopPromises = containerIds.map(id => {
+        return new Promise((resolve, reject) => {
+          exec(`docker stop ${id}`, (error, stdout, stderr) => {
+            if (error) {
+              console.error(`Error stopping container ${id}: ${error}`);
+              reject(error);
+            } else {
+              console.log(`Container ${id} stopped successfully.`);
+              resolve(stdout.trim());
+            }
+          });
+        });
+      });
+    
+      Promise.allSettled(stopPromises).then(results => {
+        console.log('All containers stopped, exiting now.');
+        process.exit(0);
+      });
+    }
 
 };
 
@@ -121,18 +163,20 @@ async function startDockerContainer(address) {
   }
 
   const image = 'better-erc20-watcher/tx-ingestion-engine';
-  const network = ' better-erc20-watcher_better-erc20-watcher-network';
+  const network = 'better-erc20-watcher-network';
   const envVar = `ERC20_CONTRACT_ADDRESS=${address}`;
   const label = `erc20_contract_address=${address}`;
 
   const command = `docker run -d --network ${network} -e "${envVar}" --label "${label}" ${image}`;
 
   exec(command, (error, stdout, stderr) => {
-      if (error) {
-          console.error(`exec error: ${error}`);
-          return;
-      }
-      console.log(`TXIE instance spawned to watch token ${address} with docker ID: ${stdout.trim()}`);
+    if (error) {
+        console.error(`exec error: ${error}`);
+        return;
+    }
+    const containerId = stdout.trim();
+    containerIds.push(containerId); // Store the container ID for later cleanup
+    console.log(`TXIE instance spawned to watch token ${address} with docker ID: ${containerId}`);
   });
 }
 

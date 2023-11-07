@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+
+  # THIS GETS STARTED BY OUR TXIE-WRANGLER NOW
+  # transaction-ingestion-engine:
+    # image: better-erc20-watcher/tx-ingestion-engine
+    # depends_on:
+      # - kafka
+    # restart: always
+    # networks:
+      # - better-erc20-watcher-network      
+  
+  api-gateway:
+    image: better-erc20-watcher/api-gateway:latest
+    ports:
+      - "4050:4050"
+    restart: always
+    networks:
+      - better-erc20-watcher-network 
+       
+  external-token-lookup-engine:
+    image:  better-erc20-watcher/external-token-lookup-engine:latest
+    restart: always
+    depends_on:
+      - master-rate-limiter
+    networks:
+    - better-erc20-watcher-network 
+  
+  txie-wrangler:
+    image:  better-erc20-watcher/txie-wrangler:latest
+    restart: always
+    networks:
+      - better-erc20-watcher-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    
+
+  master-rate-limiter:
+    image: better-erc20-watcher/master-rate-limiter:latest
+    restart: always
+
+    networks:
+      - better-erc20-watcher-network
+  
+  # react-app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   image: better-erc20-watcher/react-app:latest
+  #   restart: always
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - better-erc20-watcher-network
+
+networks:
+  better-erc20-watcher-network:
+    name: better-erc20-watcher-network
+    driver: bridge
