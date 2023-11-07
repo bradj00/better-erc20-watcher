@@ -36,9 +36,9 @@ const initConsumer = async (client) => {
     });
 
 
-    setInterval(()=>{
-      console.log('running docker containers: ',containerIds)
-    },2000)
+    // setInterval(()=>{
+    //   console.log('running docker containers: ',containerIds)
+    // },2000)
 
 
     //on cold start, check desired:actual state of ingestion engines running
