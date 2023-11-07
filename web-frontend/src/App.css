@@ -639,6 +639,16 @@ tr:nth-child(odd) {
   background-color: #2a2a2e;
 }
 
+.token-holder-stats a {
+  color: inherit; /* makes the link have the same color as surrounding text */
+  text-decoration: none; /* removes the underline */
+}
+
+.token-holder-stats a:hover {
+  text-decoration: underline; /* adds an underline when hovered */
+}
+
+
 .token-holder-stats thead th {
   padding: 10px 15px;
   background-color: #1e1e23;

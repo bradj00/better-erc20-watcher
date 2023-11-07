@@ -58,7 +58,7 @@ const [communityHeldListFromSelected, setcommunityHeldListFromSelected] = useSta
 const [communityHeldListFromSelectedAddy, setcommunityHeldListFromSelectedAddy] = useState();
 const [selectedAddyInGameBalance, setselectedAddyInGameBalance] = useState();
 const [LpToken0Token1HeldByProvider, setLpToken0Token1HeldByProvider] = useState();
-const [ ServicesErrorMessages, setservicesErrorMessages  ] = useState([{message:'something here'},{message:'something here'},{message:'something here'},{message:'something here'},]);
+const [ ServicesErrorMessages, setServicesErrorMessages  ] = useState([]);
 const [watchedTokenPriceUsd, setwatchedTokenPriceUsd] = useState();
 const [heldTokensSelectedAddressFNdisplayed, setheldTokensSelectedAddressFNdisplayed] = useState();
 const [submitvalidatedTokenToAddToWatchlist, setsubmitvalidatedTokenToAddToWatchlist] = useState();
@@ -128,7 +128,7 @@ const [dataCalls, setDataCalls] = useState({
 });
 
 const ErrorsObject = {
-  ServicesErrorMessages, setservicesErrorMessages
+  
 }
 
 
@@ -175,6 +175,9 @@ const txIngestionEngine = {
 
 
 const contextObj = {
+  ServicesErrorMessages, setServicesErrorMessages,
+
+
   addressTags, setAddressTags,
   txData, settxData,
   LpTotalTokensHeld, setLpTotalTokensHeld,
@@ -263,7 +266,7 @@ return (
     <txIngestionEngineContext.Provider   value={txIngestionEngine} >
     <ErrorsContext.Provider              value={ErrorsObject} >
     
-      <div style={{  border:'0px solid #0f0'}}>
+      <div style={{  overflow:'hidden', position:'absolute', width:'100%', height:'100%', border:'0px solid #0f0'}}>
           {/* <ConnectionStatusBanner diff={chainDataHeartbeatDiff}/> */}
           <Topbanner />
           {displayPanel === 'watchingTokens'? <TokenOverviewDashboard />: <></>}

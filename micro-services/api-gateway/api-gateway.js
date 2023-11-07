@@ -102,7 +102,7 @@ function logSubscriptions() {
     // });
 }
 
-// setInterval(logSubscriptions, 2000);
+setInterval(logSubscriptions, 2000);
 
 
 

@@ -13,6 +13,7 @@ const initConsumer = async (broadcastToTopic) => {
 
     //permanently subscribe to rawTransactions kafka topic.
     await consumer.subscribe({ topic: config.rawTransactions, fromBeginning: true });
+    await consumer.subscribe({ topic: config.txieErrors,      fromBeginning: true });
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
@@ -25,6 +26,9 @@ const initConsumer = async (broadcastToTopic) => {
                     break;
                 case config.errorTopic:
                     consumeErrorEvent(message);
+                    break;
+                case config.txieErrors:
+                    consumeTxieError(message, broadcastToTopic);
                     break;
                 default:
                     console.warn(`Received message from unknown topic: ${topic}`);
@@ -67,7 +71,25 @@ const consumeErrorEvent = (message) => {
   try {
     const errorData = JSON.parse(message.value.toString());
     console.log(`Received error event from Kafka: ${JSON.stringify(errorData)}`);
-    // TODO: Handle the error data as needed
+    
+  } catch (error) {
+    console.error(`Error consuming error event: ${error.message}`);
+  }
+};
+const consumeTxieError = (message, broadcastToTopic) => {
+  try {
+    const errorData = JSON.parse(message.value.toString());
+    console.log(`Received TXIE error event from Kafka: ${JSON.stringify(errorData)}`);
+
+    broadcastToTopic(
+      'errors', //topic the web ui websocket is subscribed to
+      {
+      service: 'txie-error', 
+      method: 'ErrorMessages',
+      data: errorData
+    })
+
+    // {"txieContract":"0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e","errorType":"tx-ingestion-engine-websocket","errorMsg":"test error message"}
   } catch (error) {
     console.error(`Error consuming error event: ${error.message}`);
   }

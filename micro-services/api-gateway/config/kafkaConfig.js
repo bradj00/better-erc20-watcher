@@ -13,6 +13,7 @@ module.exports = {
     txieWranglerControl: 'txie-wrangler-control',
     lookupExternalToken: 'lookup-external-token',
     errorTopic: 'api-gateway-errors',
+    txieErrors: 'txie-errors',
   
     // If you require any additional configurations such as SSL, authentication, etc., you can add them here.
     // ssl: {},

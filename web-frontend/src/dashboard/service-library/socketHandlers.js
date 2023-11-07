@@ -18,6 +18,34 @@ export const handleCacheFriendlyLabelsRequest = (data, dataSetterObj) => {
     dataSetterObj.setCacheFriendlyLabels(data.data.data);
 };
 
+export const handleErrorMessages = (data, dataSetterObj) => {
+    console.log('ERROR FROM KAFKA:', data)
+    dataSetterObj.setServicesErrorMessages(prevMessages => {
+        // Create a new object with the current data and a timestamp
+        const newData = {
+          ...data,
+          timestamp: new Date().toISOString() // This will add an ISO formatted timestamp
+        };
+      
+        // Prepend the new data to the array to display it at the top
+        return [newData, ...prevMessages];
+      });
+      
+    // dataSetterObj.setServicesErrorMessages();
+    // {
+    //     "service": "txie-error",
+    //     "method": "ErrorMessages",
+    //     "data": {
+    //         "txieContract": "0x1892f6ff5fbe11c31158f8c6f6f6e33106c5b10e",
+    //         "errorType": "tx-ingestion-engine-websocket",
+    //         "errorMsg": "test error message"
+    //     }
+    // }
+
+
+    // [{message:'something here'},{message:'something here'},{message:'something here'},{message:'something here'},]
+}
+
 export const handleGetTransactions = (data, dataSetterObj) => {
     console.log('GetTransactions: ', data.data.data);
     
@@ -68,6 +96,13 @@ export const handleLookupTokenRequest = (data, cachedErc20TokenMetadata, setcach
     // Updating the context with the new token data
     setcachedErc20TokenMetadata(updatedMetadata);
 }
+
+ 
+export const handletxieErrorMessage = (data, dataSetterObj) => {
+    console.log('txieErrorMessage: ', data);
+
+}
+
 
 //when a new TX comes in, or we need to feed the TX to the client 
 export const handleAppendTransactions = (data, dataSetterObj, txData) => {

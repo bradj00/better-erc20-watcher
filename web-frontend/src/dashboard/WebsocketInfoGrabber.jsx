@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useContext } from 'react';
-import { GeneralContext } from '../App.js';
+import { GeneralContext, ErrorsContext } from '../App.js';
 import * as socketHandlers from './service-library/socketHandlers';
 
 const WebsocketInfoGrabber = () => {
@@ -25,6 +25,13 @@ const WebsocketInfoGrabber = () => {
     const { submitvalidatedTokenToAddToWatchlist, setsubmitvalidatedTokenToAddToWatchlist } = useContext(GeneralContext);
     const { cachedErc20TokenMetadata, setcachedErc20TokenMetadata } = useContext(GeneralContext);
 
+
+    const {ServicesErrorMessages, setServicesErrorMessages} = useContext(GeneralContext);
+    // [{message:'something here'},{message:'something here'},{message:'something here'},{message:'something here'},]
+    
+
+
+
     //write the fetcher to get status of all addresses we have cached so far
     const {addressTags, setAddressTags} = useContext(GeneralContext); 
 
@@ -41,9 +48,15 @@ const WebsocketInfoGrabber = () => {
         setCacheFriendlyLabelsRequest,
         setCacheFriendlyLabels,
         setAddressTags,
+        setServicesErrorMessages,
+        ServicesErrorMessages
 
         
     });
+
+    // useEffect(() => {
+    //     console.log('ServicesErrorMessages:: ',ServicesErrorMessages)
+    // },[ServicesErrorMessages]);
 
     useEffect(() => {
         if (validatedTokenToAddToWatchlist){
@@ -84,6 +97,7 @@ const WebsocketInfoGrabber = () => {
                     topic: viewingTokenAddress
                 };
                 ws.current.send(JSON.stringify(subscriptionMessage));
+                ws.current.send(JSON.stringify({type:'subscribe', topic: 'errors'}));
             }
 
             // Update the previousSubscription ref

@@ -334,14 +334,24 @@ async function listenToNewBlocks(contractAddress) {
         }
     });
     
+    
 
-    ws.on('error', (err) => {
+    ws.on('error', async (err) => {
         console.error('WebSocket encountered an error:', err);
+        produceErrorEvent(
+            {
+                errorType: 'tx-ingestion-engine-websocket',
+                errorMsg: err,
+                txieContract: ERC20_CONTRACT_ADDRESS,
+            }
+        )
     });
 
     ws.on('close', () => {
         console.log('WebSocket connection closed.');
-        // Consider adding logic here to reconnect if desired.
+
+        
+        setTimeout(listenToNewBlocks, 5000);
     });
 }
 
@@ -375,6 +385,16 @@ function initKafkaProducer(){
 (async () => {
     await connectToMongo();
     await initKafkaProducer();
+
+    setInterval(()=>{
+        produceErrorEvent(
+            {
+                errorType: 'tx-ingestion-engine-TEST-MESSAGE-TYPE',
+                errorMsg: 'test error message:',
+                txieContract: ERC20_CONTRACT_ADDRESS,
+            }
+        )
+    },5000)
 
     const decimals = await getDecimals(ERC20_CONTRACT_ADDRESS);
     console.log(`Token has ${decimals} decimals.`);
