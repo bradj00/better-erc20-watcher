@@ -7,7 +7,8 @@ const express = require('express')
 const dotenv = require('dotenv')
 dotenv.config();
 
-const { initConsumer} = require('./kafka/consumer');
+const { initConsumer } = require('./kafka/consumer');
+const { initProducer, produceFinishedLookupRequest } = require('./kafka/producer');
 let db;
 const app = express();
 const PORT = 4000;
@@ -36,24 +37,21 @@ async function initialize() {
         db = client.db(DB_NAME);
         console.log("Connected to MongoDB");
         
-        // Any other initialization logic you want, like starting your Express app, goes here.
-
-    } catch (error) {
-        console.error("Error connecting to MongoDB:", error);
-        process.exit(1);  // Exit if can't connect to MongoDB
-    }
-
-    try { 
-        console.log('INITIALIZING CONSUMER!')
         await initConsumer(PENDING_JOBS)
-        console.log('\t\t~~~~~~~~INITIALIZED CONSUMER~~~~~~~~~~~~')
-    } catch (error2){
-        console.error("Error initializing CONSUMER:", error);
+        console.log("Consumer Initialized.");
+        
+        await initProducer()
+        console.log("Producer Initialized.");
+        
+
+    } catch (error){
+        console.error("Error initializing Lookup Engine:", error);
         process.exit(1);  
     }
 }
 
 initialize();
+
 
 
 async function reconnectToMongo() {
@@ -145,6 +143,14 @@ async function processLookupRequests() {
 
             job.status = 'Success';
             console.log(`Processed jobID ${job.id} for contract ${job.contractAddress}`);
+
+            produceFinishedLookupRequest({
+                status: job.status,
+                contractAddress: job.contractAddress,
+                data: response.data
+            })
+            // produce success with this info back to kafka for API-GW consumption
+
         } else {
             job.status = 'Rate Limit Exceeded';
             RATE_LIMITED_JOBS.push(job); // Add the job to the rate-limited jobs array

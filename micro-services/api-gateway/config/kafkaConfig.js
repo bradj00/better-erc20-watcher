@@ -14,6 +14,7 @@ module.exports = {
     lookupExternalToken: 'lookup-external-token',
     errorTopic: 'api-gateway-errors',
     txieErrors: 'txie-errors',
+    finishedTokenLookupReq: 'finished-token-lookup-req',
   
     // If you require any additional configurations such as SSL, authentication, etc., you can add them here.
     // ssl: {},

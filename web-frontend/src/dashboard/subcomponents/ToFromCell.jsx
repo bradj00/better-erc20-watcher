@@ -110,7 +110,7 @@ const ToFromCell = (props) => {
     const [newFriendlyNameInput, setNewFriendlyNameInput] = useState('');
     const [selectedCells, setSelectedCells] = useState([]);
     
-    const { updateCommitFriendlyNameRequest, setUpdateCommitFriendlyNameRequest, CacheFriendlyLabels } = useContext(GeneralContext);
+    const { updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest, CacheFriendlyLabels } = useContext(GeneralContext);
     const {addressTags, setAddressTags} = useContext(GeneralContext);
     
 
@@ -133,7 +133,7 @@ const ToFromCell = (props) => {
 
         if (e.key === 'Enter' && addressToUpdate) {
             console.log('commit update friendly name: ', e.target.value, addressToUpdate);
-            setUpdateCommitFriendlyNameRequest({
+            setupdateCommitFriendlyNameRequest({
                 address: addressToUpdate,
                 friendlyName: e.target.value
             });

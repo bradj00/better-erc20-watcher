@@ -127,7 +127,7 @@ const Topbanner = () => {
     }
 
     console.log('clicked: ', token); 
-    setviewingTokenAddress(token.tokenAddress); 
+    setviewingTokenAddress(token.data.contractAddress); 
     setclickedDetailsAddress(null);
     setclickedDetailsAddressFN(null);
     document.title = "👁️ " + token.data.data.name;
@@ -298,10 +298,10 @@ const Topbanner = () => {
         viewingTokenAddress? 
             <div style={{zIndex:'10000', cursor:'pointer', }} >
             <div style={{display:'flex', justifyContent:'center', alignItems:'center', position:'absolute', top:'0.3vh', left:'0.5vw', border:'0px solid #f00', width:'17%'}}>
-                <img src={clickedToken && clickedToken.tokenAddress.logo? clickedToken.tokenAddress.logo : tokenImage } style={{width:'90%'}} />
+                <img src={clickedToken && clickedToken.data.data.image.small? clickedToken.data.data.image.small : tokenImage } style={{width:'90%'}} />
             </div>
             <div style={{fontSize:'1.5vw', zIndex:'1', position:'absolute', width:'100%', left:'0', top:'-10%',}} onClick={() => {updateSelectedToken();setclickedSearchBar(false);setshowTokenSelector(false) }}>
-            {    clickedToken? <>${clickedToken.data.symbol}</> : '...'}
+            {    clickedToken? <>${clickedToken.data.data.symbol.toUpperCase()}</> : '...'}
             </div>
 
             <div style={{ color:'#999',fontSize:'2vh',  bottom:'-10%', width:'100%', left:'0',position:'absolute',}}  >
@@ -340,11 +340,12 @@ const Topbanner = () => {
                     <div 
                         key={index}
                         style={{
+                            
                             cursor: 'pointer', 
                             zIndex: '10000', 
                             position: 'relative',
                             backgroundColor: viewingTokenAddress && token.data.contractAddress && viewingTokenAddress === token.data.contractAddress 
-                                ? 'rgba(215,215,255,0.2)' 
+                                ? 'rgba(100,100,150,0.4)' 
                                 : 'rgba(0,0,0,0)'
                         }}
                         onClick={() => {
@@ -373,7 +374,8 @@ const Topbanner = () => {
                                     marginLeft: '1vw'  // Space to the right of the logo
                                 }}
                             >
-                                {token.data.data.image.small}
+                                <div style={{fontSize:'0.8vw', color:'#fff'}}>{token.data.data.symbol.toUpperCase()}</div>
+                                <div style={{fontSize:'0.6vw', color:'#888'}}>{getEllipsisTxt(token.data.data["contract_address"], 6)}</div>
                             </div>
                         </div>
                         <div
@@ -421,8 +423,9 @@ const Topbanner = () => {
 
                 <div className="info-pane">
                 <div className="header">
-                    {cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.name ?? '...'}
+                    {cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data?.name ?? '...'}
                 </div>
+
             
                 <input
                     ref={inputRef}
@@ -441,19 +444,40 @@ const Topbanner = () => {
                     }}
                 />
             
-                <div className="grid-layout">
-                    <img className="thumbnail" src={cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.image.small ?? '#'} alt="Thumbnail" />
-                    <div className="subheaders">
-                        <span>{cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.symbol ?? '...'}</span>
-                        <span>{getEllipsisTxt(cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.contractAddress, 6) ?? '...'}</span>
-                    </div>
-                    <div className="data-point">
-                        Watchers: {cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.watchlist_portfolio_users ?? '...'}
-                    </div>
-                    <div className="data-point">
-                        Chain: {cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data.asset_platform_id ?? '...'}
-                    </div>
+            <div className="grid-layout" style={{ display:'flex', justifyContent:'center', background: '#333', color: '#fff', padding: '10px', borderRadius: '8px',  }}>
+                <img
+                    className="thumbnail"
+                    src={cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data?.image?.small ?? '#'}
+                    alt="Thumbnail"
+                    style={{ width: '2.25vw', height: '2.25vw', background: '#fff', borderRadius: '4px' }}
+                />
+                <table style={{ width: '100%',   }}>
+                    <tbody>
+
+                    
+                    <tr>
+                        <td style={{ padding: '5px 10px' }}>Site</td>
+                        <td style={{ padding: '5px 10px' }}>
+                        <a target="_blank" href={cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data?.links.homepage[0] ?? '...'}>{cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data?.links.homepage[0] ?? '...'}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style={{ padding: '5px 10px' }}>Watchers</td>
+                        <td style={{ padding: '5px 10px' }}>
+                        {cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data?.watchlist_portfolio_users ?? '...'}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style={{ padding: '5px 10px' }}>Chain</td>
+                        <td style={{ padding: '5px 10px' }}>
+                        {cachedErc20TokenMetadata[tokenLookupRequestAddy]?.data?.asset_platform_id ?? '...'}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
                 </div>
+
+
             
                 <button className={validatedTokenToAddToWatchlist? "watch-button" : "disabled-watch-button"} onClick={handleWatchClick}>Start Watching</button>
             

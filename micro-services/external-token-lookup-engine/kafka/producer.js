@@ -12,21 +12,12 @@ const initProducer = async () => {
   await producer.connect();
 };
 
-//errors topic
-const sendErrorToKafka = async (error) => {
-  await producer.send({
-    topic: 'errors',
-    messages: [
-      { value: JSON.stringify(error) }
-    ]
-  });
-};
 
-
-const produceLookupTokenRequest = async (eventData) => {
+//to be consumed by API-GW
+const produceFinishedLookupRequest = async (eventData) => {
   try {
     await producer.send({
-      topic: config.lookupExternalToken,
+      topic: config.finishedTokenLookupReq,
       messages: [
         { value: JSON.stringify(eventData) }
       ]
@@ -38,19 +29,6 @@ const produceLookupTokenRequest = async (eventData) => {
 };
 
 
-const produceWatchNewTokenRequest = async (eventData) => {
-  try {
-    await producer.send({
-      topic: config.txieWranglerControl,
-      messages: [
-        { value: JSON.stringify(eventData) }
-      ]
-    });
-    console.log(`Sent Watch New Token Request event to Kafka: ${JSON.stringify(eventData)}`);
-  } catch (error) {
-    console.error(`Error producing STREAM token transfer event: ${error.message}`);
-  }
-};
 
 const produceErrorEvent = async (errorData) => {
   try {
@@ -68,6 +46,6 @@ const produceErrorEvent = async (errorData) => {
 
 module.exports = {
   initProducer,
-  produceWatchNewTokenRequest,
+  produceFinishedLookupRequest,
   produceErrorEvent
 };

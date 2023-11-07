@@ -14,7 +14,7 @@ let containerIds = []; // This will hold the IDs of the spawned Docker container
 
 
 
-const initConsumer = async (client) => {
+const initConsumer = async (db) => {
     // Ensure Redis is connected before initializing the Kafka consumer
 
     await consumer.connect();
@@ -24,7 +24,7 @@ const initConsumer = async (client) => {
         eachMessage: async ({ topic, partition, message }) => {
             switch (topic) {
                 case config.txieWranglerControl:
-                    await consumetxieWranglerControl(message, client);
+                    await consumetxieWranglerControl(message, db);
                     break;
                 case config.errorTopic:
                     consumeErrorEvent(message);
@@ -42,7 +42,7 @@ const initConsumer = async (client) => {
 
 
     //on cold start, check desired:actual state of ingestion engines running
-    startDockerContainersFromDB(client);
+    startDockerContainersFromDB(db);
 
 
     process.on('SIGTERM', () => {
@@ -78,7 +78,7 @@ const initConsumer = async (client) => {
 
 };
 
-const consumetxieWranglerControl = async (message, client) => {
+const consumetxieWranglerControl = async (message, db) => {
   try {
     const eventData = JSON.parse(message.value.toString());
     console.log('___________________________________________')
@@ -93,7 +93,6 @@ const consumetxieWranglerControl = async (message, client) => {
       // upsert eventData.address to mongo db txie-configurations->instances
 
       try {
-        const db = client.db('txie-configurations'); // Database name
         const collection = db.collection('instances'); // Collection name
 
         const query = { "address": eventData.address.toLowerCase() };
@@ -113,7 +112,7 @@ const consumetxieWranglerControl = async (message, client) => {
 
       // trigger txie-wrangler to scan txie-configurations->instances and rectify desired:actual ingestion engine instances
       // Start the containers based on active addresses in the database
-      startDockerContainersFromDB(client);
+      startDockerContainersFromDB(db);
     }
 
     return eventData;
@@ -167,7 +166,7 @@ async function startDockerContainer(address) {
   const envVar = `ERC20_CONTRACT_ADDRESS=${address}`;
   const label = `erc20_contract_address=${address}`;
 
-  const command = `docker run -d --network ${network} -e "${envVar}" --label "${label}" ${image}`;
+  const command = `docker run -d --network ${network} -e "${envVar}" --label "${label}" --name "${address}" ${image}`;
 
   exec(command, (error, stdout, stderr) => {
     if (error) {
@@ -180,10 +179,8 @@ async function startDockerContainer(address) {
   });
 }
 
-async function startDockerContainersFromDB(client) {
+async function startDockerContainersFromDB(db, client) {
   try {
-
-      const db = client.db('txie-configurations');
       const collection = db.collection('instances');
 
       const activeDocuments = await collection.find({ state: 'active' }).toArray();
@@ -194,8 +191,6 @@ async function startDockerContainersFromDB(client) {
       }
   } catch (error) {
       console.error(`MongoDB error: ${error}`);
-  } finally {
-      await client.close();
   }
 }
 

@@ -18,6 +18,34 @@ export const handleCacheFriendlyLabelsRequest = (data, dataSetterObj) => {
     dataSetterObj.setCacheFriendlyLabels(data.data.data);
 };
 
+export const handleTokenLookupRequestResponse = (data, dataSetterObj) => {
+    console.log('TOKEN LOOKUP RESPONSE FROM KAFKA:', data);
+
+    // Extract the contract address and token metadata from the response data
+    const contractAddress = data.data.contractAddress;
+    const tokenMetadata = data.data.data;
+
+    // Use the state setter function to update the state
+    dataSetterObj.setcachedErc20TokenMetadata(existing => {
+        // Check if 'existing' is an object
+        if (typeof existing === 'object' && existing !== null) {
+            // Return a new object with the new key-value pair added
+            return {
+                ...existing,
+                [contractAddress]: {
+                    contractAddress: contractAddress,
+                    data: tokenMetadata
+                },
+            };
+        }
+        // If 'existing' is not an object, log an error or handle as appropriate
+        console.error('Expected an object for existing cached ERC20 token metadata');
+        // Initialize as an object with the new key-value pair if 'existing' was not an object
+        return { [contractAddress]: tokenMetadata };
+    });
+}
+
+
 export const handleErrorMessages = (data, dataSetterObj) => {
     console.log('ERROR FROM KAFKA:', data)
     dataSetterObj.setServicesErrorMessages(prevMessages => {

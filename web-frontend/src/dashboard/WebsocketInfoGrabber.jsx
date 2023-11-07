@@ -49,7 +49,7 @@ const WebsocketInfoGrabber = () => {
         setCacheFriendlyLabels,
         setAddressTags,
         setServicesErrorMessages,
-        ServicesErrorMessages
+        setcachedErc20TokenMetadata,
 
         
     });
@@ -97,7 +97,7 @@ const WebsocketInfoGrabber = () => {
                     topic: viewingTokenAddress
                 };
                 ws.current.send(JSON.stringify(subscriptionMessage));
-                ws.current.send(JSON.stringify({type:'subscribe', topic: 'errors'}));
+
             }
 
             // Update the previousSubscription ref
@@ -106,6 +106,13 @@ const WebsocketInfoGrabber = () => {
     }, [viewingTokenAddress]);
 
   
+    useEffect(() => {
+        if ( cachedErc20TokenMetadata ) {
+            console.log('cachedErc20TokenMetadata: ',cachedErc20TokenMetadata)
+        }
+    }, [cachedErc20TokenMetadata]);
+
+
     useEffect(() => {
         if ( submitvalidatedTokenToAddToWatchlist ) {
             requestWatchNewToken(validatedTokenToAddToWatchlist)
@@ -169,13 +176,11 @@ const WebsocketInfoGrabber = () => {
     
         ws.current.onopen = () => {
             setStatus("Connected");
-    
+         
             // Subscribe to the test topic after connection is established
-            // const subscriptionMessage = {
-            //     type: 'subscribe',
-            //     topic: 'testTopic'
-            // };
-            // ws.current.send(JSON.stringify(subscriptionMessage));
+            ws.current.send(JSON.stringify({type:'subscribe', topic: 'errors'}));
+            ws.current.send(JSON.stringify({type:'subscribe', topic: 'tokenLookupRequest'}));
+
     
             if (ws.current.readyState === WebSocket.OPEN && !hasConnectedBefore.current) {
                 requestWatchedTokensList();

@@ -79,33 +79,33 @@ module.exports = {
     },
     SetManualLabel: async function(payload, callback) {
         try {
-            console.log('trying to get friendly names for:', payload.friendlyName);
+            console.log('Setting manual label for:', payload.address);
             const database = db.getDb('friendlyNames');
             const collection = database.collection('lookup');
     
-            // Use regex to find matches in any field
-            const regex = new RegExp(payload.friendlyName, 'i');
-            const query = {
-                $or: [
-                    { address: regex },
-                    { MegaWorld: regex },
-                    { OpenSea: regex },
-                    { manuallyDefined: regex },
-                    { ENS: regex }
-                ]
+            // Define the query for the address
+            const query = { address: payload.address };
+    
+            // Define the update
+            const update = {
+                $set: { manuallyDefined: payload.friendlyName }
             };
     
-            const results = await collection.find(query).toArray();
+            // Define the options to upsert
+            const options = { upsert: true };
     
-            if (results.length > 0) {
-                console.log('found friendly names:', results);
-                callback({ status: 'success', data: results });
-            } else {
-                console.log('no friendly names found for:', payload.text);
-                callback({ status: 'error', message: 'No matches found' });
+            // Perform the update or insert
+            const result = await collection.updateOne(query, update, options);
+    
+            if (result.matchedCount > 0) {
+                console.log('Updated existing document with manual label');
+            } else if (result.upsertedCount > 0) {
+                console.log('Inserted new document with manual label');
             }
+    
+            callback({ status: 'success', data: { matchedCount: result.matchedCount, upsertedCount: result.upsertedCount } });
         } catch (error) {
-            console.error("Error fetching friendly names:", error);
+            console.error("Error setting manual label:", error);
             callback({ status: 'error', message: 'Internal Server Error' });
         }
     }
