@@ -166,7 +166,10 @@ async function startDockerContainer(address) {
   const envVar = `ERC20_CONTRACT_ADDRESS=${address}`;
   const label = `erc20_contract_address=${address}`;
 
-  const command = `docker run -d --network ${network} -e "${envVar}" --label "${label}" --name "${address}" ${image}`;
+
+  // removed any existing explicitly named tx-ingestion-engine containers before we start a new one
+  // otherwise docker complains
+  const command = `docker rm -f "${address}" && docker run -d --network ${network} -e "${envVar}" --label "${label}" --name "${address}" ${image}`;
 
   exec(command, (error, stdout, stderr) => {
     if (error) {

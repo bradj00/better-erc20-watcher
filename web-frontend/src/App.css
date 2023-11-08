@@ -713,3 +713,35 @@ tr:nth-child(odd) {
   color: rgba(200,250,255,0.8);
   border: 1px solid rgba(180,240,255,1);
 }
+
+
+.normalOrders {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5vh;
+  overflow-y: scroll;
+  width: 100%;
+  height: 30vh;
+  cursor: pointer;
+  transition: height 1s ease, top 1s ease;
+}
+
+.expandedOrders {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5vh;
+  overflow-y: scroll;
+  width: 100%;
+  height: 100%; /* Assuming you want the height to fit content when expanded */
+  cursor: pointer;
+  position: fixed;
+  background-color: #000;
+  top:7vh;
+  left:0;
+  z-index:9999;
+  transition: height 1s ease, top 1s ease;
+
+}
+.normalSeeMore{
+  position: fixed;
+  bottom: 2vh;
+}
+

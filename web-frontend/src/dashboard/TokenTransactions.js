@@ -70,7 +70,7 @@ export default function TokenTransactions() {
   const {friendlyLookupResponse, setFriendlyLookupResponse} = useContext(GeneralContext);
 
 
-
+  const {clickedToken, setclickedToken} = useContext(GeneralContext);
 
   const {rowClickMode, setrowClickMode} = useContext(GeneralContext);
 
@@ -99,27 +99,7 @@ export default function TokenTransactions() {
   },[CacheFriendlyLabels])
 
 
-  useEffect(() => {
-    // console.log('filteredtxData: ',filteredtxData)
-    
-    if (filteredtxData && filteredtxData.length > 0) {
-      let tempInflow = 0
-      let tempOutflows = 0
 
-      for (let i = 0; i < filteredtxData.length; i++) {
-        if (filteredtxData[i].to_address === clickedDetailsAddress) {
-          tempInflow += ((filteredtxData[i].value) / (10 ** 18))
-        } else {
-          tempOutflows += ((filteredtxData[i].value) / (10 ** 18))
-        }
-      }
-      setfilteredtxDataInflow(tempInflow)
-      setfilteredtxDataOutflow(tempOutflows)
-    }
-    
-      
-
-  },[filteredtxData])
 
   useEffect(() => {
     console.log('TXDATA: ',txData)
@@ -245,21 +225,24 @@ export default function TokenTransactions() {
   return (
     <>
       <Title>Transactions</Title>
-      <div style={{border:'1px solid rgba(255,255,255,0.2)', borderRadius:'0.5vh', padding:'0.2vw', overflowY:'scroll', width:'100%', height:expandTxView? 'auto':'30vh', cursor:'pointer'}}>
-        
+      <div className={expandTxView? "expandedOrders":"normalOrders"} >
+        <Link className={expandTxView? "": "normalSeeMore"} color="primary" href="#" onClick={() => { setexpandTxView(!expandTxView); }}>
+          {!expandTxView? "See more":"See less"}
+        </Link>
+
         <Table size="small">
           <TableHead style={{position:'sticky', top:'0', backgroundColor:'rgba(50,50,60,1)'}}>
             <TableRow>
-              <TableCell><span title="Originating Chain">chain</span></TableCell>
-              <TableCell><span title="Block Number">block number</span></TableCell>
-              <TableCell><span title="Amount of Tokens">amount</span></TableCell>
-              <TableCell><span title="How Long Ago">age</span></TableCell>
-              <TableCell><span title="From Whom">from</span></TableCell>
-              <TableCell><span title="To Whom">to</span></TableCell>
-              <TableCell><span title="Transaction Hash">tx hash</span></TableCell>
-              <TableCell><span title="Labeling Engine Classifications for this TX">tags</span></TableCell>
-              <TableCell><span title="Estimated USD value of this transfer">value</span></TableCell>
-              <TableCell><span title="Labeling Engine Classified Action Taken">action</span></TableCell>
+              <TableCell align="right"><span title="Originating Chain">chain</span></TableCell>
+              <TableCell align="right"><span title="Block Number">block number</span></TableCell>
+              <TableCell align="right"><span title="Amount of Tokens">amount</span></TableCell>
+              <TableCell align="right"><span title="How Long Ago">age</span></TableCell>
+              <TableCell align="center"><span title="From Whom">from</span></TableCell>
+              <TableCell align="center"><span title="To Whom">to</span></TableCell>
+              <TableCell align="right"><span title="Transaction Hash">tx hash</span></TableCell>
+              <TableCell style={{ textAlign:'right'}}><span title="Labeling Engine Classifications for this TX">tags</span></TableCell>
+              <TableCell style={{ textAlign:'right'}}><span title="Estimated USD value of this transfer">value</span></TableCell>
+              <TableCell style={{ textAlign:'right'}}><span title="Labeling Engine Classified Action Taken">action</span></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -270,25 +253,25 @@ export default function TokenTransactions() {
                 
                 return (
                   <TableRow className={rowAge > 100 ? "rowHover" : "transactionRow"} style={{fontSize:'3vw', backgroundColor: row.transaction_hash ? determineRowColor(row) : 'rgba(0,0,0,0)'}} key={index}>
-                    <TableCell align="left" style={{ fontSize:'1vw' }}>
+                    <TableCell align="right" style={{ fontSize:'1vw' }}>
                         <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
                     </TableCell> 
-                    <TableCell align="left" style={{fontSize:'1vw'}}>
+                    <TableCell align="right" style={{fontSize:'1vw'}}>
                        1234
                     </TableCell> 
-                    <TableCell align="left" style={{fontSize:'1vw'}}>
-                        {commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}
+                    <TableCell align="right" style={{fontSize:'1vw'}}>
+                        {commaNumber(parseFloat(row.value / (clickedToken && clickedToken.data? (10 ** clickedToken.data.data["detail_platforms"].ethereum["decimal_place"])  :(10**25) )).toFixed(4))}
                     </TableCell> 
-                    <TableCell title={row.block_timestamp} style={{fontSize:'1vw'}}>
+                    <TableCell align="right" title={row.block_timestamp} style={{fontSize:'1vw'}}>
                         {timeAgo.format(new Date(row.block_timestamp),'mini')}
                     </TableCell>
-                    <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'from')}>
+                    <TableCell align="right" style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'from')}>
                         <ToFromCell row={row} toFrom={'from'}  clickMode={rowClickMode} />   
                     </TableCell>
-                    <TableCell style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'to')}>
+                    <TableCell align="right" style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(row, 'to')}>
                         <ToFromCell row={row} toFrom={'to'} clickMode={rowClickMode} />   
                     </TableCell>
-                    <TableCell style={{fontSize:'1vw'}}>
+                    <TableCell align="right" style={{fontSize:'1vw'}}>
                         <a href={`https://etherscan.io/tx/${row.transaction_hash}`} target="_blank" rel="noopener noreferrer">
                             {getEllipsisTxt(row.transaction_hash, 6)}
                         </a> 
@@ -300,13 +283,13 @@ export default function TokenTransactions() {
                             </div>
                         )}
                     </TableCell>
-                    <TableCell style={{fontSize:'1vw'}}>
+                    <TableCell align="right" style={{fontSize:'1vw'}}>
                         {row.action || '-'}
                     </TableCell>
-                    <TableCell style={{fontSize:'1vw'}}>
-                        {row.action || '-'}
+                    <TableCell align="right" style={{fontSize:'1vw'}}>
+                        {clickedToken?.data.data? "$"+ commaNumber(parseFloat((row.value / (clickedToken && clickedToken.data? (10 ** clickedToken.data.data["detail_platforms"].ethereum["decimal_place"])  :(10**25) )) * clickedToken.data.data["market_data"]["current_price"].usd).toFixed(2)) : '--' }
                     </TableCell>
-                    <TableCell style={{fontSize:'1vw'}}>
+                    <TableCell align="right" style={{fontSize:'1vw'}}>
                         {row.action || '-'}
                     </TableCell>
                   </TableRow>
@@ -324,7 +307,7 @@ export default function TokenTransactions() {
                           <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
                       </TableCell> 
                       <TableCell align="left" style={{fontSize:'1vw'}}>
-                          {commaNumber(parseFloat(row.value / (10**18)).toFixed(4))}
+                        {commaNumber(parseFloat(row.value / (clickedToken && clickedToken.data? (10 ** clickedToken.data.data["detail_platforms"].ethereum["decimal_place"])  :(10**25) )).toFixed(4))}
                       </TableCell> 
                       <TableCell title={row.block_timestamp} style={{fontSize:'1vw'}}>
                           {timeAgo.format(new Date(row.block_timestamp),'mini')}
@@ -347,7 +330,7 @@ export default function TokenTransactions() {
                               </div>
                           )}
                       </TableCell>
-                      <TableCell style={{fontSize:'1vw'}}>
+                      <TableCell style={{fontSize:'1vw', textAlign:'right'}}>
                           {row.action || '-'}
                       </TableCell>
                     </TableRow>
@@ -359,9 +342,7 @@ export default function TokenTransactions() {
         </Table>
       </div> 
 
-      <Link color="primary" href="#" onClick={() => { setexpandTxView(!expandTxView); }}>
-        {!expandTxView? "See more":"See less"}
-      </Link>
+
 
      
 

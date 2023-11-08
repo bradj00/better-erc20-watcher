@@ -109,7 +109,8 @@ const Topbanner = () => {
 
   useEffect(()=>{
     if (clickedToken){
-        console.log('clickedToken: ',clickedToken)
+        console.log('clickedToken: ',clickedToken, clickedToken.data.data["detail_platforms"].ethereum["decimal_place"])
+        
     }
   },[clickedToken]);
 
