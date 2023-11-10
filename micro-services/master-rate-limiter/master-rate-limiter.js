@@ -5,10 +5,12 @@ import express from 'express';
 const app = express();
 const PORT = 4000;
 
+
+//per second
 const RATE_LIMIT = [
-    { serviceName: 'coingecko', maxRate: 3 },
-    { serviceName: 'infura', maxRate: 10 },
-    { serviceName: 'etherscan', maxRate: 10 },
+    { serviceName: 'coingecko', maxRate: 2 },
+    { serviceName: 'infura',    maxRate: 3 },
+    { serviceName: 'etherscan', maxRate: 3 },
     { serviceName: 'megaworld', maxRate: 3 },
 ];
 
@@ -29,7 +31,7 @@ setInterval(() => {
         }
         serviceCallCounts[service].count = 0;
     }
-}, 60000); //reset counts every 60 seconds to base the call rates per minute
+}, 1000); //reset counts every 60 seconds to base the call rates per minute
 
 app.get('/request/:externalService', (req, res) => {
     const serviceName = req.params.externalService;

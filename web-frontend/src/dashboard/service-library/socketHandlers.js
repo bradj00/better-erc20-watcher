@@ -18,6 +18,20 @@ export const handleCacheFriendlyLabelsRequest = (data, dataSetterObj) => {
     dataSetterObj.setCacheFriendlyLabels(data.data.data);
 };
 
+export const handleTxHashDetailsArray = (data, dataSetterObj) => {
+    console.log('TxHashDetailsArray: ', data);
+
+    //transform the array into an object where the key names are the transaction hash IDs
+    const transformedData = data.data.reduce((acc, item) => {
+        acc[item.transactionHash] = item;
+        return acc;
+    }, {});
+
+    console.log('TRANSFORMED DATA: ',transformedData)
+    dataSetterObj.setTxHashDetailsObj(transformedData);
+};
+
+
 export const handleTokenLookupRequestResponse = (data, dataSetterObj) => {
     console.log('TOKEN LOOKUP RESPONSE FROM KAFKA:', data);
 

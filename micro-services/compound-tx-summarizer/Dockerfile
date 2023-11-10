@@ -15,4 +15,4 @@ RUN npm install
 COPY . .
 
 # Specify the command to run on container start
-CMD [ "npm", "start" ]
+CMD [ "node", "compound-tx-summarizer.js" ]

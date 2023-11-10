@@ -745,3 +745,30 @@ tr:nth-child(odd) {
   bottom: 2vh;
 }
 
+
+
+
+
+.summarizeButton {
+  padding: 0.35vh 0.5vh;
+  background-color: rgba(50,50,50,0.8);
+  border: 1px solid rgba(110,150,255,0.5);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: rgba(150,220,255,1);
+  height: 1.4vw;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -0.4vh;
+  left: 6vw;
+}
+
+.summarizeButton:hover {
+
+  background-color: rgba(100,100,100,1);
+  color: rgba(180,240,255,0.7);
+}

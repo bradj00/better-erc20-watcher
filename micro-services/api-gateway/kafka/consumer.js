@@ -1,5 +1,7 @@
 const { Kafka } = require('kafkajs');
 const config = require('../config/kafkaConfig');
+const { MongoClient } = require('mongodb');
+require('dotenv').config('../.env');
 
 const kafka = new Kafka({
   clientId: config.clientId,
@@ -12,9 +14,10 @@ const initConsumer = async (broadcastToTopic) => {
     await consumer.connect();
 
     //permanently subscribe to rawTransactions kafka topic.
-    await consumer.subscribe({ topic: config.rawTransactions,             fromBeginning: true });
-    await consumer.subscribe({ topic: config.txieErrors,                  fromBeginning: true });
-    await consumer.subscribe({ topic: config.finishedTokenLookupReq,      fromBeginning: true });
+    await consumer.subscribe({ topic: config.rawTransactions,                  fromBeginning: true });
+    await consumer.subscribe({ topic: config.txieErrors,                       fromBeginning: true });
+    await consumer.subscribe({ topic: config.finishedTokenLookupReq,           fromBeginning: true });
+    await consumer.subscribe({ topic: config.TxHashDetailsLookupFinished,      fromBeginning: true });
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
@@ -33,6 +36,9 @@ const initConsumer = async (broadcastToTopic) => {
                     break;
                 case config.finishedTokenLookupReq:
                     consumeFinishedTokenLookupReq(message, broadcastToTopic);
+                    break;
+                case config.TxHashDetailsLookupFinished:
+                    consumeTxHashDetailsLookupFinished(message, broadcastToTopic);
                     break;
                 default:
                     console.warn(`Received message from unknown topic: ${topic}`);
@@ -117,6 +123,42 @@ const consumeFinishedTokenLookupReq = (message, broadcastToTopic) => {
     console.error(`Error consuming error event: ${error.message}`);
   }
 };
+
+const consumeTxHashDetailsLookupFinished = async (message, broadcastToTopic) => {
+  let client;
+  try {
+    const txHashes = JSON.parse(message.value.toString());
+    console.log(`Received TX HASH LOOKUP job complete signal from CTXS service...`);
+
+    // Create a new MongoDB client and connect
+    client = new MongoClient(process.env.MONGO_CONNECT_STRING);
+    await client.connect();
+
+    // Fetch the documents
+    const collection = client.db('tx-hash-details').collection('details');
+    const documents = await collection.find({ transactionHash: { $in: txHashes } }).toArray();
+
+    console.log(`Pulling TxHash info from db and pushing to frontend websocket`);
+
+    broadcastToTopic(
+      'TxHashDetailsLookupFinished', // Topic the web UI websocket is subscribed to
+      {
+        service: 'compound-tx-summarizer',
+        method: 'TxHashDetailsArray',
+        data: documents // Sending the fetched documents
+      }
+    );
+
+  } catch (error) {
+    console.error(`Error in consumeTxHashDetailsLookupFinished: ${error.message}`);
+  } finally {
+    // Close the MongoDB connection
+    if (client) {
+      await client.close();
+    }
+  }
+};
+
 
 module.exports = {
   initConsumer, consumeTokenTransferEvent

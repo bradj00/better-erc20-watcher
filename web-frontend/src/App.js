@@ -91,6 +91,8 @@ const [detectedLPs, setdetectedLPs] = useState();
 const [megaPriceUsd, setMegaPriceUsd] = useState();
 const [LpChartData, setLpChartData] = useState([]);
 const [RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice] = useState({});
+const [SummarizedTxsRequest, setSummarizedTxsRequest] = useState([]);
+const [TxHashDetailsObj, setTxHashDetailsObj] = useState({});
 
 const [LpTotalTokensHeld, setLpTotalTokensHeld] = useState();
 const [updateCommitFriendlyNameRequest, setupdateCommitFriendlyNameRequest] = useState();
@@ -206,7 +208,7 @@ const contextObj = {
   DisplayMinAmountFilterValue, setDisplayMinAmountFilterValue,
   DisplayMaxAmountFilterValue, setDisplayMaxAmountFilterValue,
   rowClickMode, setrowClickMode,
-  
+  SummarizedTxsRequest, setSummarizedTxsRequest,
   RequestFriendlyLookup, setRequestFriendlyLookup,
   friendlyLookupResponse, setFriendlyLookupResponse,
   updateFriendlyName, setupdateFriendlyName,
@@ -238,6 +240,7 @@ const contextObj = {
   TxSummaryData, setTxSummaryData,
   CacheFriendlyLabels, setCacheFriendlyLabels,
   txDataForceGraph, settxDataForceGraph,
+  TxHashDetailsObj, setTxHashDetailsObj,
 
   cachedErc20TokenMetadata, setcachedErc20TokenMetadata,
   validatedTokenToAddToWatchlist, setvalidatedTokenToAddToWatchlist,

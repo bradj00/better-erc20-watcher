@@ -23,6 +23,19 @@ const sendErrorToKafka = async (error) => {
 };
 
 
+const produceTxArraySummary = async (eventData) => {
+  try {
+    await producer.send({
+      topic: config.txArraySummarizeReq,
+      messages: [
+        { value: JSON.stringify(eventData) }
+      ]
+    });
+    console.log(`Sent TX Array Summarize request event to Kafka`);
+  } catch (error) {
+    console.error(`Error producing TX Array Summarize request event to KAFKA: ${error.message}`);
+  }
+};
 const produceLookupTokenRequest = async (eventData) => {
   try {
     await producer.send({
@@ -31,7 +44,7 @@ const produceLookupTokenRequest = async (eventData) => {
         { value: JSON.stringify(eventData) }
       ]
     });
-    console.log(`Sent Token Lookup Request event to Kafka: ${JSON.stringify(eventData)}`);
+    console.log(`Sent Token Lookup Request event to Kafka`);
   } catch (error) {
     console.error(`Error producing Lookup Token Request event to KAFKA: ${error.message}`);
   }
@@ -46,7 +59,7 @@ const produceWatchNewTokenRequest = async (eventData) => {
         { value: JSON.stringify(eventData) }
       ]
     });
-    console.log(`Sent Watch New Token Request event to Kafka: ${JSON.stringify(eventData)}`);
+    console.log(`Sent Watch New Token Request event to Kafka`);
   } catch (error) {
     console.error(`Error producing STREAM token transfer event: ${error.message}`);
   }
@@ -70,5 +83,6 @@ module.exports = {
   initProducer,
   produceWatchNewTokenRequest,
   produceLookupTokenRequest,
-  produceErrorEvent
+  produceErrorEvent,
+  produceTxArraySummary
 };

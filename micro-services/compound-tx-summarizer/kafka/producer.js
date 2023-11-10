@@ -22,33 +22,17 @@ const sendErrorToKafka = async (error) => {
   });
 };
 
-// raw-transactions Kafka event
-const produceTokenTransferEvent = async (eventData) => {
+const produceTxHashDetailsLookupFinished = async (eventData) => {
   try {
     await producer.send({
-      topic: config.rawTransactions,
+      topic: config.TxHashDetailsLookupFinished,
       messages: [
         { value: JSON.stringify(eventData) }
       ]
     });
-    // console.log(`Sent token transfer event to Kafka: ${JSON.stringify(eventData)}`);
+    console.log(`Sent [ produceTxHashDetailsLookupFinished ] event to Kafka`); //sends array of TxHashes as string
   } catch (error) {
-    console.error(`Error producing token transfer event: ${error.message}`);
-  }
-};
-
-// raw-transactions Kafka event
-const produceTokenTransferStreamEvent = async (eventData) => {
-  try {
-    await producer.send({
-      topic: config.rawStreamedTransactions,
-      messages: [
-        { value: JSON.stringify(eventData) }
-      ]
-    });
-    // console.log(`Sent token transfer event to Kafka: ${JSON.stringify(eventData)}`);
-  } catch (error) {
-    console.error(`Error producing STREAM token transfer event: ${error.message}`);
+    console.error(`Error producing [ produceTxHashDetailsLookupFinished ] event: ${error.message}`);
   }
 };
 
@@ -68,7 +52,6 @@ const produceErrorEvent = async (errorData) => {
 
 module.exports = {
   initProducer,
-  produceTokenTransferStreamEvent,
-  produceTokenTransferEvent,
+  produceTxHashDetailsLookupFinished,
   produceErrorEvent
 };

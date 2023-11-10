@@ -42,6 +42,14 @@ services:
 
     networks:
       - better-erc20-watcher-network
+
+  compound-tx-summarizer:
+    image: better-erc20-watcher/compound-tx-summarizer:latest
+    restart: always
+    depends_on:
+      - master-rate-limiter
+    networks:
+      - better-erc20-watcher-network
   
   # react-app:
   #   build:

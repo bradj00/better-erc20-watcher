@@ -1,5 +1,5 @@
 const db = require('./db')
-const { produceWatchNewTokenRequest, produceLookupTokenRequest  } = require('../kafka/producer');
+const { produceWatchNewTokenRequest, produceLookupTokenRequest, produceTxArraySummary  } = require('../kafka/producer');
 module.exports = {
     
     LookupTokenRequest: async function(payload, callback) {
@@ -31,6 +31,13 @@ module.exports = {
         }
     },
     
+
+    TxArraySummary: async function(payload, callback) {
+        produceTxArraySummary({
+            action: payload.action,
+            txHashes: payload.txHashes
+        })
+    },
 
     WatchNewToken: async function(payload, callback) {
         // produce to kafka a txie-wrangler-control request, consumed by txie-wrangler. will start up a new txie instance and 

@@ -24,7 +24,8 @@ const WebsocketInfoGrabber = () => {
     const { validatedTokenToAddToWatchlist } = useContext(GeneralContext);
     const { submitvalidatedTokenToAddToWatchlist, setsubmitvalidatedTokenToAddToWatchlist } = useContext(GeneralContext);
     const { cachedErc20TokenMetadata, setcachedErc20TokenMetadata } = useContext(GeneralContext);
-
+    const {SummarizedTxsRequest, setSummarizedTxsRequest} = useContext(GeneralContext);
+    const {TxHashDetailsObj, setTxHashDetailsObj} = useContext(GeneralContext);
 
     const {ServicesErrorMessages, setServicesErrorMessages} = useContext(GeneralContext);
     // [{message:'something here'},{message:'something here'},{message:'something here'},{message:'something here'},]
@@ -50,6 +51,7 @@ const WebsocketInfoGrabber = () => {
         setAddressTags,
         setServicesErrorMessages,
         setcachedErc20TokenMetadata,
+        setTxHashDetailsObj,
 
         
     });
@@ -63,6 +65,14 @@ const WebsocketInfoGrabber = () => {
             //send token watch request to api-gw
         }
     },[validatedTokenToAddToWatchlist]);
+
+    useEffect(() => {
+        if (SummarizedTxsRequest){
+            //send TX ARRAY SUMMARY request to api-gw
+            console.log('OK SENDING')
+            requestTxArraySummary(SummarizedTxsRequest)
+        }
+    },[SummarizedTxsRequest]);
 
     useEffect(() => {
         if (tokenLookupRequestAddy  ){
@@ -180,6 +190,7 @@ const WebsocketInfoGrabber = () => {
             // Subscribe to the test topic after connection is established
             ws.current.send(JSON.stringify({type:'subscribe', topic: 'errors'}));
             ws.current.send(JSON.stringify({type:'subscribe', topic: 'tokenLookupRequest'}));
+            ws.current.send(JSON.stringify({type:'subscribe', topic: 'TxHashDetailsLookupFinished'}));
 
     
             if (ws.current.readyState === WebSocket.OPEN && !hasConnectedBefore.current) {
@@ -253,6 +264,24 @@ const WebsocketInfoGrabber = () => {
         }
     }
 
+
+    // tell the API GW we want to start caching tx's for a new token
+    const requestTxArraySummary = (TxHashes) => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            console.log('AYYYY TX HASHES: ',TxHashes)
+
+            const requestPayload = {
+                service: 'general',
+                method: 'TxArraySummary',
+                data: {
+                    action: 'request',
+                    txHashes: TxHashes
+                }
+                
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
+    }
 
     // tell the API GW we want to start caching tx's for a new token
     const requestWatchNewToken = (address) => {
