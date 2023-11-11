@@ -96,41 +96,27 @@ const MultiTxCell = (props) => {
 
       
       <TableCell colSpan={3} style={{ padding: '0.25vw' }}>
-            <div style={{ backgroundColor: 'rgba(150,150,150,0.2)', borderRadius:'5px', padding: '0.5vw', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
-                {/* Column 1 - From Addresses */}
-                <div>
-                    {decodedERC20Transfers.map((transfer, idx) => (
-                        <div key={idx}>
-                            {idx === 0 && (
-                                <div style={{ position:'relative', height: '1.5em', width:'100%', display:'flex', justifyContent:'center', fontSize:'0.7vw' }}>
-                                    <div style={{ color: '#f55', position:'absolute', left:'5%', fontSize:'0.5vw' }}>Contract Caller:</div>
-                                    <div>{CacheFriendlyLabels[initiatorAddress]?.manuallyDefined || getEllipsisTxt(initiatorAddress, 6)}</div>
-                                </div>
-                            )}
-                            <div>
-                                <span style={{ color:'rgba(150,150,250,0.8)', marginLeft:'2vw' }}>{idx+1}.&nbsp;</span>
-                                <span style={{ color: '#999', display: 'inline-block' }}>From:&nbsp;</span>
-                                {CacheFriendlyLabels[transfer.from]?.manuallyDefined || getEllipsisTxt(transfer.from, 6)}
-                            </div>
-                        </div>
-                    ))}
+            <div style={{ position: 'relative', zIndex: '-1', backgroundColor: 'rgba(50,50,60,0.7)', borderRadius: '5px', padding: '0.5vw', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', border: '1px solid #660', height: '100%' }}>
+
+                {/* Contract Caller at Top-Left */}
+                <div style={{ alignSelf: 'flex-start', marginBottom: '1vw' }}>
+                    <span style={{ color: '#f55', fontSize: '0.7vw' }}>Contract Caller: &nbsp;</span>
+                    <span>{CacheFriendlyLabels[initiatorAddress]?.manuallyDefined || getEllipsisTxt(initiatorAddress, 6)}</span>
                 </div>
 
-                {/* Column 2 - To Addresses */}
-                <div>
-                    {decodedERC20Transfers.map((transfer, idx) => (
-                        <div key={idx} >
-                            {idx === 0 && <div style={{ height: '1.5em' }}></div>} {/* Spacer for alignment */}
-                            <div>
-                                <span style={{ color: '#999' }}>To:</span>
-                                {CacheFriendlyLabels[transfer.to]?.manuallyDefined || getEllipsisTxt(transfer.to, 6)}
-                            </div>
-                        </div>
-                    ))}
+                {/* Grid Headers */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0vw', width: '100%', fontSize:'0.7vw', color:'rgba(200,50,50,0.8)', letterSpacing:'0.05vw'  }}>
+                    <div style={{ textAlign:'center', fontWeight: 'bold',textDecoration:'underline' }}>Order</div>
+                    <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>From</div>
+                    <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>To</div>
+                    <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>USD</div>
+                    <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>Amount</div>
+                    <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>Token</div>
+                    {/* <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>Logo</div> */}
                 </div>
 
-                {/* Column 3 - Transfer Details */}
-                <div>
+                {/* 6-Column Grid Layout */}
+                <div style={{ border: '0px solid #0ff', width: '100%', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0vw' }}>
                     {decodedERC20Transfers.map((transfer, idx) => {
                         const decimals = cachedErc20TokenMetadata[transfer.contractAddress]?.data.detail_platforms.ethereum.decimal_place || 18;
                         const adjustedAmount = transfer.amount / Math.pow(10, decimals);
@@ -138,24 +124,42 @@ const MultiTxCell = (props) => {
                         const estimatedValue = (adjustedAmount * usdPrice).toFixed(2);
 
                         return (
-                            <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', alignItems: 'center' }}>
-                                {idx === 0 && <div style={{ gridColumn: '1 / -1', height: '1.5em' }}></div>} {/* Spacer */}
-                                <div style={{ textAlign: 'right' }}>{adjustedAmount.toLocaleString()}</div>
-                                <div style={{ textAlign: 'right', color: '#0f0' }}>${commaNumber(estimatedValue)}</div>
-                                <div style={{ textAlign: 'right' }}>
-                                    {cachedErc20TokenMetadata[transfer.contractAddress]
-                                        ? cachedErc20TokenMetadata[transfer.contractAddress].data.symbol.toUpperCase()
-                                        : getEllipsisTxt(transfer.contractAddress, 6)}
-                                    {cachedErc20TokenMetadata[transfer.contractAddress]?.data.image.thumb &&
-                                        <img style={{ marginLeft: '1vw' }} src={cachedErc20TokenMetadata[transfer.contractAddress].data.image.thumb} alt="Token" />
-                                    }
+                            <React.Fragment key={idx}>
+                                <div style={{textAlign:'center'}}>
+                                    {idx+1}
                                 </div>
-                            </div>
+                                
+                                {/* From Address */}
+                                <div style={{ border: '0px solid #0f0' }}>{CacheFriendlyLabels[transfer.from]?.manuallyDefined || getEllipsisTxt(transfer.from, 6)}</div>
+
+                                {/* To Address */}
+                                <div>{CacheFriendlyLabels[transfer.to]?.manuallyDefined || getEllipsisTxt(transfer.to, 6)}</div>
+
+                                
+
+                                {/* Amount */}
+                                <div>{adjustedAmount.toLocaleString()}</div>
+
+                                {/* Token Symbol */}
+                                <div style={{display:'flex', alignItems:'center', padding:'0 0 0.25vw 0'}}>
+                                    {cachedErc20TokenMetadata[transfer.contractAddress]?.data.image.thumb &&
+                                        <img src={cachedErc20TokenMetadata[transfer.contractAddress].data.image.thumb} alt="Token" />
+                                    }&nbsp;
+                                    {cachedErc20TokenMetadata[transfer.contractAddress]?.data.symbol.toUpperCase() || getEllipsisTxt(transfer.contractAddress, 6)}
+                                </div>
+
+                                {/* USD Value */}
+                                <div style={{ color: '#0f0' }}>${commaNumber(estimatedValue)}</div>
+
+                                
+                            </React.Fragment>
                         );
                     })}
                 </div>
             </div>
         </TableCell>
+
+
 
 
       <TableCell align="right" style={{fontSize:'1vw'}}>
