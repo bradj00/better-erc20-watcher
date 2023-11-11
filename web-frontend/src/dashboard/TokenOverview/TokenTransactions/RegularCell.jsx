@@ -43,9 +43,6 @@ const RegularCell = (props) => {
                     <TableCell align="right" style={{fontSize:'1vw'}}>
                        {commaNumber(props.row['block_number'])}
                     </TableCell> 
-                    <TableCell align="right" style={{fontSize:'1vw'}}>
-                        {commaNumber(parseFloat(props.row.value / (clickedToken && clickedToken.data? (10 ** clickedToken.data.data["detail_platforms"].ethereum["decimal_place"])  :(10**25) )).toFixed(4))}
-                    </TableCell> 
                     <TableCell align="right" title={props.row.block_timestamp} style={{fontSize:'1vw'}}>
                         {props.timeAgo.format(new Date(props.row.block_timestamp),'mini')}
                     </TableCell>
@@ -55,6 +52,9 @@ const RegularCell = (props) => {
                     <TableCell align="right" style={{fontSize:'1vw',color: "#aaa"}} onClick={() => processTableClicked(props.row, 'to')}>
                         <ToFromCell row={props.row} toFrom={'to'} clickMode={rowClickMode} />   
                     </TableCell>
+                    <TableCell align="right" style={{fontSize:'1vw'}}>
+                        {commaNumber(parseFloat(props.row.value / (clickedToken && clickedToken.data? (10 ** clickedToken.data.data["detail_platforms"].ethereum["decimal_place"])  :(10**25) )).toFixed(4))}
+                    </TableCell> 
                     <TableCell align="right" style={{fontSize:'1vw'}}>
                         <a href={`https://etherscan.io/tx/${props.row.transaction_hash}`} target="_blank" rel="noopener noreferrer">
                             {getEllipsisTxt(props.row.transaction_hash, 6)}

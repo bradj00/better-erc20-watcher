@@ -26,6 +26,10 @@ const WebsocketInfoGrabber = () => {
     const { cachedErc20TokenMetadata, setcachedErc20TokenMetadata } = useContext(GeneralContext);
     const {SummarizedTxsRequest, setSummarizedTxsRequest} = useContext(GeneralContext);
     const {TxHashDetailsObj, setTxHashDetailsObj} = useContext(GeneralContext);
+    
+    const { uniqueContractAddresses, setUniqueContractAddresses } = useContext(GeneralContext);
+    const { areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded } = useContext(GeneralContext);
+
 
     const {ServicesErrorMessages, setServicesErrorMessages} = useContext(GeneralContext);
     // [{message:'something here'},{message:'something here'},{message:'something here'},{message:'something here'},]
@@ -52,13 +56,32 @@ const WebsocketInfoGrabber = () => {
         setServicesErrorMessages,
         setcachedErc20TokenMetadata,
         setTxHashDetailsObj,
+        setcachedErc20TokenMetadata,
 
         
     });
 
-    // useEffect(() => {
-    //     console.log('ServicesErrorMessages:: ',ServicesErrorMessages)
-    // },[ServicesErrorMessages]);
+    
+    useEffect(() => {
+        // Ensure that there are entries in the areAllMultiTxCellsLoaded object
+        const hasEntries = Object.keys(areAllMultiTxCellsLoaded).length > 0;
+      
+        const allLoaded = hasEntries && Object.values(areAllMultiTxCellsLoaded).every(status => status);
+        if (allLoaded) {
+            console.log('WE HAVE FINISHED AGGREGATING ALL THE CONTRACT ADDRESSES FROM THE TX HASH LOGS');
+            
+            // Filter out addresses already present in cachedErc20TokenMetadata
+            const addressesToFetch = uniqueContractAddresses.filter(address => !cachedErc20TokenMetadata[address]);
+    
+            // Check if there are any new addresses to fetch
+            if (addressesToFetch.length > 0) {
+                requestErc20BulkCacheInfo(addressesToFetch);
+            }
+        }
+    }, [areAllMultiTxCellsLoaded, uniqueContractAddresses, cachedErc20TokenMetadata]);
+      
+
+
 
     useEffect(() => {
         if (validatedTokenToAddToWatchlist){
@@ -252,6 +275,16 @@ const WebsocketInfoGrabber = () => {
         };
     }
     
+    const requestErc20BulkCacheInfo = (bulkErc20Contracts) => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const requestPayload = {
+                service: 'general',
+                method: 'RequestErc20BulkCacheInfo',
+                data: bulkErc20Contracts
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
+    }
 
     const requestFnLookup = (friendlyName) => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {

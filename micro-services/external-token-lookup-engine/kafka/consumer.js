@@ -36,9 +36,9 @@ const consumeLookupTokenEvent = async (message, PENDING_JOBS) => {
   try {
     const eventData = JSON.parse(message.value.toString());
     console.log(`Consumed Lookup Token Event from Kafka:`);
-    console.log(message);
-    console.log('value (decoded): ',eventData)
-    console.log('\n\n')
+    // console.log(eventData);
+    // console.log('value (decoded): ',eventData)
+    // console.log('\n\n')
 
     const jobID = {
       id: Date.now().toString(),

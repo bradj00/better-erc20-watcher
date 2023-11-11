@@ -197,7 +197,7 @@ const ToFromCell = (props) => {
                     </div>
                 </>
             ) : (
-                <div style={{ textAlign: 'center', width: '100%' }}>
+                <div style={{ textAlign: 'center', fontSize:'0.7vw', width: '100%' }}>
                     {displayedValue}
                 </div>
             )}

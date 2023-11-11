@@ -1,48 +1,38 @@
-console.clear();
-
 import express from 'express';
 
 const app = express();
 const PORT = 4000;
 
+// Rate limits per service
+const RATE_LIMIT = {
+    'coingecko': { maxRate: 10, interval: 60000 }, // 10 per 60 seconds
+    'infura':    { maxRate: 3,  interval: 1000 },  // 3 per 1 second
+    'etherscan': { maxRate: 3,  interval: 1000 },  // 3 per 1 second
+    'megaworld': { maxRate: 1,  interval: 1000 },  // 1 per 1 second
+};
 
-//per second
-const RATE_LIMIT = [
-    { serviceName: 'coingecko', maxRate: 2 },
-    { serviceName: 'infura',    maxRate: 3 },
-    { serviceName: 'etherscan', maxRate: 3 },
-    { serviceName: 'megaworld', maxRate: 3 },
-];
-
-// In-memory storage for service call counts and queue
+// In-memory storage for service call counts
 const serviceCallCounts = {};
 
-// Helper function to get the rate limit for a specific service
-function getMaxRate(serviceName) {
-    const service = RATE_LIMIT.find(s => s.serviceName === serviceName);
-    return service ? service.maxRate : Infinity; // Default to no limit if service not found
-}
+// Initialize serviceCallCounts based on RATE_LIMIT
+Object.keys(RATE_LIMIT).forEach(serviceName => {
+    serviceCallCounts[serviceName] = { count: 0, inQueue: 0 };
 
-// Middleware to reset counts every minute
-setInterval(() => {
-    for (const service in serviceCallCounts) {
-        if (serviceCallCounts[service].count < getMaxRate(service)) {
-            serviceCallCounts[service].inQueue = 0; // Reset inQueue count if service is HEALTHY
-        }
-        serviceCallCounts[service].count = 0;
-    }
-}, 1000); //reset counts every 60 seconds to base the call rates per minute
+    // Reset the count based on each service's interval
+    setInterval(() => {
+        serviceCallCounts[serviceName].count = 0;
+        // Handle queued requests here if needed
+    }, RATE_LIMIT[serviceName].interval);
+});
 
 app.get('/request/:externalService', (req, res) => {
     const serviceName = req.params.externalService;
 
-    // Initialize count and queue for the service if they don't exist
     if (!serviceCallCounts[serviceName]) {
-        serviceCallCounts[serviceName] = { count: 0, inQueue: 0 };
+        return res.status(404).json({ status: 'SERVICE_NOT_FOUND' });
     }
 
-    // Check the current rate
-    if (serviceCallCounts[serviceName].count < getMaxRate(serviceName)) {
+    if (serviceCallCounts[serviceName].count < RATE_LIMIT[serviceName].maxRate) {
         serviceCallCounts[serviceName].count++;
         res.json({ status: 'GRANTED' });
     } else {
@@ -52,17 +42,7 @@ app.get('/request/:externalService', (req, res) => {
 });
 
 app.get('/status', (req, res) => {
-    const serviceStatuses = {};
-
-    for (const service in serviceCallCounts) {
-        serviceStatuses[service] = {
-            count: serviceCallCounts[service].count,
-            inQueue: serviceCallCounts[service].inQueue,
-            status: serviceCallCounts[service].count < getMaxRate(service) ? 'HEALTHY' : 'RATE_LIMITED'
-        };
-    }
-
-    res.json(serviceStatuses);
+    res.json(serviceCallCounts);
 });
 
 app.listen(PORT, () => {

@@ -231,12 +231,12 @@ export default function TokenTransactions() {
         <Table size="small">
           <TableHead style={{position:'sticky', top:'0', backgroundColor:'rgba(50,50,60,1)'}}>
             <TableRow>
-              <TableCell align="right"><span title="Originating Chain">chain</span></TableCell>
+              <TableCell align="left"><span title="Originating Chain">chain</span></TableCell>
               <TableCell align="right"><span title="Block Number">block number</span></TableCell>
-              <TableCell align="right"><span title="Amount of Tokens">amount</span></TableCell>
               <TableCell align="right"><span title="How Long Ago">age</span></TableCell>
               <TableCell align="center"><span title="From Whom">from</span></TableCell>
               <TableCell align="center"><span title="To Whom">to</span></TableCell>
+              <TableCell align="right"><span title="Amount of Tokens">amount</span></TableCell>
               <TableCell align="right"><span title="Transaction Hash">tx hash</span></TableCell>
               <TableCell style={{ textAlign:'right'}}><span title="Labeling Engine Classifications for this TX">tags</span></TableCell>
               <TableCell style={{ textAlign:'right'}}><span title="Estimated USD value of this transfer">value</span></TableCell>

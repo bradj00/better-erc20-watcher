@@ -52,6 +52,52 @@ module.exports = {
         // write new config state to db
     },
 
+    RequestErc20BulkCacheInfo: async function(payload, callback) {
+        try {
+            console.log('bulk ERC20 token info request: ', payload);
+            const database = db.getDb('coingecko_tokens');
+            const collection = database.collection('tokens');
+    
+            // Prepare a query for the array of contract addresses
+            const query = { contractAddress: { $in: payload } };
+    
+            const results = await collection.find(query).toArray();
+    
+            const foundAddresses = results.map(item => item.contractAddress);
+            const notFoundAddresses = payload.filter(address => !foundAddresses.includes(address));
+            
+            notFoundAddresses.forEach(address => {
+                produceLookupTokenRequest({
+                    token: address
+                });
+            });
+
+            const foundAddressesLog = results.map(item => item.contractAddress).join(', ');
+
+            if (results.length > 0) {
+                console.log('found token info for the following addresses:', foundAddressesLog);
+                
+                if (notFoundAddresses.length > 0) {
+                    console.log('missing cached info for these addresses:\n\t', notFoundAddresses.join(',\n\t'));
+                }
+
+                
+                
+                callback({ 
+                    status: 'success', 
+                    data: results, 
+                    toFetch: notFoundAddresses // List of addresses to be fetched
+                });
+            } else {
+                console.log('no token info found for:', payload);
+                callback({ status: 'error', message: 'No matches found', toFetch: payload });
+            }
+        } catch (error) {
+            console.error("Error fetching token info:", error);
+            callback({ status: 'error', message: 'Internal Server Error' });
+        }
+    },
+    
     GetFriendlyName: async function(payload, callback) {
         try {
             console.log('trying to get friendly names for:', payload.friendlyName);

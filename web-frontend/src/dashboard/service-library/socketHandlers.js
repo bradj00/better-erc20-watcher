@@ -13,6 +13,23 @@ export const handleGetFriendlyName = (data, dataSetterObj) => {
     dataSetterObj.setFriendlyLookupResponse(data.data.data);
 };
 
+export const handleRequestErc20BulkCacheInfo = (data, dataSetterObj) => {
+    if (data.data.data === null || data.data.data === undefined ) return;
+    console.log('~~RequestErc20BulkCacheInfo: ', data.data.data);
+
+    const newCachedData = data.data.data.reduce((acc, current) => {
+        if (current.contractAddress) {
+            acc[current.contractAddress] = current; // Map each item to its contract address
+        }
+        return acc;
+    }, {});
+
+    dataSetterObj.setcachedErc20TokenMetadata(prevData => ({
+        ...prevData,  // Spread the existing data
+        ...newCachedData // Add new data, updating existing entries if they exist
+    }));
+};
+
 export const handleCacheFriendlyLabelsRequest = (data, dataSetterObj) => {
     console.log('CacheFriendlyLabelsRequest: ',data)
     dataSetterObj.setCacheFriendlyLabels(data.data.data);

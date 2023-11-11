@@ -32,7 +32,9 @@ export const ErrorsContext                       = React.createContext({});
 function App() {
 
 const [addressTags, setAddressTags] = useState([]); //array of addresses and their assigned category tags
+const [uniqueContractAddresses, setUniqueContractAddresses] = useState([]); 
 
+const [areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded] = useState({});
 
 
 
@@ -241,10 +243,11 @@ const contextObj = {
   CacheFriendlyLabels, setCacheFriendlyLabels,
   txDataForceGraph, settxDataForceGraph,
   TxHashDetailsObj, setTxHashDetailsObj,
-
+  uniqueContractAddresses, setUniqueContractAddresses,
   cachedErc20TokenMetadata, setcachedErc20TokenMetadata,
   validatedTokenToAddToWatchlist, setvalidatedTokenToAddToWatchlist,
   submitvalidatedTokenToAddToWatchlist, setsubmitvalidatedTokenToAddToWatchlist,
+  areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded,
 ///////////////////////////////////////////////
 /////////MICRO SERVICE RE-FACTOR///////////////
 

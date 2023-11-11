@@ -158,7 +158,7 @@ async function processLookupRequests() {
         }
     } catch (error) {
         job.status = 'API or Cache Error';
-        console.error('Error processing job:', error);
+        console.error('Error processing job for token [ '+job.contractAddress+' ] :', error.response.status, error.response.data);
     }
 
     setTimeout(processLookupRequests, RATE_LIMIT_DELAY);
