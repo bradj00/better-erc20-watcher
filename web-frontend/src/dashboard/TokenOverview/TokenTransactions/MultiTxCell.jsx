@@ -5,6 +5,9 @@ import ethLogo from '../../images/eth-logo.png';
 import { getEllipsisTxt, commaNumber } from '../../helpers/h.js';
 import { GeneralContext } from '../../../App.js';
 import ToFromCell from '../../subcomponents/ToFromCell';
+import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
+import "../../../App.css"
+import TagIcon from '@mui/icons-material/Tag';
 
 const MultiTxCell = (props) => {
     const { uniqueContractAddresses, setUniqueContractAddresses } = useContext(GeneralContext);
@@ -20,6 +23,7 @@ const MultiTxCell = (props) => {
 
   const transactionLogs = TxHashDetailsObj[props.row.transaction_hash]?.transactionData?.logs || [];
   const initiatorAddress = TxHashDetailsObj[props.row.transaction_hash]?.transactionData?.from || [];
+  const interactingWithContractAddress = TxHashDetailsObj[props.row.transaction_hash]?.transactionData?.to || [];
 
   useEffect(() => {
     // Set the loading status of this cell to true when it mounts
@@ -83,40 +87,65 @@ const MultiTxCell = (props) => {
     .filter(transfer => transfer !== null); // Filter out non-transfer logs or undecodable logs
 
   return (
-    <TableRow className={props.rowAge > 100 ? "rowHover" : "transactionRow"} style={{ fontSize: '3vw', backgroundColor:'rgba(0,0,0,0)', }}>
-      <TableCell align="right" style={{ fontSize:'1vw' }}>
-        <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" />
-      </TableCell>
-      <TableCell align="right" style={{fontSize:'1vw'}}>
-        {commaNumber(props.row['block_number'])}
-      </TableCell> 
-      <TableCell align="right" title={props.row.block_timestamp} style={{fontSize:'1vw'}}>
-        {props.timeAgo.format(new Date(props.row.block_timestamp),'mini')}
-      </TableCell>
+      
 
       
-      <TableCell colSpan={3} style={{ padding: '0.25vw' }}>
-            <div style={{ position: 'relative', zIndex: '-1', backgroundColor: 'rgba(50,50,60,0.7)', borderRadius: '5px', padding: '0.5vw', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', border: '1px solid #660', height: '100%' }}>
+            <div style={{ position: 'relative',  backgroundColor: 'rgba(50,50,65,0.5)', borderRadius: '5px', padding: '0.5vw', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'right', width: '100%', border: '1px solid #660', height: '100%', marginBottom:'0.2vw', }}>
 
-                {/* Contract Caller at Top-Left */}
-                <div style={{ alignSelf: 'flex-start', marginBottom: '1vw' }}>
-                    <span style={{ color: '#f55', fontSize: '0.7vw' }}>Contract Caller: &nbsp;</span>
-                    <span>{CacheFriendlyLabels[initiatorAddress]?.manuallyDefined || getEllipsisTxt(initiatorAddress, 6)}</span>
+                <div style={{color:'#fff', backgroundColor:'rgba(100,255,100,0.3)',borderRadius:'0.25vw', position:'absolute', top:'3%', padding:'0.25vw 0.6vw 0.25vw 0.6vw', textAlign:'left',}}>
+                    BUY    
+                </div>
+                {/* <div style={{color:'#fff', backgroundColor:'rgba(100,100,255,0.2)',borderRadius:'0.25vw', position:'absolute', top:'3%', padding:'0.25vw 0.6vw 0.25vw 0.6vw', textAlign:'left',}}>
+                    GAME DEPOSIT    
+                </div> */}
+                {/* <div style={{color:'#fff', backgroundColor:'rgba(100,255,100,0.3)',borderRadius:'0.25vw', position:'absolute', top:'3%', padding:'0.25vw 0.6vw 0.25vw 0.6vw', textAlign:'left',}}>
+                    STAKE  
+                </div> */}
+
+
+                <div style={{display:'flex', textAlign:'center', position:'absolute',top:'0',left:'0',width:'5%',height:'2.5vh',backgroundColor:'rgba(255,255,0,0.3)',color:'#fff', padding:'0.15vw', borderRadius:'0 0 0.15vw 0'}}>
+                    &nbsp;CONTRACT
                 </div>
 
-                {/* Grid Headers */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0vw', width: '100%', fontSize:'0.7vw', color:'rgba(200,50,50,0.8)', letterSpacing:'0.05vw'  }}>
+                <div title="transaction hash" style={{ position:'absolute', right:'0.25vw', top:'0.25vw',backgroundColor:'rgba(255,255,255,0.1)', padding:'0vw 0.25vw 0vw 0.25vw',borderRadius:'0.15vw' }}>
+                    <span style={{ color: '#f55', fontSize: '0.8vw', display:'flex', alignItems:'center' }}>
+                        <TagIcon /> 
+                        <a href={`https://etherscan.io/tx/${props.row.transaction_hash}`} target="_blank"> {getEllipsisTxt(props.row.transaction_hash, 6)} </a> 
+                    </span>
+                </div>
+
+                <div style={{backgroundColor:'rgba(255,255,255,0.1)',borderRadius:'0.25vw', position:'absolute', left:'0.25%', top:'15%', padding:'0.15vw', textAlign:'left',}}>
+                    <div style={{}}>
+                        <span style={{ color: '#f55', fontSize: '0.8vw' }}>Caller: &nbsp;</span>
+                        <span style={{ float:'right', fontSize: '0.65vw' }}> <a target="_blank" href={"https://etherscan.io/address/"+initiatorAddress}>{CacheFriendlyLabels[initiatorAddress]?.manuallyDefined || getEllipsisTxt(initiatorAddress, 6)}</a></span>
+                    </div>
+
+                    <div style={{}}>
+                        <span style={{ color: '#f55', fontSize: '0.8vw' }}>Contract: &nbsp;&nbsp;</span>
+                        <span style={{float:'right',  fontSize: '0.65vw' }}> <a target="_blank" href={"https://etherscan.io/address/"+interactingWithContractAddress}>{CacheFriendlyLabels[interactingWithContractAddress]?.manuallyDefined || getEllipsisTxt(interactingWithContractAddress, 6)}</a></span>
+                    </div>
+                </div>
+
+                <div title="1m ago. Block: 1234556"  style={{ display:'flex',alignItems:'center', position:'absolute', top:'1%', left:'5.5%', backgroundColor:'rgba(255,255,255,0.1)', padding:'0vw 0.25vw 0vw 0.25vw',borderRadius:'0.15vw' }}>
+                    <div style={{ color: 'rgba(250,250,0,0.8)', fontSize: '0.1vw' }}> <HistoryToggleOffIcon/> </div>
+                    <div style={{ color: 'rgba(250,250,0,0.8)', fontSize: '0.4vw' }}>&nbsp;1m </div>
+                </div>
+                <div title="Ethereum TX"  style={{ display:'flex',alignItems:'center', position:'absolute', top:'1%', left:'9%', backgroundColor:'rgba(255,255,255,0.1)', padding:'0vw 0.25vw 0vw 0.25vw',borderRadius:'0.15vw' }}>
+                    <div style={{ color: 'rgba(250,250,0,0.8)', fontSize: '0.1vw' }}> <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" /> </div>
+                </div>
+
+
+
+                <div style={{ display: 'grid', marginTop:'5.5vh', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0vw', width: '90%', fontSize:'0.7vw', color:'rgba(250,250,0,0.8)', letterSpacing:'0.05vw', alignSelf:'end', paddingBottom:'0.25vw'}}>
                     <div style={{ textAlign:'center', fontWeight: 'bold',textDecoration:'underline' }}>Order</div>
                     <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>From</div>
                     <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>To</div>
-                    <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>USD</div>
                     <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>Amount</div>
                     <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>Token</div>
-                    {/* <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>Logo</div> */}
+                    <div style={{ fontWeight: 'bold',textDecoration:'underline' }}>USD</div>
                 </div>
 
-                {/* 6-Column Grid Layout */}
-                <div style={{ border: '0px solid #0ff', width: '100%', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0vw' }}>
+                <div style={{ border: '0px solid #0ff', width: '90%', display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '0vw', alignSelf:'end', }}>
                     {decodedERC20Transfers.map((transfer, idx) => {
                         const decimals = cachedErc20TokenMetadata[transfer.contractAddress]?.data.detail_platforms.ethereum.decimal_place || 18;
                         const adjustedAmount = transfer.amount / Math.pow(10, decimals);
@@ -157,29 +186,9 @@ const MultiTxCell = (props) => {
                     })}
                 </div>
             </div>
-        </TableCell>
+     
 
 
-
-
-      <TableCell align="right" style={{fontSize:'1vw'}}>
-        <a href={`https://etherscan.io/tx/${props.row.transaction_hash}`} target="_blank" rel="noopener noreferrer">
-            {getEllipsisTxt(props.row.transaction_hash, 6)}
-        </a> 
-      </TableCell>
-      <TableCell align="right">
-      1
-      </TableCell>
-      <TableCell align="right">
-      1
-      </TableCell>
-
-
-      <TableCell align="right">
-      1
-      </TableCell>
-
-    </TableRow>
   )
 }
 

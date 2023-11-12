@@ -433,7 +433,7 @@ const [activeStageTab, setActiveStageTab] = useState('Visualizer');
 
 
             </div>
-              <div style={{position:'absolute', width:'98%',top:'62vh',}}>
+              <div style={{position:'absolute', width:'80vw',right:'2vw',top:'62vh',}}>
                 <TokenTransactions />
               </div>
             

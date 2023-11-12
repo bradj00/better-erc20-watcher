@@ -220,67 +220,41 @@ export default function TokenTransactions() {
   return (
     <>
       <Title>Transactions</Title>
-      <div className={expandTxView? "expandedOrders":"normalOrders"} >
-        <Link className={expandTxView? "": "normalSeeMore"} color="primary" href="#" onClick={() => { setexpandTxView(!expandTxView); }}>
-          {!expandTxView? "See more":"See less"}
-        </Link>
+      <div className={expandTxView? "expandedOrders":"normalOrders"} style={{padding:'0.25vw',}}>
+        
+        <div style={{position:'absolute', bottom:'-5vh'}}>
+          <Link color="primary" href="#" onClick={() => { setexpandTxView(!expandTxView); }}>
+            {!expandTxView? "See more":"See less"}
+          </Link>
+        </div>
+
         <div className="summarizeButton" onClick={()=>{requestSummarizedTxs(txData)}}>
           Summarize TXs
         </div>  
 
-        <Table size="small">
-          <TableHead style={{position:'sticky', top:'0', backgroundColor:'rgba(50,50,60,1)'}}>
-            <TableRow>
-              <TableCell align="left"><span title="Originating Chain">chain</span></TableCell>
-              <TableCell align="right"><span title="Block Number">block number</span></TableCell>
-              <TableCell align="right"><span title="How Long Ago">age</span></TableCell>
-              <TableCell align="center"><span title="From Whom">from</span></TableCell>
-              <TableCell align="center"><span title="To Whom">to</span></TableCell>
-              <TableCell align="right"><span title="Amount of Tokens">amount</span></TableCell>
-              <TableCell align="right"><span title="Transaction Hash">tx hash</span></TableCell>
-              <TableCell style={{ textAlign:'right'}}><span title="Labeling Engine Classifications for this TX">tags</span></TableCell>
-              <TableCell style={{ textAlign:'right'}}><span title="Estimated USD value of this transfer">value</span></TableCell>
-              <TableCell style={{ textAlign:'right'}}><span title="Labeling Engine Classified Action Taken">action</span></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {txData ? (
-              txData.map((row, index) => {
-                const rowAge = (new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000;
-                const timeAgo = new TimeAgo('en-US');
-                
-
-                return (
-                  // <TableBody>
-                  <>
-                    {txData.map((row, index) => { 
-                      // Check if this transaction hash has already been rendered
-                      if (!renderedHashes.has(row.transaction_hash)) {
-                        const rowAge = (new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000;
-                        const timeAgo = new TimeAgo('en-US');
-                        const isMultiTx = TxHashDetailsObj[row.transaction_hash] && TxHashDetailsObj[row.transaction_hash].transactionData.logs.length > 1;
-                
-                        // Add the hash to the set to mark it as rendered
-                        renderedHashes.add(row.transaction_hash);
-                        
-                        return (
-                          isMultiTx ?
-                            <MultiTxCell index={index} row={row} rowAge={rowAge} timeAgo={timeAgo} />
-                            :
-                            <RegularCell index={index} row={row} rowAge={rowAge} timeAgo={timeAgo} />
-                        );
-                      }
-                      // If the hash has already been rendered, return null or an empty fragment
-                      return null;
-                    })}
-                    </>
-                  // </TableBody>
-                );
-                
-              })
-            ) : <></>}
-          </TableBody>
-        </Table>
+        <div style={{border:'0px solid #ff0', width:'99.5%', float:'right', margin:'0.25vw'}}>
+        {txData? txData.map((row, index) => { 
+          // Check if this transaction hash has already been rendered
+          if (!renderedHashes.has(row.transaction_hash)) {
+            const rowAge = (new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000;
+            const timeAgo = new TimeAgo('en-US');
+            const isMultiTx = TxHashDetailsObj[row.transaction_hash] && TxHashDetailsObj[row.transaction_hash].transactionData.logs.length > 1;
+    
+            // Add the hash to the set to mark it as rendered
+            renderedHashes.add(row.transaction_hash);
+            
+            return (
+              isMultiTx ?
+                <MultiTxCell index={index} row={row} rowAge={rowAge} timeAgo={timeAgo} />
+                :
+                <RegularCell index={index} row={row} rowAge={rowAge} timeAgo={timeAgo} />
+            );
+          }
+          // If the hash has already been rendered, return null or an empty fragment
+          return null;
+        }) : <></>}
+        </div>
+       
       </div> 
 
     </>
