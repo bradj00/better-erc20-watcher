@@ -302,7 +302,8 @@ const Topbanner = () => {
                 <img src={clickedToken && clickedToken.data.data.image.small? clickedToken.data.data.image.small : tokenImage } style={{width:'90%'}} />
             </div>
             <div style={{fontSize:'1.5vw', zIndex:'1', position:'absolute', width:'100%', left:'0', top:'-10%',}} onClick={() => {updateSelectedToken();setclickedSearchBar(false);setshowTokenSelector(false) }}>
-            {    clickedToken? <>${clickedToken.data.data.symbol.toUpperCase()}</> : '...'}
+            ${clickedToken ? <>{clickedToken.data.data.symbol.replace(/\$/g, '').toUpperCase()}</> : '...'}
+
             </div>
 
             <div style={{ color:'#999',fontSize:'2vh',  bottom:'-10%', width:'100%', left:'0',position:'absolute',}}  >

@@ -31,6 +31,7 @@ import engStrings from 'react-timeago/lib/language-strings/en'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 import RegularCell from './TokenTransactions/RegularCell';
 import MultiTxCell from './TokenTransactions/MultiTxCell';
+import AutoLookupTxLogsSlider from '../subcomponents/AutoLookupTxLogsSlider';
 
 const formatter = buildFormatter(engStrings)
 // TimeAgo.addDefaultLocale(en)
@@ -222,15 +223,19 @@ export default function TokenTransactions() {
       <Title>Transactions</Title>
       <div className={expandTxView? "expandedOrders":"normalOrders"} style={{padding:'0.25vw',}}>
         
-        <div style={{position:'absolute', bottom:'-5vh'}}>
+        <div style={{position:'absolute', bottom:'-1.3vh'}}>
           <Link color="primary" href="#" onClick={() => { setexpandTxView(!expandTxView); }}>
             {!expandTxView? "See more":"See less"}
           </Link>
         </div>
 
         <div className="summarizeButton" onClick={()=>{requestSummarizedTxs(txData)}}>
-          Summarize TXs
+          Lookup TX Logs
         </div>  
+        <div style={{position:'absolute', top:'0vh', left:'12vw', display:'flex', alignItems:'center'}}>
+          <AutoLookupTxLogsSlider /> &nbsp;
+          auto
+        </div>
 
         <div style={{border:'0px solid #ff0', width:'99.5%', float:'right', margin:'0.25vw'}}>
         {txData? txData.map((row, index) => { 

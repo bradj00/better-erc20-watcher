@@ -5,9 +5,9 @@ const PORT = 4000;
 
 // Rate limits per service
 const RATE_LIMIT = {
-    'coingecko': { maxRate: 10, interval: 60000 }, // 10 per 60 seconds
+    'coingecko': { maxRate: 30, interval: 60000 }, // 30 per 60 seconds
     'infura':    { maxRate: 3,  interval: 1000 },  // 3 per 1 second
-    'etherscan': { maxRate: 3,  interval: 1000 },  // 3 per 1 second
+    'etherscan': { maxRate: 5,  interval: 1000 },  // 5 per 1 second
     'megaworld': { maxRate: 1,  interval: 1000 },  // 1 per 1 second
 };
 

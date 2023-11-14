@@ -5,7 +5,7 @@ const { produceTxHashDetailsLookupFinished } = require('./producer.js');
 const axios = require('axios');
 require('dotenv').config('../.env');
 
-const RATE_LIMIT_DELAY = 1000; // Adjust as needed
+const RATE_LIMIT_DELAY = 250; // Adjust as needed
 const MASTER_RATE_LIMITER_URL = 'http://master-rate-limiter:4000/request/etherscan'; // Adjust as needed
 const ETHERSCAN_BASE_URL = 'https://api.etherscan.io/api'; // Adjust as needed
 let PENDING_JOBS = []; // Queue for rate-limited jobs
@@ -60,9 +60,9 @@ const consumeTxArrayLookupReq = async (message, client) => {
 
 
 
-async function processTxHashes(txHashes, client) {
-  for (const txHash of txHashes) {
-    await processSingleTxHash(txHash, client);
+const totalCount = txHashes.length;
+  for (let i = 0; i < totalCount; i++) {
+    await processSingleTxHash(txHashes[i], i + 1, totalCount, client);
   }
 
   console.log('Finished processing all transaction hashes.');
@@ -70,7 +70,7 @@ async function processTxHashes(txHashes, client) {
   produceTxHashDetailsLookupFinished(txHashes)
 }
 
-async function processSingleTxHash(txHash, client) {
+async function processSingleTxHash(txHash, currentIndex, totalCount, client) {
   try {
     // Check if txHash is already cached in the database
     const collection = client.db(DB_NAME).collection('details');
@@ -102,7 +102,7 @@ async function processSingleTxHash(txHash, client) {
 
         try {
           await collection.updateOne(filter, update, options);
-          console.log(`Transaction data for hash ${txHash} has been upserted into the database`);
+          console.log(`[${currentIndex} / ${totalCount}] Transaction data for hash ${txHash} has been upserted into the database`);
         } catch (dbError) {
           console.error(`Error upserting data for hash ${txHash}:`, dbError);
         }
