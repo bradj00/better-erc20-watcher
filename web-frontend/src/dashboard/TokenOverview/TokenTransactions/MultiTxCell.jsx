@@ -103,7 +103,7 @@ const MultiTxCell = (props) => {
                 </div> */}
 
 
-                <div style={{display:'flex', textAlign:'center', position:'absolute',top:'0',left:'0',width:'5%',height:'2.5vh',backgroundColor:'rgba(255,255,0,0.3)',color:'#fff', padding:'0.15vw', borderRadius:'0 0 0.15vw 0'}}>
+                <div style={{display:'flex', textAlign:'center', position:'absolute',top:'0',left:'0',width:'5vw',height:'2.7vh',backgroundColor:'rgba(255,255,0,0.3)',color:'#fff', padding:'0.15vw', borderRadius:'0 0 0.15vw 0'}}>
                     &nbsp;CONTRACT
                 </div>
 
@@ -114,7 +114,7 @@ const MultiTxCell = (props) => {
                     </span>
                 </div>
 
-                <div style={{backgroundColor:'rgba(255,255,255,0.1)',borderRadius:'0.25vw', position:'absolute', left:'0.25%', top:'15%', padding:'0.15vw', textAlign:'left',}}>
+                <div style={{backgroundColor:'rgba(255,255,255,0.1)',borderRadius:'0.25vw', position:'absolute', left:'0.25vw', top:'1.5vw', padding:'0.15vw', textAlign:'left',}}>
                     <div style={{}}>
                         <span style={{ color: '#f55', fontSize: '0.8vw' }}>Caller: &nbsp;</span>
                         <span style={{ float:'right', fontSize: '0.65vw' }}> <a target="_blank" href={"https://etherscan.io/address/"+initiatorAddress}>{CacheFriendlyLabels[initiatorAddress]?.manuallyDefined || getEllipsisTxt(initiatorAddress, 6)}</a></span>
@@ -126,11 +126,11 @@ const MultiTxCell = (props) => {
                     </div>
                 </div>
 
-                <div title="1m ago. Block: 1234556"  style={{ display:'flex',alignItems:'center', position:'absolute', top:'1%', left:'5.5%', backgroundColor:'rgba(255,255,255,0.1)', padding:'0vw 0.25vw 0vw 0.25vw',borderRadius:'0.15vw' }}>
+                <div title="1m ago. Block: 1234556"  style={{ display:'flex',alignItems:'center', position:'absolute', top:'1%', left:'5.5vw', backgroundColor:'rgba(255,255,255,0.1)', padding:'0vw 0.25vw 0vw 0.25vw',borderRadius:'0.15vw' }}>
                     <div style={{ color: 'rgba(250,250,0,0.8)', fontSize: '0.1vw' }}> <HistoryToggleOffIcon/> </div>
                     <div style={{ color: 'rgba(250,250,0,0.8)', fontSize: '0.4vw' }}>&nbsp;1m </div>
                 </div>
-                <div title="Ethereum TX"  style={{ display:'flex',alignItems:'center', position:'absolute', top:'1%', left:'9%', backgroundColor:'rgba(255,255,255,0.1)', padding:'0vw 0.25vw 0vw 0.25vw',borderRadius:'0.15vw' }}>
+                <div title="Ethereum TX"  style={{ display:'flex',alignItems:'center', position:'absolute', top:'1%', left:'8.5vw', backgroundColor:'rgba(255,255,255,0.1)', padding:'0vw 0.25vw 0vw 0.25vw',borderRadius:'0.15vw' }}>
                     <div style={{ color: 'rgba(250,250,0,0.8)', fontSize: '0.1vw' }}> <img src={ethLogo} style={{display:'flex', justifyContent:'center',alignItems:'center',width:'1vw'}} alt="Ethereum Logo" /> </div>
                 </div>
 

@@ -39,7 +39,5 @@ const produceErrorEvent = async (errorData) => {
 
 module.exports = {
   initProducer,
-  produceTokenTransferStreamEvent,
-  produceTokenTransferEvent,
   produceErrorEvent
 };

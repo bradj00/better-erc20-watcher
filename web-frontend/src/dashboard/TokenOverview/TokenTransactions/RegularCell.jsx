@@ -18,7 +18,7 @@ const RegularCell = (props) => {
 
   return (
     <div style={{ position: 'relative',  backgroundColor: 'rgba(50,50,65,0.5)', borderRadius: '5px', padding: '0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'right', width: '100%', border: '1px solid rgba(100,10,60,0.6)', marginBottom:'0.2vw', }}>
-      <div style={{display:'flex', justifyContent:'center', textAlign:'center', position:'absolute',top:'0',left:'0',width:'5%',height:'2.5vh',backgroundColor:'rgba(100,10,60,0.3)',color:'#fff', padding:'0.15vw', borderRadius:'0 0 0.15vw 0'}}>
+      <div style={{display:'flex', justifyContent:'center', textAlign:'center', position:'absolute',top:'0',left:'0',width:'5%',height:'2.7vh',backgroundColor:'rgba(100,10,60,0.3)',color:'#fff', padding:'0.15vw', borderRadius:'0 0 0.15vw 0'}}>
         P2P
       </div>
 

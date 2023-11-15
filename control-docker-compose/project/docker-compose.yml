@@ -18,6 +18,12 @@ services:
     restart: always
     networks:
       - better-erc20-watcher-network 
+
+  tagging-engine:
+    image: better-erc20-watcher/tagging-engine:latest
+    restart: always
+    networks:
+      - better-erc20-watcher-network 
        
   external-token-lookup-engine:
     image:  better-erc20-watcher/external-token-lookup-engine:latest
