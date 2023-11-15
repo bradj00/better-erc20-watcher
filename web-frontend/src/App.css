@@ -722,7 +722,7 @@ tr:nth-child(odd) {
   width: 100%;
   height: 34vh;
   cursor: pointer;
-  transition: height 1s ease, top 1s ease;
+
 }
 
 .expandedOrders {
@@ -737,12 +737,20 @@ tr:nth-child(odd) {
   top:7vh;
   left:0;
   z-index:9999;
-  transition: height 1s ease, top 1s ease;
+
 
 }
 .normalSeeMore{
   position: fixed;
   bottom: 2vh;
+  right:0.5vw;
+  z-index: 9999;
+}
+.expandedSeeMore{
+  position: fixed;
+  top: 7vh;
+  right:0vw;
+  z-index: 9999;
 }
 
 
@@ -759,12 +767,7 @@ tr:nth-child(odd) {
   color: rgba(150,220,255,1);
   height: 1.4vw;
   text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: -0.4vh;
-  left: 6vw;
+  margin-right: 0.5vw;
 }
 
 .summarizeButton:hover {

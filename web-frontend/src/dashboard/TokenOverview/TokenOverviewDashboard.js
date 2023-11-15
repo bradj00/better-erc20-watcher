@@ -51,6 +51,7 @@ import WidgetPanelStats from './WidgetPanel/WidgetPanelStats';
 import WidgetPanelSocial from './WidgetPanel/WidgetPanelSocial';
 import TokenDetective from '../TokenDetective';
 import VolumeGraph from './StagePanel/VolumeGraph';
+import TokenTransactionsOptions from './TokenTransactionsOptions';
 
 
 // TimeAgo.addDefaultLocale(en);
@@ -436,6 +437,7 @@ const [activeStageTab, setActiveStageTab] = useState('Visualizer');
               <div style={{position:'absolute', width:'80vw',right:'2vw',top:'62vh',}}>
                 <TokenTransactions />
               </div>
+                <TokenTransactionsOptions />
             
            
             </div>

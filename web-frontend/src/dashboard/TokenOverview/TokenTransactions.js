@@ -31,10 +31,16 @@ import engStrings from 'react-timeago/lib/language-strings/en'
 import buildFormatter from 'react-timeago/lib/formatters/buildFormatter'
 import RegularCell from './TokenTransactions/RegularCell';
 import MultiTxCell from './TokenTransactions/MultiTxCell';
-import AutoLookupTxLogsSlider from '../subcomponents/AutoLookupTxLogsSlider';
+
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 
 const formatter = buildFormatter(engStrings)
-// TimeAgo.addDefaultLocale(en)
+
+
+TimeAgo.addLocale(en);
+const timeAgo = new TimeAgo('en-US');
+
 
 
 function preventDefault(event) {
@@ -82,11 +88,14 @@ export default function TokenTransactions() {
   const {displayPanel, setdisplayPanel} = useContext(GeneralContext); 
   const {RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice} = useContext(GeneralContext); 
   const {CacheFriendlyLabels} = useContext(GeneralContext);
-  const {SummarizedTxsRequest, setSummarizedTxsRequest} = useContext(GeneralContext);
+
   
   const {TxHashDetailsObj} = useContext(GeneralContext);
 
-
+  const getTimeAgoText = (timestamp) => {
+    const date = new Date(timestamp);
+    return timeAgo.format(date);
+  };
   
 
   useEffect(() => {
@@ -160,27 +169,7 @@ export default function TokenTransactions() {
    
   // }
 
-  function requestSummarizedTxs(TxArray) {
-    if (TxArray && TxArray.length > 0) {
 
-      // Create a Set to store unique transaction hashes
-        const uniqueTransactionHashes = new Set();
-
-        // Iterate over the array and add each transaction hash to the Set
-        TxArray.forEach(tx => {
-            uniqueTransactionHashes.add(tx.transaction_hash);
-        });
-
-        // Convert the Set to an array
-        const uniqueTxArray = Array.from(uniqueTransactionHashes);
-
-        console.log('UNIQUE tx_hashes from given array: ',uniqueTxArray)
-        // Set the unique transaction hashes
-        setSummarizedTxsRequest(uniqueTxArray);
-    } else {
-        console.log('malformed array provided as input');
-    }
-}
 
 
   function getUniSwapPoolAddy(row){
@@ -193,7 +182,19 @@ export default function TokenTransactions() {
     } 
     else return false
   }
-
+const customFormatter = (value, unit, suffix) => {
+  if (unit === 'second') {
+    return '<1 m';
+  } else if (unit === 'minute') {
+    return `${value} m`;
+  } else if (unit === 'hour') {
+    return `${value} hr`;
+  } else if (unit === 'day') {
+    return `${value} d`;
+  } else {
+    return timeAgo.format(value);
+  }
+};
   
   const displayAddressFN = (clickedDetailsAddressFN) => {
     if (clickedDetailsAddressFN === null || clickedDetailsAddressFN == undefined) {return 'null'}
@@ -220,42 +221,31 @@ export default function TokenTransactions() {
   
   return (
     <>
-      <Title>Transactions</Title>
+      {/* <Title>Transactions</Title> */}
       <div className={expandTxView? "expandedOrders":"normalOrders"} style={{padding:'0.25vw',}}>
         
-        <div style={{position:'absolute', bottom:'-1.3vh'}}>
+        <div className={!expandTxView? 'normalSeeMore':'expandedSeeMore'}>
           <Link color="primary" href="#" onClick={() => { setexpandTxView(!expandTxView); }}>
-            {!expandTxView? "See more":"See less"}
+            {!expandTxView? <AddCircleOutlineIcon />:<RemoveCircleIcon />}
           </Link>
         </div>
 
-        <div className="summarizeButton" onClick={()=>{requestSummarizedTxs(txData)}}>
-          Lookup TX Logs
-        </div>  
-        <div style={{position:'absolute', top:'0vh', left:'12vw', display:'flex', alignItems:'center'}}>
-          <AutoLookupTxLogsSlider /> &nbsp;
-          auto
-        </div>
+
 
         <div style={{border:'0px solid #ff0', width:'99.5%', float:'right', margin:'0.25vw'}}>
-        {txData? txData.map((row, index) => { 
+        {txData ? txData.map((row, index) => {
           // Check if this transaction hash has already been rendered
           if (!renderedHashes.has(row.transaction_hash)) {
-            const rowAge = (new Date().getTime() - new Date(row.block_timestamp).getTime()) / 1000;
-            const timeAgo = new TimeAgo('en-US');
-            const isMultiTx = TxHashDetailsObj[row.transaction_hash] && TxHashDetailsObj[row.transaction_hash].transactionData.logs.length > 1;
-    
-            // Add the hash to the set to mark it as rendered
             renderedHashes.add(row.transaction_hash);
-            
-            return (
-              isMultiTx ?
-                <MultiTxCell index={index} row={row} rowAge={rowAge} timeAgo={timeAgo} />
-                :
-                <RegularCell index={index} row={row} rowAge={rowAge} timeAgo={timeAgo} />
-            );
+
+            const timeAgoText = getTimeAgoText(row.block_timestamp);
+            const isMultiTx = TxHashDetailsObj[row.transaction_hash] && TxHashDetailsObj[row.transaction_hash].transactionData.logs.length > 1;
+
+            return isMultiTx ?
+              <MultiTxCell index={index} row={row} timeAgo={timeAgoText} />
+              :
+              <RegularCell index={index} row={row} timeAgo={timeAgoText} />;
           }
-          // If the hash has already been rendered, return null or an empty fragment
           return null;
         }) : <></>}
         </div>

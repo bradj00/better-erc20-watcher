@@ -166,31 +166,23 @@ async function analyzeTransactions(collectionName) {
     const transactions = await collection.find({}).toArray();
     
     const addressStats = {};
-    const totalTXs = transactions.length;
-    let currentTX = 0;
-    const updateInterval = 1000; // Update the console every 1000 transactions
-
     transactions.forEach(tx => {
-        currentTX++;
-
-        //find an economic way to update our progress for large DB queries as this could take time on large collections..
-        // if (currentTX % updateInterval === 0 || currentTX === totalTXs) {
-        //     // Update progress on console only at specified intervals or at the end
-        //     console.log(`[${collectionName}] [${currentTX} / ${totalTXs}] analyzing TXs...`);
-        // }
-
         ['from_address', 'to_address'].forEach(key => {
             if (!addressStats[tx[key]]) {
-                addressStats[tx[key]] = parseInt(tx['block_number'], 10); // Convert to number
+                addressStats[tx[key]] = {
+                    firstBlockNumberSeen: parseInt(tx['block_number'], 10),
+                    txFrequencyCount: 1
+                };
+            } else {
+                addressStats[tx[key]].txFrequencyCount++;
             }
         });
     });
 
-    console.log(`finished with collection [${collectionName}]`)
-
-    return Object.entries(addressStats).map(([address, block_number]) => ({
+    console.log(`Finished analyzing transactions in collection [${collectionName}]`);
+    return Object.entries(addressStats).map(([address, data]) => ({
         address,
-        firstBlockNumberSeen: block_number
+        ...data
     }));
 }
 
@@ -200,15 +192,16 @@ async function updateAddressStats(addresses, collectionName) {
     const db = client.db('watchedTokens-addressStats');
     const statsCollection = db.collection(collectionName);
     
-    for (const { address, firstBlockNumberSeen } of addresses) {
+    for (const { address, firstBlockNumberSeen, txFrequencyCount } of addresses) {
         // Update or insert address stats
         await statsCollection.updateOne(
             { address },
-            { $set: { firstBlockNumberSeen } },
+            { $set: { firstBlockNumberSeen, txFrequencyCount } },
             { upsert: true }
         );
     }
 }
+
 
 async function assignAndUpdateElderRank(collectionName) {
     const db = client.db('watchedTokens-addressStats');
