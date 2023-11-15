@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useEffect, useState, useRef, useContext, useCallback } from 'react';
 import { GeneralContext, ErrorsContext } from '../App.js';
 import * as socketHandlers from './service-library/socketHandlers';
 
@@ -31,19 +31,21 @@ const WebsocketInfoGrabber = () => {
     const { areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded } = useContext(GeneralContext);
 
 
+    
+    const {addressTags, setAddressTags} = useContext(GeneralContext); 
+    const {elderCount, setElderCount} = useContext(GeneralContext); 
+    
     const {ServicesErrorMessages, setServicesErrorMessages} = useContext(GeneralContext);
     // [{message:'something here'},{message:'something here'},{message:'something here'},{message:'something here'},]
     
 
 
 
-    //write the fetcher to get status of all addresses we have cached so far
-    const {addressTags, setAddressTags} = useContext(GeneralContext); 
-
     const previousSubscription = useRef(null); // To keep track of the previous subscription
 
-    const hasOpenedCertPage = useRef(false);  // Add this ref to track the certificate acceptance page
-
+    const hasOpenedCertPage = useRef(false);
+    const hasConnectedSuccessfully = useRef(false);
+    
 
 
     const [dataSetterObj] = useState({
@@ -57,11 +59,15 @@ const WebsocketInfoGrabber = () => {
         setcachedErc20TokenMetadata,
         setTxHashDetailsObj,
         setcachedErc20TokenMetadata,
-
-        
+        setElderCount, 
     });
 
     
+    useEffect(() => {
+        console.log('addressTags: ',addressTags)
+
+    },[addressTags]);
+
     useEffect(() => {
         // Ensure that there are entries in the areAllMultiTxCellsLoaded object
         const hasEntries = Object.keys(areAllMultiTxCellsLoaded).length > 0;
@@ -193,13 +199,42 @@ const WebsocketInfoGrabber = () => {
     //     txDataRef.current = txData;
     // }, [txData]);
 
+    const isTagCached = useCallback((address) => {
+        return addressTags.hasOwnProperty(address);
+    }, [addressTags]);
+    
+    const getUniqueAddresses = useCallback((transactions) => {
+        const addresses = new Set();
+    
+        transactions.forEach(tx => {
+            if (!isTagCached(tx.from_address)) {
+                addresses.add(tx.from_address);
+            }
+            if (!isTagCached(tx.to_address)) {
+                addresses.add(tx.to_address);
+            }
+        });
+    
+        return Array.from(addresses);
+    }, [isTagCached]);
+    
     useEffect(() => {
         if (txDataRef.current) {
-            console.log("Previous txData:", txDataRef.current);
-            console.log("Current txData:", txData);
+            // console.log("Previous txData:", txDataRef.current);
+            // console.log("Current txData:", txData);
         }
         txDataRef.current = txData;
+        
+        if (txData?.length>0){
+            const newAddressesToLookup = getUniqueAddresses(txData);
+        
+            if (newAddressesToLookup.length > 0) {
+                requestGetBulkTagsRequest(newAddressesToLookup);
+            }
+        }
+    
     }, [txData]);
+    
     
     const connectWebSocket = () => {
         const hostIP = window.location.hostname;
@@ -209,7 +244,8 @@ const WebsocketInfoGrabber = () => {
     
         ws.current.onopen = () => {
             setStatus("Connected");
-         
+            hasConnectedSuccessfully.current = true;
+
             // Subscribe to the test topic after connection is established
             ws.current.send(JSON.stringify({type:'subscribe', topic: 'errors'}));
             ws.current.send(JSON.stringify({type:'subscribe', topic: 'tokenLookupRequest'}));
@@ -223,8 +259,14 @@ const WebsocketInfoGrabber = () => {
         };
     
         ws.current.onerror = (error) => {
-            console.error(`WebSocket Error: ${error}`);
-        };
+        console.error(`WebSocket Error: ${error}`);
+
+        // Open the cert page only if it has never been opened and there has never been a successful connection
+        if (!hasOpenedCertPage.current && !hasConnectedSuccessfully.current) {
+            hasOpenedCertPage.current = true;
+            window.open(`https://${hostIP}:4050`, '_blank');
+        }
+    };
     
         ws.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -255,15 +297,7 @@ const WebsocketInfoGrabber = () => {
                 }
             }
         };
-        ws.current.onerror = (error) => {
-            console.error(`WebSocket Error: ${error}`);
-            
-            // If WebSocket fails due to the certificate and the cert page hasn't been opened yet
-            if (!hasOpenedCertPage.current) {
-                hasOpenedCertPage.current = true;
-                window.open(`https://${hostIP}:4050`, '_blank');  // Open the certificate acceptance page in a new tab
-            }
-        };
+        
     
         ws.current.onclose = (event) => {
             if (event.wasClean) {
@@ -309,6 +343,25 @@ const WebsocketInfoGrabber = () => {
                 data: {
                     action: 'request',
                     txHashes: TxHashes
+                }
+                
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
+    }
+
+    const requestGetBulkTagsRequest = (addressArray,) => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const collection = 'a_'+viewingTokenAddress
+
+            console.log(`[ ${viewingTokenAddress} ] asking for address TAGS (x${addressArray.length})`)
+            const requestPayload = {
+                service: 'general',
+                method: 'GetBulkTagsRequest',
+                data: {
+                    action: 'request',
+                    addresses: addressArray,
+                    collection: collection
                 }
                 
             };

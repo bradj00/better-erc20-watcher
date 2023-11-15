@@ -30,6 +30,57 @@ module.exports = {
             callback({ status: 'error', message: 'Internal Server Error' });
         }
     },
+    GetBulkTagsRequest: async function(payload, callback) {
+        try {
+            // Connect to MongoDB collection
+            const database = db.getDb('watchedTokens-addressStats'); 
+            // eventually rename this db to watchedTokens-addressTags for continuity
+            
+            if (!payload.collection) { 
+                console.log('ERROR: Collection not specified in payload\n-----\n', payload);  
+                return;
+            }
+    
+            const collection = database.collection(payload.collection); 
+            
+            // Count total documents in the collection
+            const totalElderCount = await collection.countDocuments();
+    
+            // Look for the tokens in the collection that match the addresses in payload.addresses
+            const query = { address: { $in: payload.addresses } };
+            const addressesTagsArr = await collection.find(query).toArray();
+            
+            // Check if any documents were found
+            if (addressesTagsArr.length > 0) {
+                console.log(`\tFound ${addressesTagsArr.length} tag assignments for addresses in the database.`);
+                callback({ 
+                    status: 'success', 
+                    data: {
+                        addressesTags: addressesTagsArr, 
+                        totalElderCount: totalElderCount
+                    }
+                });
+            } else {
+                console.log('\tNo matching documents found for given addresses');
+                callback({ 
+                    status: 'success', 
+                    message: 'No matching documents found for the provided addresses',
+                    data: {
+                        addressesTags: [], 
+                        totalElderCount: totalElderCount
+                    }
+                });
+            }
+        } catch (error) {
+            console.error("\tError in GetBulkTagsRequest:", error);
+            callback({ 
+                status: 'error', 
+                message: 'Internal Server Error - Unable to process the request for TAG LOOKUP' 
+            });
+        }
+    },
+    
+    
     
 
     TxArraySummary: async function(payload, callback) {

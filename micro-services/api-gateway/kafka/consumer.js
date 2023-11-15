@@ -52,11 +52,15 @@ const initConsumer = async (broadcastToTopic) => {
 const consumeTokenTransferEvent = async (message, broadcastToTopic) => {
   try {
     const eventData = JSON.parse(message.value.toString());
-    console.log(`Received ( consumeTokenTransferEvent ) token transfer event from Kafka:`);
-    console.log(eventData);
-    console.log('\n\n')
-    console.log(eventData.data.address)
-    console.log('\n\n')
+    const now = new Date();
+    const timestamp = now.toLocaleString();
+    
+    console.log(`${timestamp} - Received ( consumeTokenTransferEvent ) token transfer event from Kafka`);
+    
+    // console.log(eventData);
+    // console.log('\n\n')
+    // console.log(eventData.data.address)
+    // console.log('\n\n')
 
     broadcastToTopic(eventData.data && eventData.data.address ? eventData.data.address : 'error-getting-tx-address', {
       service: 'watchedTokenTX',

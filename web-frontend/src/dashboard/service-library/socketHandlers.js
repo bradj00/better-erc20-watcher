@@ -119,14 +119,14 @@ export const handleGetTransactions = (data, dataSetterObj) => {
     dataSetterObj.settxData(data.data.data);
     dataSetterObj.settxVisualData(data.data.data);
 };
-export const handleSetAddressTags = (data, dataSetterObj) => {
-    console.log('SetAddressTags: ', data.data.data);
+// export const handleSetAddressTags = (data, dataSetterObj) => {
+//     console.log('SetAddressTags: ', data.data.data);
     
-    //LOGIC GOES HERE...
+//     //LOGIC GOES HERE...
 
-    dataSetterObj.setAddressTags();
+//     dataSetterObj.setAddressTags();
     
-};
+// };
 
 // TEST FUNCTION
 export const handleAppendTransaction = (data) => {
@@ -161,6 +161,27 @@ export const handletxieErrorMessage = (data, dataSetterObj) => {
     console.log('txieErrorMessage: ', data);
 
 }
+export const handleGetBulkTagsRequest = (data, dataSetterObj) => {
+    if (data?.data?.data?.addressesTags) {
+        console.log('HANDLING GET BULK TAGS RESPONSE: ', data.data.data);
+
+        dataSetterObj.setElderCount(data.data.data.totalElderCount)
+        
+        // Transform the array of tag objects into an object keyed by address
+        const newAddressesTags = data.data.data.addressesTags.reduce((acc, tagObj) => {
+            acc[tagObj.address] = tagObj;
+            return acc;
+        }, {});
+
+        // Update the existing addressTags with the new data
+        dataSetterObj.setAddressTags(prevAddressesTags => ({
+            ...prevAddressesTags,
+            ...newAddressesTags
+        }));
+    } else {
+        console.log('Malformed bulk tags response from the apigw: ', data);
+    }
+};
 
 
 //when a new TX comes in, or we need to feed the TX to the client 
