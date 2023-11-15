@@ -37,15 +37,10 @@ Very alpha and in active development.
 5. The backend of this project is containerized and managed via Docker.
 
 
-<sub>( Feature rich web ui with live data updates )</sub>
+<sub>Feature rich web ui with live data updates </sub>
 ![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/90c54274-d9c0-44e2-bbc8-37271b0c9b10)
 
-
-
-
-<sub>( Address Summary stats, includes held tokens common to the existing database of watched addresses )</sub>
-
-<sub>( This will be good for stepping into a community and quickly seeing commonly held ERC20 tokens and patterns)</sub>
+<sub>Easily view crossover ERC20 tokens mutually held in your watched community</sub>
 ![image](https://user-images.githubusercontent.com/99688245/212493974-77cdc1bc-a1fe-44bd-83d6-2add1ebc87c5.png)
 
 <sub>Transaction Visualizer using react-force-graph to render transaction flows </sub>
@@ -53,8 +48,7 @@ Very alpha and in active development.
 
 
 
-
-<sub>( chainData.js ingestion engine fetching and caching blockchain token TXs to mongo )</sub>
+<sub>( chainData.js ingestion engine fetching and caching blockchain token TXs to mongo (old engine. to do: show new TX-Ingestion-Engine) )</sub>
 ![chainData_action](https://user-images.githubusercontent.com/99688245/202078438-05a839b5-f258-4e94-b2d3-f0d78301fea8.gif)
 
 
