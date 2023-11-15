@@ -37,8 +37,9 @@ Very alpha and in active development.
 5. The backend of this project is containerized and managed via Docker.
 
 
-<sub>( Feature rich front-end UI with live data updates )</sub>
-![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/ed7e346a-32d7-4f4a-b410-3f4336a26aff)
+<sub>( Feature rich web ui with live data updates )</sub>
+![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/90c54274-d9c0-44e2-bbc8-37271b0c9b10)
+
 
 
 
