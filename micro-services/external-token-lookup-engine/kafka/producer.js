@@ -22,7 +22,7 @@ const produceFinishedLookupRequest = async (eventData) => {
         { value: JSON.stringify(eventData) }
       ]
     });
-    console.log(`Sent Token Lookup Request event to Kafka: ${JSON.stringify(eventData)}`);
+    console.log(`Sent Token Lookup Request COMPLETION event to Kafka`); 
   } catch (error) {
     console.error(`Error producing STREAM token transfer event: ${error.message}`);
   }
