@@ -11,13 +11,26 @@ const timeAgo = new TimeAgo('en-US');
 const VolumeGraph = () => {
     const [data, setData] = useState([]);
     const { txData, txHashActionCache } = useContext(GeneralContext);
+    const { clickedToken } = useContext(GeneralContext);
+
+    const tokenDecimals = clickedToken?.data?.data?.detail_platforms?.ethereum?.decimal_place || 0;
+    const tokenPriceUSD = clickedToken?.data?.data?.market_data?.current_price?.usd  || 0;
+  
+
+
 
     useEffect(() => {
-        console.log('txHashActionCache: ', txHashActionCache);
-        const graphData = processTransactions();
-        setData(graphData);
+        if (txData && txHashActionCache){
+            const graphData = processTransactions();
+            setData(graphData);
+        }
     }, [txData, txHashActionCache]);
 
+
+    const formatToUSD = (value) => {
+        return `$${value.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+    };
+    
     const processTransactions = () => {
         // Sort transactions by block_timestamp
         const sortedTxData = [...txData].sort((a, b) => new Date(a.block_timestamp) - new Date(b.block_timestamp));
@@ -40,20 +53,27 @@ const VolumeGraph = () => {
             sellerVolume: 0,
         }));
 
+
+
         // Calculate stats for each transaction
         sortedTxData.forEach(tx => {
             const txDate = new Date(tx.block_timestamp);
             const segmentIndex = Math.min(Math.floor((txDate - startTime) / segmentSize), 9);
             const action = txHashActionCache[tx.transaction_hash];
+
+
+            const valueInTokens = parseInt(tx.value, 10) / (10 ** tokenDecimals); // Convert raw value to token amount
+            const valueInUSD = valueInTokens * tokenPriceUSD; // Convert token amount to USD
+
     
             if (action === 'BUY') {
                 segments[segmentIndex].uniqueBuyers.add(tx.from_address); // Add buyer
                 segments[segmentIndex].uniqueSellers.add(tx.to_address); // Add seller
-                segments[segmentIndex].buyerVolume += parseInt(tx.value, 10);
+                segments[segmentIndex].buyerVolume += valueInUSD;
             } else if (action === 'SELL') {
                 segments[segmentIndex].uniqueSellers.add(tx.from_address); // Add seller
                 segments[segmentIndex].uniqueBuyers.add(tx.to_address); // Add buyer
-                segments[segmentIndex].sellerVolume += parseInt(tx.value, 10);
+                segments[segmentIndex].sellerVolume += valueInUSD; // Add USD value instead of raw token value
             }
             // Add more conditions if there are other types of actions
         });
@@ -83,14 +103,14 @@ const VolumeGraph = () => {
             <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                 <XAxis dataKey="timestamp" stroke="#aaa" />
-                <YAxis yAxisId="left" stroke="#aaa" />
-                <YAxis yAxisId="right" orientation="right" stroke="#48cae4" />
-                <Tooltip />
+                <YAxis yAxisId="left" stroke="#fff" strokeDasharray="3 3"/>
+                <YAxis yAxisId="right" orientation="right" stroke="#fff"  tickFormatter={formatToUSD} />
+                <Tooltip contentStyle={{ backgroundColor: '#333', color: '#fff' }} />
                 <Legend />
-                <Line yAxisId="left" type="monotone" dataKey="unique_buyers" stroke="#ff7300" />
-                <Line yAxisId="right" type="monotone" dataKey="buyer_volume" stroke="#ff79ff" />
-                <Line yAxisId="left" type="monotone" dataKey="unique_sellers" stroke="#f6416c" />
-                <Line yAxisId="right" type="monotone" dataKey="seller_volume" stroke="#22cae4" />
+                <Line yAxisId="left" type="monotone" dataKey="unique_buyers" stroke="rgba(0,255,0,1)" strokeDasharray="5 5" />
+                <Line yAxisId="left" type="monotone" dataKey="unique_sellers" stroke="rgba(255,0,0,1)" strokeDasharray="5 5"/>
+                <Line yAxisId="right" type="monotone" dataKey="buyer_volume" stroke="rgba(100,255,100,1)" />
+                <Line yAxisId="right" type="monotone" dataKey="seller_volume" stroke="rgba(255,0,0,1)" />
             </LineChart>
         </ResponsiveContainer>
         

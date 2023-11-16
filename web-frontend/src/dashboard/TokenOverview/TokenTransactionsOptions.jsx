@@ -30,10 +30,13 @@ const TokenTransactionsOptions = () => {
     }
 
     return (
-        <div style={{paddingTop:'1vh', display:'flex', justifyContent:'center', alignItems:'center', position:'absolute', left:'0.95vw', top:'62vh', height:'35vh', width:'16vw', borderRadius:'0.25vw', border:'1px solid #f0f'}}>
+        <div style={{paddingTop:'1vh', display:'flex', justifyContent:'center', alignItems:'center', position:'absolute', left:'0.95vw', top:'62vh', height:'35vh', width:'16vw', borderRadius:'0.25vw', border:'1px solid rgba(200,200,255,0.3'}}>
+            <div style={{position:'absolute', top:'5%'}}>
+                Options Panel
+            </div>
             <div style={{display:'flex', alignItems:'center'}}>
                 <div className="summarizeButton" onClick={()=>{requestSummarizedTxs(txData)}}>
-                    Lookup TX Logs
+                    Fetch TX events
                 </div>  
                 <div >
                     <AutoLookupTxLogsSlider /> 

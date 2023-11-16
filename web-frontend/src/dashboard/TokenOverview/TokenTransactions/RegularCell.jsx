@@ -15,25 +15,22 @@ const RegularCell = (props) => {
   const { elderCount } = useContext(GeneralContext); 
   const { CacheFriendlyLabels } = useContext(GeneralContext);
 
-  const tokenDecimals = clickedToken?.data?.detail_platforms?.ethereum?.decimal_place || 18;
+  const tokenDecimals = clickedToken?.data?.detail_platforms?.ethereum?.decimal_place || 0;
   const tokenPriceUSD = clickedToken?.data?.data?.market_data?.current_price?.usd || 0;
 
   const adjustedValue = props.row.value / (10 ** clickedToken.data.data["detail_platforms"].ethereum["decimal_place"]);
   const formattedValue = commaNumber(adjustedValue.toFixed(4));
   const estimatedValueUSD = commaNumber(parseFloat(adjustedValue * tokenPriceUSD).toFixed(2));
 
-  useEffect(()=>{
-    console.log('row: ',row);
-  },[row])
+  // useEffect(()=>{
+  //   console.log('row: ',row);
+  // },[row])
 
-  const getElderRank = (address) => {
-    return addressTags[address]?.ElderRank || 'N/A';
-  };
-
+  
   const getTxFrequencyCount = (address) => {
     return addressTags[address]?.txFrequencyCount || 0;
   };
-
+  
   const normalizeTxFrequency = (address) => {
     const txCount = getTxFrequencyCount(address);
     // Assuming you have a maximum count for normalization. Adjust as needed.
@@ -43,6 +40,10 @@ const RegularCell = (props) => {
     return normalizedValue;
   };
   
+
+  const getElderRank = (address) => {
+    return addressTags[address]?.ElderRank || 'N/A';
+  };
   const getElderRankPercent = (address) => {
     const elderRank = getElderRank(address);
     if (!isNaN(elderRank) && elderCount) {

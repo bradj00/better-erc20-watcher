@@ -52,6 +52,7 @@ import WidgetPanelSocial from './WidgetPanel/WidgetPanelSocial';
 import TokenDetective from '../TokenDetective';
 import VolumeGraph from './StagePanel/VolumeGraph';
 import TokenTransactionsOptions from './TokenTransactionsOptions';
+import EldersPanelStats from './WidgetPanel/ElderPanelStats';
 
 
 // TimeAgo.addDefaultLocale(en);
@@ -361,8 +362,8 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
   return lpHeldCount;
 }
 
-const [activeWidgetTab, setActiveWidgetTab] = useState('Stats');
-const [activeStageTab, setActiveStageTab] = useState('Visualizer');
+const [activeWidgetTab, setActiveWidgetTab] = useState('Elders');
+const [activeStageTab, setActiveStageTab] = useState('Volume');
 
   return (
     <div style={{width:'100%', position:'absolute', border:'0px solid #ff0'}}>
@@ -404,11 +405,13 @@ const [activeStageTab, setActiveStageTab] = useState('Visualizer');
             }}
           > 
            <div className="tabs-widget-container">
-                <div className={activeWidgetTab === 'Stats' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Stats')}>Stats</div>
+                <div className={activeWidgetTab === 'Elders'       ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Elders')}>Elders</div>
+                <div className={activeWidgetTab === 'Stats'        ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Stats')}>Stats</div>
                 <div className={activeWidgetTab === 'Distribution' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Distribution')}>Distribution</div>
-                <div className={activeWidgetTab === 'Social' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Social')}>Social</div>
+                <div className={activeWidgetTab === 'Social'       ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Social')}>Social</div>
             </div>
 
+            {activeWidgetTab === 'Elders' && <EldersPanelStats />}
             {activeWidgetTab === 'Stats' && <WidgetPanelStats />}
             {activeWidgetTab === 'Distribution' && <WidgetPanelDistribution />}
             {activeWidgetTab === 'Social' && <WidgetPanelSocial />}
@@ -418,15 +421,15 @@ const [activeStageTab, setActiveStageTab] = useState('Visualizer');
 
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
               <div className="tabs-stage-container">
-                  <div className={activeStageTab === 'Visualizer' ? "tab active" : "tab"} onClick={() => setActiveStageTab('Visualizer')}>Visualizer</div>
                   <div className={activeStageTab === 'Volume' ? "tab active" : "tab"} onClick={() => setActiveStageTab('Volume')}>Volume</div>
+                  <div className={activeStageTab === 'Visualizer' ? "tab active" : "tab"} onClick={() => setActiveStageTab('Visualizer')}>Visualizer</div>
               </div>
 
 
               <div style={{position:'absolute', width:'100%', height:'50vh', border:'1px solid rgba(255,255,255,0.4)',  top:'1vh',borderRadius: '0.5vw',overflow:'hidden'}}>
                 
-                {activeStageTab === 'Visualizer' && <ForceGraphComponent />}
                 {activeStageTab === 'Volume' && <VolumeGraph />}
+                {activeStageTab === 'Visualizer' && <ForceGraphComponent />}
 
               </div>
 
