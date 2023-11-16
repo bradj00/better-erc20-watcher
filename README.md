@@ -68,7 +68,10 @@
 
 
 Some market data provided by CoinGecko! ❤️
+
 Some blockchain data provided by Infura! ❤️
+
 Some blockchain data provided by Etherscan! ❤️
+
 
 
