@@ -13,7 +13,7 @@ let db;
 const app = express();
 const PORT = 4000;
 
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGODB_URI;
 const DB_NAME = process.env.DB_NAME;
 const COLLECTION_NAME = process.env.COLLECTION_NAME;
 
