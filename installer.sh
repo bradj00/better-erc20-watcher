@@ -258,9 +258,13 @@ echo "Configuration updated and MongoDB restarted."
 cd ../../control-docker-compose/kafka
 docker-compose up -d
 
-cd ../project
-docker-compose up -d
-
 
 # Display the URL for the web frontend
-echo "\n\n\nSetup complete. You can access the web frontend at: https://$MONGO_IP:3000"
+echo "\n\n\n\n\n\nSetup complete. You can access the web frontend once the web ui launches at: https://$MONGO_IP:3000\n\n\n\n\n\n"
+
+
+cd ../project
+docker-compose up
+
+
+

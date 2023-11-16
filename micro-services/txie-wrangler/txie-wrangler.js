@@ -5,7 +5,7 @@ require('dotenv').config({ path: './.env' });
 const { MongoClient } = require('mongodb');
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = process.env.DB_NAME;
+const DB_NAME = process.env.TXIE_WRANGLER_DB_NAME;
 
 const client = new MongoClient(MONGODB_URI);
 
