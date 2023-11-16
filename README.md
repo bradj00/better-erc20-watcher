@@ -1,20 +1,26 @@
-# better-erc20-watcher
+![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/bf78e4a8-2828-48b9-bb4f-ac487db26550)
+<div align="center">
+    
+    Watch ERC-20 transactions live.
+
+    Categorize on-chain actions and give friendly labels to addresses.
+
+    Step into an ERC-20 community and rapidly gain analytical insight.
+
+    Pet project in active development. Contributors welcomed.
+</div>
+
+
+
+
 ![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/53669b13-6af8-4915-a7b2-b7d70b0d4b12)
 
-
-Watch ERC-20 transactions live. 
-
-Categorize on-chain actions and give friendly labels to addresses.
-
-Step into a tokenized community and rapidly gain analytical insight.
-
-Very alpha and in active development.
 
 ## Requirements:
 
 - Ubuntu (tested on)
 - Chrome (tested on)
-- Node.js
+- Node.js v20
 - MongoDB
 - Docker
 - API keys for enabling data retrieval from third-party services (Infura, Coingecko, Etherscan, etc.)
@@ -40,10 +46,6 @@ Very alpha and in active development.
 5. The backend of this project is containerized and managed via Docker.
 
 
-<sub>Feature rich web ui with live data updates </sub>
-
-
-
 <sub>Easily view crossover ERC20 tokens mutually held in your watched community</sub>
 ![image](https://user-images.githubusercontent.com/99688245/212493974-77cdc1bc-a1fe-44bd-83d6-2add1ebc87c5.png)
 
@@ -52,17 +54,19 @@ Very alpha and in active development.
 
 
 
-<sub>( chainData.js ingestion engine fetching and caching blockchain token TXs to mongo (old engine. to do: show new TX-Ingestion-Engine) )</sub>
+<sub>legacy chainData.js ingestion engine fetching and caching blockchain token TXs to mongo (to do: show new TX-Ingestion-Engine) </sub>
 ![chainData_action](https://user-images.githubusercontent.com/99688245/202078438-05a839b5-f258-4e94-b2d3-f0d78301fea8.gif)
 
 
-<sub>( translator.js service querying OpenSea api for human readable name and caching to mongo )</sub>
+<sub>legacy translator.js service querying OpenSea api for public identitites (to do: show new Tagging-Engine)</sub>
 ![image](https://user-images.githubusercontent.com/99688245/202107232-82cb591c-a2cf-423a-b455-df82a6be85a0.png)
 
 
 
 
 
-(Some Market Data provided by CoinGecko! Backlink to be added in webUI.)
+Some market data provided by CoinGecko! ♥
+Some blockchain data provided by Infura! ♥
+Some blockchain data provided by Etherscan! ♥
 
 
