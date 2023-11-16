@@ -245,5 +245,8 @@ echo "Configuration updated and MongoDB restarted."
 
 
 # attempt to start the docker-compose.yml group
-cd ../../
-docker-compose up 
+cd ../../control-docker-compose/kafka
+docker-compose up -d
+
+cd ../project
+docker-compose up -d
