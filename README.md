@@ -67,11 +67,11 @@
 
 
 
-Some market data provided by CoinGecko! ❤️
+Some market data provided by CoinGecko! ❤️<br>
 
-Some blockchain data provided by Infura! ❤️
+Some blockchain data provided by Infura! ❤️<br>
 
-Some blockchain data provided by Etherscan! ❤️
+Some blockchain data provided by Etherscan! ❤️<br>
 
 
 
