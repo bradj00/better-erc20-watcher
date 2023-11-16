@@ -135,7 +135,7 @@ const RegularCell = (props) => {
 
 
         <div style={{position:'absolute', left:'13vw', top:'22%', width:'6%', display:'flex', justifyContent:'center', border:'0px solid #0ff'}}>
-            <DetermineTxAction from={row.from_address} to={row.to_address} />
+            <DetermineTxAction from={row.from_address} to={row.to_address} txHash={row.transaction_hash} />
         </div>
 
 

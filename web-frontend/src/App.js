@@ -36,6 +36,7 @@ const [elderCount, setElderCount] = useState(); //count of total addresses inter
 const [uniqueContractAddresses, setUniqueContractAddresses] = useState([]); 
 
 const [areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded] = useState({});
+const [txHashActionCache, settxHashActionCache,] = useState({});
 
 
 
@@ -182,7 +183,7 @@ const txIngestionEngine = {
 const contextObj = {
   ServicesErrorMessages, setServicesErrorMessages,
 
-
+  txHashActionCache, settxHashActionCache,
   elderCount, setElderCount,
   addressTags, setAddressTags,
   txData, settxData,

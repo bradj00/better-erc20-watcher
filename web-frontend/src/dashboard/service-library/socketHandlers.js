@@ -166,7 +166,7 @@ export const handleGetBulkTagsRequest = (data, dataSetterObj) => {
         console.log('HANDLING GET BULK TAGS RESPONSE: ', data.data.data);
 
         dataSetterObj.setElderCount(data.data.data.totalElderCount)
-        
+
         // Transform the array of tag objects into an object keyed by address
         const newAddressesTags = data.data.data.addressesTags.reduce((acc, tagObj) => {
             acc[tagObj.address] = tagObj;
@@ -184,7 +184,6 @@ export const handleGetBulkTagsRequest = (data, dataSetterObj) => {
 };
 
 
-//when a new TX comes in, or we need to feed the TX to the client 
 export const handleAppendTransactions = (data, dataSetterObj, txData) => {
     console.log('AppendTransactions: ', data);
     console.log('AppendTransactions2: ', txData);
@@ -199,14 +198,14 @@ export const handleAppendTransactions = (data, dataSetterObj, txData) => {
     // If the transaction already exists, no further processing is needed.
     if (transactionExists) return;
 
-    // Extract unique addresses from the new transaction.
-    // const uniqueAddresses = [newTransaction.from_address, newTransaction.to_address];
-
-    // Update address cache request with new unique addresses.
-    // dataSetterObj.setCacheFriendlyLabelsRequest(uniqueAddresses);
-    
     // Append the new transaction to the existing txData and update state.
     const updatedTxData = [newTransaction, ...txData];
-    dataSetterObj.settxData(updatedTxData); 
-    dataSetterObj.settxVisualData(updatedTxData);
+
+    // Clip off the oldest entries, keeping the size of txData to a maximum of 200
+    const clippedTxData = updatedTxData.slice(0, 200);
+
+    // Update the state with the clipped data
+    dataSetterObj.settxData(clippedTxData); 
+    dataSetterObj.settxVisualData(clippedTxData);
 };
+
