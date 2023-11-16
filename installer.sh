@@ -137,6 +137,10 @@ DB_NAME=watchedTokens
 DB_NAME_FN=friendlyNames
 COLLECTION_NAME=tokens
 API_LISTEN_PORT=4000
+
+COINGECKO_DB_NAME=coingecko_tokens
+COINGECKO_TOKENS_COLLECTION_NAME=tokens
+
 HTTPS=true
 SSL_CRT_FILE=./certs/cert.pem
 EOL
