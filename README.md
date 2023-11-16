@@ -1,4 +1,7 @@
 # better-erc20-watcher
+![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/53669b13-6af8-4915-a7b2-b7d70b0d4b12)
+
+
 Watch ERC-20 transactions live. 
 
 Categorize on-chain actions and give friendly labels to addresses.
@@ -38,7 +41,8 @@ Very alpha and in active development.
 
 
 <sub>Feature rich web ui with live data updates </sub>
-![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/90c54274-d9c0-44e2-bbc8-37271b0c9b10)
+
+
 
 <sub>Easily view crossover ERC20 tokens mutually held in your watched community</sub>
 ![image](https://user-images.githubusercontent.com/99688245/212493974-77cdc1bc-a1fe-44bd-83d6-2add1ebc87c5.png)
