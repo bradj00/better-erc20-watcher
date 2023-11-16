@@ -108,6 +108,11 @@ function DashboardContent() {
         // Create a set of all unique node IDs that are present in the newLinks array
         const linkedNodeIds = new Set();
         newLinks.forEach(link => {
+            if (!link || !link.source || !link.target) {
+                console.error("Invalid link data", link);
+                return; // Skip this iteration
+            }
+
             linkedNodeIds.add(link.source.id);
             linkedNodeIds.add(link.target.id);
         });
@@ -152,6 +157,12 @@ function DashboardContent() {
         let min = Infinity;
     
         links.forEach(link => {
+
+            if (!link || !link.source || !link.target) {
+                console.error("Invalid link data", link);
+                return; // Skip this iteration
+            }
+
             if (link.value > max) max = link.value;
             if (link.value < min) min = link.value;
         });
@@ -169,6 +180,12 @@ function DashboardContent() {
     
     function getUniqueAddysForVisualizer(data) {
         let temp = { nodes: [], links: [] };
+    
+        if (!data || !Array.isArray(data)) {
+            console.error("Invalid data provided to getUniqueAddysForVisualizer", data);
+            return temp;
+        }
+    
         for (let i = 0; i < data.length; i++) {
             let from_address = data[i].from_address;
             let from_address_friendlyName = data[i].from_address_friendlyName;
@@ -176,9 +193,13 @@ function DashboardContent() {
             let to_address_friendlyName = data[i].to_address_friendlyName;
             let from_address_exists = false;
             let to_address_exists = false;
-            // let txValue = web3.utils.fromWei(data[i].value, 'ether');
-            let txValue = 555
-
+            let txValue = 555; // example value, replace with actual logic
+    
+            if (!from_address || !to_address || !from_address_friendlyName || !to_address_friendlyName) {
+                console.error("Invalid address data", data[i]);
+                continue; // Skip this iteration if necessary data is missing
+            }
+    
             for (let j = 0; j < temp.nodes.length; j++) {
                 if (temp.nodes[j].id === from_address_friendlyName) {
                     from_address_exists = true;
@@ -187,12 +208,12 @@ function DashboardContent() {
                     to_address_exists = true;
                 }
             }
+    
             const fromGroupColor = determineGroup(from_address, TxSummaryData);
             const toGroupColor = determineGroup(to_address, TxSummaryData);
             const fromRadius = computeNodeRadius(from_address, TxSummaryData);
             const toRadius = computeNodeRadius(to_address, TxSummaryData);
     
-
             if (!from_address_exists) {
                 temp.nodes.push({
                     id: displayAddressFN(from_address_friendlyName),
@@ -212,26 +233,29 @@ function DashboardContent() {
                 });
             }
             if (displayAddressFN(from_address_friendlyName) && displayAddressFN(to_address_friendlyName)) {
-                temp.links.push({ source: displayAddressFN(from_address_friendlyName), target: displayAddressFN(to_address_friendlyName), value: txValue});
+                temp.links.push({
+                    source: displayAddressFN(from_address_friendlyName),
+                    target: displayAddressFN(to_address_friendlyName),
+                    value: txValue
+                });
             }
-            temp.nodes = temp.nodes.filter((thing, index, self) =>
-                index === self.findIndex((t) => (
-                    t.id === thing.id
-                ))
-            )
         }
-        const { max, min } = getMaxMinLinkValue(temp.links);       
-        // Adjust link width based on its value
+    
+        temp.nodes = temp.nodes.filter((thing, index, self) =>
+            index === self.findIndex((t) => (
+                t.id === thing.id
+            ))
+        );
+    
+        const { max, min } = getMaxMinLinkValue(temp.links);
         temp.links = temp.links.map(link => ({
             ...link,
             width: computeLinkWidth(link.value, max, min)
         }));
-
-        
-
-        
+    
         return temp;
     }
+    
 
     useEffect(() => { 
         let dataToSet;
