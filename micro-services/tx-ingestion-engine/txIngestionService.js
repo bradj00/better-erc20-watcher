@@ -41,12 +41,12 @@ async function checkAndCreateCollection(contractAddress) {
     const collectionName = `a_${contractAddress}`;
     const db = client.db(DB_NAME);
 
-    const collectionExists = await db.listCollections({ name: collectionName }).hasNext();
+    const collectionExists = await db.listCollections({ name: collectionName }, { limit: 1 }).hasNext();
 
     if (!collectionExists) {
-        console.log(`Collection ${collectionName} does not exist. Creating with 'isSyncing: true'...`);
+        console.log(`Collection ${collectionName} does not exist. Creating...`);
         await db.createCollection(collectionName);
-        await db.collection(collectionName).insertOne({ isSyncing: true });
+        // Removed the line that inserted the initial document
     } else {
         console.log(`Collection ${collectionName} already exists.`);
     }
