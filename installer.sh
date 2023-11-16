@@ -171,38 +171,50 @@ echo "Self-signed certificate and key have been generated and placed in ./certs/
 echo "\t✓ building web-frontend docker image"
 cd web-frontend
 cp ../certs/* ./certs/
-docker build -t better-erc20-watcher/react-app:latest .
+docker build -t better-erc20-watcher/react-app .
 
 echo "\t✓ building api-gateway docker image"
 cd ../micro-services/api-gateway
 cp ../../certs/* ./certs/
 cp ../../.env .
-docker build -t better-erc20-watcher/api-gateway:latest .
+docker build -t better-erc20-watcher/api-gateway .
+
+echo "\t✓ building compound-tx-summarizer docker image"
+cd ../micro-services/compound-tx-summarizer
+cp ../../certs/* ./certs/
+cp ../../.env .
+docker build -t better-erc20-watcher/compound-tx-summarizer .
+
+echo "\t✓ building tagging-engine docker image"
+cd ../micro-services/tagging-engine
+cp ../../certs/* ./certs/
+cp ../../.env .
+docker build -t better-erc20-watcher/tagging-engine .
 
 echo "\t✓ building tx-ingestion-engine docker image"
 cd ../tx-ingestion-engine
 cp ../../.env .
-docker build -t better-erc20-watcher/tx-ingestion-engine:latest .
+docker build -t better-erc20-watcher/tx-ingestion-engine .
 
 echo "\t✓ building labeling-engine docker image"
 cd ../labeling-engine
 cp ../../.env .
-docker build -t better-erc20-watcher/labeling-engine:latest .
+docker build -t better-erc20-watcher/labeling-engine .
 
 echo "\t✓ building txie-wrangler docker image"
 cd ../txie-wrangler
 cp ../../.env .
-docker build -t better-erc20-watcher/txie-wrangler:latest .
+docker build -t better-erc20-watcher/txie-wrangler .
 
 echo "\t✓ building master-rate-limiter docker image"
 cd ../master-rate-limiter
 cp ../../.env .
-docker build -t better-erc20-watcher/master-rate-limiter:latest .
+docker build -t better-erc20-watcher/master-rate-limiter .
 
 echo "\t✓ building external-token-lookup-engine docker image"
 cd ../external-token-lookup-engine
 cp ../../.env .
-docker build -t better-erc20-watcher/external-token-lookup-engine:latest .
+docker build -t better-erc20-watcher/external-token-lookup-engine .
 
 
 #optionally prune images at the end

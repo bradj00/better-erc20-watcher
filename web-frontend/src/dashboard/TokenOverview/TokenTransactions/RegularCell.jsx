@@ -6,6 +6,7 @@ import TagIcon from '@mui/icons-material/Tag'; // Ensure you have imported this 
 import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff'; // Ensure you have imported this icon
 import frequencyIcon from '../../images/frequency.png';
 import freshness from '../../images/freshness.png';
+import DetermineTxAction from './DetermineTxAction';
 
 const RegularCell = (props) => {
   const { row, timeAgo } = props;
@@ -93,7 +94,7 @@ const RegularCell = (props) => {
   return (
     <div style={{ position: 'relative',  backgroundColor: 'rgba(50,50,65,0.5)', borderRadius: '5px', padding: '0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'right', width: '100%', border: '1px solid rgba(100,10,60,0.6)', marginBottom:'0.2vw', }}>
       <div style={{display:'flex', justifyContent:'center', textAlign:'center', position:'absolute',top:'0',left:'0',width:'5%',height:'2.7vh',backgroundColor:'rgba(100,10,60,0.3)',color:'#fff', padding:'0.15vw', borderRadius:'0 0 0.15vw 0'}}>
-        P2P
+        Stub
       </div>
 
       <div style={{ position:'absolute', left:'12%', top:'2%', border:'0px solid #0f0', height:'100%', width:'2%'}}>
@@ -131,19 +132,16 @@ const RegularCell = (props) => {
           {commaNumber(row.block_number)}
         </div> */}
         <div></div>
-        <div style={{position:'absolute', left:'13vw', top:'10%', width:'6%', display:'flex', justifyContent:'center', border:'1px solid #0ff'}}>
-            <div>
-              <div style={{ textDecoration: 'underline', fontSize:'0.5vw' }}>Action</div>
-              <div>
-                BUY
-              </div>
-            </div>
+
+
+        <div style={{position:'absolute', left:'13vw', top:'22%', width:'6%', display:'flex', justifyContent:'center', border:'0px solid #0ff'}}>
+            <DetermineTxAction from={row.from_address} to={row.to_address} />
         </div>
 
 
         <div>${estimatedValueUSD}</div>
 
-        <div style={{marginTop:'-0.5vw', marginBottom:'0.5vw'}}>
+        <div title={row.from_address} style={{marginTop:'-0.5vw', marginBottom:'0.5vw'}}>
           {CacheFriendlyLabels[row.from_address]?.manuallyDefined || getEllipsisTxt(row.from_address, 6)}
           
           <div title="FRESHNESS: indicates on slider how early this address started interacting with the contract" style={{display:'flex', width:'100%', position:'relative',}}>
@@ -157,7 +155,7 @@ const RegularCell = (props) => {
           </div>
 
         </div>
-        <div style={{marginTop:'-0.5vw'}}>
+        <div title={row.to_address}  style={{marginTop:'-0.5vw'}}>
           {CacheFriendlyLabels[row.to_address]?.manuallyDefined || getEllipsisTxt(row.to_address, 6)}
           <div title="FRESHNESS: indicates on slider how early this address started interacting with the contract" style={{display:'flex', width:'100%', position:'relative',}}>
             <img src={freshness} style={{width:'6%',position:'absolute', top:'-50%', left:'-12%', }}></img>
