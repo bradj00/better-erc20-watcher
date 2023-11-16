@@ -7,7 +7,9 @@
 
     Step into an ERC-20 community and rapidly gain analytical insight.
 
-    Pet project in active development. Contributors welcomed.
+    Cache analyzed data to your local database.
+
+    Pet project in active development. Contributors welcomed.❤️
 </div>
 
 
@@ -65,8 +67,11 @@
 
 
 
-Some market data provided by CoinGecko! ♥
-Some blockchain data provided by Infura! ♥
-Some blockchain data provided by Etherscan! ♥
+Some market data provided by CoinGecko! ❤️<br>
+
+Some blockchain data provided by Infura! ❤️<br>
+
+Some blockchain data provided by Etherscan! ❤️<br>
+
 
 
