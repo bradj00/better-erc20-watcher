@@ -110,6 +110,11 @@ fi
 echo ""
 read -p "What is your Infura API key? This can be changed later from the web UI: " INFURA_API_KEY
 
+# Prompt for Etherscan API key
+echo ""
+read -p "What is your Etherscan API key? This can be changed later from the web UI: " ETHERSCAN_API_KEY
+
+
 # Determine the bound IPs of the host
 IP_ADDRESSES=$(hostname -I | tr ' ' '\n')
 
@@ -126,6 +131,7 @@ INFURA_WS_ENDPOINT_URL=wss://mainnet.infura.io/ws/v3/$INFURA_API_KEY
 MONGODB_URI=mongodb://$MONGO_IP:27017
 REDIS_URL=redis://$REDIS_IP:6379
 MONGO_CONNECT_STRING=mongodb://$MONGO_IP:27017
+ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY
 # Static configurations
 DB_NAME=watchedTokens
 DB_NAME_FN=friendlyNames
@@ -250,3 +256,7 @@ docker-compose up -d
 
 cd ../project
 docker-compose up -d
+
+
+# Display the URL for the web frontend
+echo "\n\n\nSetup complete. You can access the web frontend at: https://$MONGO_IP:3000"
