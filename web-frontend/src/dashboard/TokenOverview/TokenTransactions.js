@@ -93,6 +93,11 @@ export default function TokenTransactions() {
   const {TxHashDetailsObj} = useContext(GeneralContext);
 
   const getTimeAgoText = (timestamp) => {
+    if (!timestamp || isNaN(new Date(timestamp).getTime())) {
+      // Handle invalid or undefined timestamp
+      console.error("Invalid timestamp:", timestamp);
+      return "Invalid date";
+    }
     const date = new Date(timestamp);
     return timeAgo.format(date);
   };
