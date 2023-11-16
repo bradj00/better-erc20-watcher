@@ -35,6 +35,26 @@ if (!ERC20_CONTRACT_ADDRESS) {
     process.exit(1);
 }
 
+
+
+async function checkAndCreateCollection(contractAddress) {
+    const collectionName = `a_${contractAddress}`;
+    const db = client.db(DB_NAME);
+
+    const collectionExists = await db.listCollections({ name: collectionName }).hasNext();
+
+    if (!collectionExists) {
+        console.log(`Collection ${collectionName} does not exist. Creating with 'isSyncing: true'...`);
+        await db.createCollection(collectionName);
+        await db.collection(collectionName).insertOne({ isSyncing: true });
+    } else {
+        console.log(`Collection ${collectionName} already exists.`);
+    }
+}
+
+
+
+
 async function getLatestBlockFromMongo(contractAddress) {
     const collectionName = `a_${contractAddress}`;
     const collection = client.db(DB_NAME).collection(collectionName);
@@ -398,7 +418,7 @@ function initKafkaProducer(){
 (async () => {
     await connectToMongo();
     await initKafkaProducer();
-
+    await checkAndCreateCollection(ERC20_CONTRACT_ADDRESS);
 
     //test error message generation to kafka
     // setInterval(()=>{
