@@ -201,10 +201,10 @@ function DashboardContent() {
             }
     
             for (let j = 0; j < temp.nodes.length; j++) {
-                if (temp.nodes[j].id === from_address_friendlyName) {
+                if (temp.nodes[j]?.id === from_address_friendlyName) {
                     from_address_exists = true;
                 }
-                if (temp.nodes[j].id === to_address_friendlyName) {
+                if (temp.nodes[j]?.id === to_address_friendlyName) {
                     to_address_exists = true;
                 }
             }
@@ -319,7 +319,7 @@ function DashboardContent() {
                 linkHoverPrecision={10}
                 backgroundColor="rgba(5,5,8,1)"
                 nodeLabel={function (d) {
-                    return "<div style='color: #111; background-color: #999; border: 1px solid rgba(255,255,255,0.5); border-radius:0.5vh; padding:0.5vh'; text-align:center><span class='label'>Name: " + d.id + "<br />...</span></div>";
+                    return "<div style='color: #111; background-color: #999; border: 1px solid rgba(255,255,255,0.5); border-radius:0.5vh; padding:0.5vh'; text-align:center><span class='label'>Name: " + d?.id + "<br />...</span></div>";
                 }}
 
                 nodeThreeObject={(node) => {
