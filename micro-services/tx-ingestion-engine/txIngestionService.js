@@ -1,6 +1,6 @@
 console.clear();
 
-const { initProducer, produceTokenTransferEvent, produceTokenTransferStreamEvent, produceErrorEvent } = require('./kafka/producer.js');
+const { initProducer, produceTokenTransferEvent, producefullTxDetailsArrived, produceTokenTransferStreamEvent, produceErrorEvent } = require('./kafka/producer.js');
 
 
 
@@ -17,6 +17,12 @@ const INFURA_ENDPOINT = process.env.INFURA_ENDPOINT_URL;
 const INFURA_WS_ENDPOINT = process.env.INFURA_WS_ENDPOINT_URL;
 const ERC20_CONTRACT_ADDRESS = process.env.ERC20_CONTRACT_ADDRESS;
 const web3 = new Web3(INFURA_ENDPOINT);
+
+const MASTER_RATE_LIMITER_URL_ETHERSCAN = 'http://master-rate-limiter:4000/request/etherscan'; // Adjust as needed
+const ETHERSCAN_BASE_URL = 'https://api.etherscan.io/api'; // Adjust as needed
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
+const RATE_LIMIT_DELAY = 250; // Adjust as needed
+
 
 const SKIP_RESET_COUNTER = 20;
 const THROTTLE_MS = 300;
@@ -358,6 +364,9 @@ async function listenToNewBlocks(contractAddress) {
             for (const transfer of transfers) {
                 console.log(chalk.underline('INSERTING TX INTO MONGO: '),transfer)
                 await insertTransferToMongo(transfer);
+
+                console.log(chalk.underline('QUEUED TX TO GATHER FULL DETAILS: '))
+                processTransactionQueue(transfer.raw.transactionHash)
             }
         }
     });
@@ -412,6 +421,102 @@ function initKafkaProducer(){
 
 
 
+var PENDING_JOBS = [];
+
+
+//producefullTxDetailsArrived({
+    //            transaction:  <TRANSACTION_OBJECT_FROM_ETHERSCAN>,
+    //         })
+async function processTransactionQueue(newTxHash) {
+    // console.log('Initiating transaction processing for TX HASH:', newTxHash);
+
+    // Add the new transaction hash to the queue
+    PENDING_JOBS.push(newTxHash);
+    // console.log('Transaction hash added to processing queue:', newTxHash);
+
+    const processTxHash = async (txHash) => {
+    //   console.log('Starting processing of transaction hash:', txHash);
+      try {
+        // Accessing the MongoDB collection
+        // console.log('Accessing MongoDB collection');
+        const collection = client.db('tx-hash-details').collection('details');
+        console.log('\t> Checking for cached transaction hash:', txHash);
+        const cachedTx = await collection.findOne({ transactionHash: txHash });
+  
+        if (cachedTx) {
+          console.log(`\t> Found cached transaction hash, skipping processing: ${txHash}`);
+          return;
+        } else {
+          console.log(`\t> No cache found for transaction hash: ${txHash}, proceeding with processing`);
+        }
+  
+        console.log('\t> Requesting rate limiter status for Etherscan API');
+        const rateLimiterResponse = await axios.get(MASTER_RATE_LIMITER_URL_ETHERSCAN);
+        console.log('\t> Rate limiter response received:', rateLimiterResponse.data.status);
+  
+        if (rateLimiterResponse.data.status === 'GRANTED') {
+            console.log('\t> Rate limit status granted. Fetching transaction details from Etherscan for:', txHash);
+            const etherscanURL = `${ETHERSCAN_BASE_URL}?module=proxy&action=eth_getTransactionReceipt&txhash=${txHash}&apikey=${ETHERSCAN_API_KEY}`;
+            const response = await axios.get(etherscanURL);
+    
+            if (response.data && response.data.result) {
+              console.log('\t> Transaction data received from Etherscan:', response.data.result);
+              // Insert response into MongoDB
+              const filter = { transactionHash: txHash };
+              const update = {
+                $set: {
+                  transactionHash: txHash,
+                  transactionData: response.data.result
+                }
+              };
+              const options = { upsert: true };
+    
+              await collection.updateOne(filter, update, options);
+              console.log(`\t> Transaction data for hash ${txHash} successfully upserted into the database`);
+  
+              // Send transaction data to Kafka
+              console.log('\t> Sending transaction data to Kafka for:', txHash);
+              producefullTxDetailsArrived({ transaction: response.data.result });
+  
+            } else {
+              console.log(`\t> No data received from Etherscan for transaction hash: ${txHash}`);
+            }
+  
+          console.log('\t> Applying rate limit delay');
+          await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY));
+        } else {
+          console.log(`\t> Rate limit exceeded for transaction hash: ${txHash}, re-queuing the job`);
+          PENDING_JOBS.push(txHash); // Re-queue the job if rate limit is exceeded
+        }
+      } catch (error) {
+        console.error('\t> Error encountered during processing of txHash:', txHash, 'Error:', error);
+      }
+    };
+  
+    console.log('Starting to process transaction hashes in the queue. Queue length:', PENDING_JOBS.length);
+    // Process each transaction hash in the queue
+    while (PENDING_JOBS.length > 0) {
+      const currentTxHash = PENDING_JOBS.shift();
+      console.log('Processing next transaction hash in the queue:', currentTxHash);
+      await processTxHash(currentTxHash);
+    }
+    console.log('Completed processing of transaction queue.');
+}
+
+  
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
 
 
 
@@ -439,3 +544,5 @@ function initKafkaProducer(){
     await processBlocks(ERC20_CONTRACT_ADDRESS);
     await listenToNewBlocks(ERC20_CONTRACT_ADDRESS);
 })();
+
+

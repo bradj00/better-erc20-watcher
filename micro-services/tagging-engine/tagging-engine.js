@@ -9,6 +9,7 @@
 console.clear();
 
 const { initProducer,  produceErrorEvent } = require('./kafka/producer.js');
+const { initConsumer } = require('./kafka/consumer.js');
 
 
 require('dotenv').config({ path: './.env' });
@@ -37,23 +38,13 @@ client.on("close", () => {
 
 (async () => {
     await connectToMongo();
+    await initKafkaConsumer(client);
+    
+    //currently blocking anything below this line...fix
     await processERC20Transactions(); // New function call to process transactions
 
-    // await initKafkaProducer();
-    // await initKafkaConsumer();
 
 
-
-    // // Step 1: Assign queue numbers
-    // await assignQueueNumbers();
-
-    // // Step 2: Process the addresses
-    // await processAddresses();
-
-    // // Step 3: Continuous check
-    // setInterval(async () => {
-    //     await checkForUnprocessedAddresses();
-    // }, ADDRESS_QUEUE_INTERVAL);
 
 })();
 
@@ -112,7 +103,7 @@ async function checkForUnprocessedAddresses() {
 async function connectToMongo() {
     try {
         await client.connect();
-        console.log("Connected to MongoDB");
+        // console.log("Connected to MongoDB");
     } catch (error) {
         console.error("Error connecting to MongoDB:", error);
     }

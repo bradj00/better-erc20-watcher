@@ -8,7 +8,7 @@ module.exports = {
     CacheFriendlyLabelsRequest: async function(addresses, callback) {
         try {
             console.log('--------------------');
-            const mongoDatabase = db.getDb('friendlyNames'); // replace with your actual MongoDB name
+            const mongoDatabase = db.getDb('friendlyNames'); 
             const mongoCollection = mongoDatabase.collection('lookup'); // replace with your actual collection name
     
             const fetchFromMongo = async (address) => {
@@ -89,19 +89,14 @@ module.exports = {
     },
     GetTransactions: async function(parameters, callback) {
         try {
-            console.log('trying to get transactions:', parameters);
+            console.log('Starting ERC20 transaction lookup:', parameters);
             
-            // Prefix 'a_' to the token address to get the collection name
+            // Access 'watchedTokens' database
+            const watchedTokensDb = db.getDb('watchedTokens');
             const collectionName = 'a_' + parameters.tokenAddress;
-        
-            // Access the collection within the 'watchedTokens' database
-            const database = db.getDb('watchedTokens');
-            const collection = database.collection(collectionName);
-        
-            // Build the base query
-            let query = {};
+            const watchedTokensCollection = watchedTokensDb.collection(collectionName);
     
-            // If both dateFrom and dateTo are provided, add the date constraints to the query
+            let query = {};
             if (parameters.dateFrom && parameters.dateTo) {
                 query.block_timestamp = {
                     $gte: new Date(parameters.dateFrom),
@@ -109,26 +104,49 @@ module.exports = {
                 };
             }
     
-            // Fetch transactions based on the query, sort by block_number in descending order, limit to 100, and offset as provided
-            const transactions = await collection
+            // Fetch stub transactions
+            console.log('Fetching stub transactions from collection:', collectionName);
+            const stubTransactions = await watchedTokensCollection
                     .aggregate([
                         { $match: query },
-                        {
-                            $addFields: {
-                                int_block_number: { $toInt: "$block_number" }
-                            }
-                        },
+                        { $addFields: { int_block_number: { $toInt: "$block_number" } } },
                         { $sort: { int_block_number: -1 } },
                         { $limit: 200 },
                         { $skip: parameters.offset }
                     ])
                     .toArray();
-        
-            if (transactions && transactions.length) {
-                callback({ status: 'success', data: transactions });
+            console.log('Retrieved stub transactions count:', stubTransactions.length);
+    
+            // Extract transaction hashes from stub transactions
+            const stubTxHashes = stubTransactions.map(tx => tx.transaction_hash);
+            console.log('Extracted transaction hashes for cross lookup:', stubTxHashes.length);
+    
+            // Access 'tx-hash-details' database
+            const txHashDetailsDb = db.getDb('tx-hash-details');
+            const detailsCollection = txHashDetailsDb.collection('details');
+    
+            // Fetch full transactions using stub transaction hashes
+            console.log('Performing cross lookup for full transaction details');
+            let fullTransactions = [];
+            if (stubTxHashes.length > 0) {
+                fullTransactions = await detailsCollection
+                        .find({ transactionHash: { $in: stubTxHashes } })
+                        .toArray();
+                console.log('Retrieved full transactions count:', fullTransactions.length);
             } else {
-                callback({ status: 'success', data: [], message: 'No transactions found' });
+                console.log('No transaction hashes available for cross lookup');
             }
+    
+            // Prepare and send the response
+            let response = {
+                status: 'success',
+                data: stubTransactions,
+                fullTxData: fullTransactions
+            };
+            if (stubTransactions.length === 0) {
+                response.message = 'No transactions found';
+            }
+            callback(response);
         
         } catch (error) {
             console.error("Error fetching transactions:", error);
@@ -136,6 +154,53 @@ module.exports = {
         }
     },
     
+    
+
+    // get full transactions (from Etherscan scrape) (infura gives initial erc20 txs. etherscan gives tx_hash detailed lookups)
+    GetFullTransactions: async function(parameters, callback) {
+        try {
+            console.log('Fetching full transaction details for specified hashes:', parameters.txHashes);
+    
+            // Access the 'details' collection in the 'tx-hash-details' database
+            const database = db.getDb('tx-hash-details');
+            const collection = database.collection('details');
+    
+            // Build the query to fetch transactions for the specified hashes
+            let query = {};
+            if (parameters.txHashes && parameters.txHashes.length) {
+                query.transactionHash = { $in: parameters.txHashes };
+            } else {
+                return callback({ status: 'error', message: 'No transaction hashes provided' });
+            }
+    
+            // Fetch full transaction details based on the query
+            const fullTransactions = await collection
+                    .find(query)
+                    .sort({ 'transactionData.blockNumber': -1 }) // Sorting by block number
+                    .toArray();
+    
+            // Determine which hashes were not found in the database
+            const foundTxHashes = fullTransactions.map(tx => tx.transactionHash);
+            const missingTxHashes = parameters.txHashes.filter(hash => !foundTxHashes.includes(hash));
+    
+            // Prepare the callback response
+            let response = {
+                status: 'success',
+                data: fullTransactions,
+                missingHashes: missingTxHashes
+            };
+    
+            if (fullTransactions.length === 0) {
+                response.message = 'No full transactions found for provided hashes';
+            }
+    
+            callback(response);
+    
+        } catch (error) {
+            console.error("Error fetching full transactions:", error);
+            callback({ status: 'error', message: 'Internal Server Error' });
+        }
+    },
     
     
     

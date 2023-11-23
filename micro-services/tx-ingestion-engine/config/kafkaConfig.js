@@ -11,6 +11,7 @@ module.exports = {
     rawTransactions: 'raw-transactions',
     rawStreamedTransactions: 'raw-streamed-transactions',
     errorTopic: 'txie-errors',
+    fullTxDetailsArrived: 'full-tx-details-arrived',
   
     // If you require any additional configurations such as SSL, authentication, etc., you can add them here.
     // ssl: {},

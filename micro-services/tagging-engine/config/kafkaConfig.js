@@ -10,13 +10,16 @@ module.exports = {
     // errorTopic: 'txie-errors',
     rawTransactions: 'raw-transactions',
     rawStreamedTransactions: 'raw-streamed-transactions',
-    errorTopic: 'txie-errors',
+    // errorTopic: 'txie-errors',
+
+    // produced from tx-ingestion-engine when full transaction details have been pulled and cached from Etherscan API
+    fullTxDetailsArrived: 'full-tx-details-arrived',
   
     // If you require any additional configurations such as SSL, authentication, etc., you can add them here.
     // ssl: {},
     // sasl: { mechanism: 'plain', username: 'your-username', password: 'your-password' },
     
     // Consumer group for your microservice
-    consumerGroup: 'txie-consumer-group'
+    consumerGroup: 'tagging-engine'
   };
   

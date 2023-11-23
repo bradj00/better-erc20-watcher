@@ -30,33 +30,54 @@ module.exports = {
             callback({ status: 'error', message: 'Internal Server Error' });
         }
     },
-    GetBulkTagsRequest: async function(payload, callback) {
+    GetBulkTagsRequest : async function(payload, callback) {
         try {
-            // Connect to MongoDB collection
-            const database = db.getDb('watchedTokens-addressStats'); 
-            // eventually rename this db to watchedTokens-addressTags for continuity
-            
+            // Connect to MongoDB collections
+            const database = db.getDb('watchedTokens-addressStats');
+            const statsDatabase = db.getDb('address-tags');
+    
             if (!payload.collection) { 
                 console.log('ERROR: Collection not specified in payload\n-----\n', payload);  
+                callback({ status: 'error', message: 'Collection not specified in payload' });
                 return;
             }
     
-            const collection = database.collection(payload.collection); 
-            
+            const collection = database.collection(payload.collection);
+            const statsCollection = statsDatabase.collection('addresses');
+    
+            // Query for the tokens in the collection that match the addresses in payload.addresses
+            const query = { address: { $in: payload.addresses } };
+            const addressesTagsArr = await collection.find(query).toArray();
+            const addressStatsArr = await statsCollection.find(query).toArray();
+    
+            // Log query results for debugging
+            console.log('Addresses Tags Array:', addressesTagsArr);
+            console.log('Address Stats Array:', addressStatsArr);
+    
+            // Merging results from both collections
+            const mergedResults = payload.addresses.map(address => {
+                const tagInfo = addressesTagsArr.find(doc => doc.address === address) || {};
+                const statInfo = addressStatsArr.find(doc => doc.address === address) || {};
+    
+                // Resolve conflicts in merging (if any keys overlap, prefer data from statsCollection)
+                const merged = {...tagInfo, ...statInfo};
+    
+                // Log individual merges for debugging
+                console.log(`Merging for address ${address}:`, merged);
+    
+                return merged;
+            });
+    
             // Count total documents in the collection
             const totalElderCount = await collection.countDocuments();
     
-            // Look for the tokens in the collection that match the addresses in payload.addresses
-            const query = { address: { $in: payload.addresses } };
-            const addressesTagsArr = await collection.find(query).toArray();
-            
-            // Check if any documents were found
-            if (addressesTagsArr.length > 0) {
-                console.log(`\tFound ${addressesTagsArr.length} tag assignments for addresses in the database.`);
+            // Check if any documents were found and merged
+            if (mergedResults.length > 0) {
+                console.log(`\tFound and merged ${mergedResults.length} documents for addresses in the database.`);
                 callback({ 
                     status: 'success', 
                     data: {
-                        addressesTags: addressesTagsArr, 
+                        addressesTags: mergedResults, 
                         totalElderCount: totalElderCount
                     }
                 });
@@ -79,6 +100,9 @@ module.exports = {
             });
         }
     },
+    
+    
+    
     
     
     

@@ -53,6 +53,7 @@ import TokenDetective from '../TokenDetective';
 import VolumeGraph from './StagePanel/VolumeGraph';
 import TokenTransactionsOptions from './TokenTransactionsOptions';
 import EldersPanelStats from './WidgetPanel/ElderPanelStats';
+import ElderTransactionRanks from './ElderTransactionRanks';
 
 
 // TimeAgo.addDefaultLocale(en);
@@ -440,7 +441,8 @@ const [activeStageTab, setActiveStageTab] = useState('Volume');
               <div style={{position:'absolute', width:'80vw',right:'2vw',top:'62vh',}}>
                 <TokenTransactions />
               </div>
-                <TokenTransactionsOptions />
+                {/* <TokenTransactionsOptions /> */}
+                <ElderTransactionRanks />
             
            
             </div>

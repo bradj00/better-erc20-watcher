@@ -37,6 +37,22 @@ const produceTokenTransferEvent = async (eventData) => {
   }
 };
 
+
+// raw-transactions Kafka event
+const producefullTxDetailsArrived = async (eventData) => {
+  try {
+    await producer.send({
+      topic: config.fullTxDetailsArrived,
+      messages: [
+        { value: JSON.stringify(eventData) }
+      ]
+    });
+    // console.log(`Sent tx-details-arrived event to Kafka: ${JSON.stringify(eventData)}`);
+  } catch (error) {
+    console.error(`Error producing tx-details-arrived  event: ${error.message}`);
+  }
+};
+
 // raw-transactions Kafka event
 const produceTokenTransferStreamEvent = async (eventData) => {
   try {
@@ -70,5 +86,6 @@ module.exports = {
   initProducer,
   produceTokenTransferStreamEvent,
   produceTokenTransferEvent,
-  produceErrorEvent
+  produceErrorEvent,
+  producefullTxDetailsArrived
 };

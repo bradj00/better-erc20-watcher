@@ -118,15 +118,19 @@ export const handleGetTransactions = (data, dataSetterObj) => {
     dataSetterObj.setCacheFriendlyLabelsRequest(uniqueAddresses);
     dataSetterObj.settxData(data.data.data);
     dataSetterObj.settxVisualData(data.data.data);
-};
-// export const handleSetAddressTags = (data, dataSetterObj) => {
-//     console.log('SetAddressTags: ', data.data.data);
-    
-//     //LOGIC GOES HERE...
 
-//     dataSetterObj.setAddressTags();
-    
-// };
+    // also set the fullTxDetails data for any existing in db cache
+    const transformedData = data.data.fullTxData.reduce((acc, item) => {
+        acc[item.transactionHash] = item;
+        return acc;
+    }, {});
+
+    dataSetterObj.setTxHashDetailsObj(transformedData);
+
+};
+
+
+
 
 // TEST FUNCTION
 export const handleAppendTransaction = (data) => {
@@ -208,4 +212,3 @@ export const handleAppendTransactions = (data, dataSetterObj, txData) => {
     dataSetterObj.settxData(clippedTxData); 
     dataSetterObj.settxVisualData(clippedTxData);
 };
-

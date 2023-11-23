@@ -836,3 +836,18 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.LiqAddTab {
+  background-color: #2196F3;
+}
+.GenericContractTab {
+  background-color: rgba(255,255,0,0.3);
+}
+
+.LiqAddCell{
+  border: 1px solid #2196F3;
+}
+
+.GenericContractCell {
+  border: 1px solid #660;
+}

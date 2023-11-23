@@ -25,7 +25,10 @@ const initConsumer = async (client) => {
 
     //permanently subscribe to these kafka topics..
     await consumer.subscribe({ topic: config.txArraySummarizeReq,             fromBeginning: true });
-    console.log('subscribed to topic: ',config.txArraySummarizeReq)
+    await consumer.subscribe({ topic: config.rawTransactions,             fromBeginning: true });
+    
+    console.log('subscribed to topics: ',config.txArraySummarizeReq, rawTransactions)
+    
 
 
     await consumer.run({
@@ -33,6 +36,9 @@ const initConsumer = async (client) => {
             switch (topic) {
                 case config.txArraySummarizeReq:
                     await consumeTxArrayLookupReq(message, client);
+                    break;
+                case config.rawTransactions:
+                    await consumeRawTransactions(message, client);
                     break;
                 default:
                     console.warn(`Received message from unknown topic: ${topic}`);
@@ -42,6 +48,20 @@ const initConsumer = async (client) => {
 };
 
 
+const consumeRawTransactions = async (message, client) => {
+  try {
+    const eventData = JSON.parse(message.value.toString());
+    console.log(`Received event from Kafka:`);
+    console.log(eventData);
+
+    await processTxHashes(eventData.txHashes, client);
+
+    return eventData;
+  } catch (error) {
+    console.error(`Error consuming event: ${error.message}`);
+    return null;
+  }
+};
 
 const consumeTxArrayLookupReq = async (message, client) => {
   try {

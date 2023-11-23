@@ -6,6 +6,7 @@ module.exports = {
     clientId: 'compound-tx-summarizer',
   
     // Topic names that the service will be producing to or consuming from
+    rawTransactions: 'raw-transactions',
     errorTopic: 'txie-errors',
     txArraySummarizeReq: 'txArraySummarizeReq',
     TxHashDetailsLookupFinished: 'TxHashDetailsLookupFinished',

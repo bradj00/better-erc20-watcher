@@ -20,7 +20,7 @@ const DetermineTxAction = (props) => {
 
         // Save action to context
 
-        console.log('setting action: ',action,txHash)
+        // console.log('setting action: ',action,txHash)
         settxHashActionCache(prevCache => ({
             ...prevCache,
             [txHash]: action

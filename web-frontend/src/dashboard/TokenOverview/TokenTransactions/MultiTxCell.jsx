@@ -4,7 +4,6 @@ import TableRow from '@mui/material/TableRow';
 import ethLogo from '../../images/eth-logo.png';
 import { getEllipsisTxt, commaNumber } from '../../helpers/h.js';
 import { GeneralContext } from '../../../App.js';
-import ToFromCell from '../../subcomponents/ToFromCell';
 import HistoryToggleOffIcon from '@mui/icons-material/HistoryToggleOff';
 import "../../../App.css"
 import TagIcon from '@mui/icons-material/Tag';
@@ -13,6 +12,7 @@ const MultiTxCell = (props) => {
     const { uniqueContractAddresses, setUniqueContractAddresses } = useContext(GeneralContext);
     const { areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded } = useContext(GeneralContext);
     const { cachedErc20TokenMetadata } = useContext(GeneralContext);
+    const { addressTags } = useContext(GeneralContext);
 
   // Contexts
   const { clickedToken } = useContext(GeneralContext);
@@ -24,6 +24,10 @@ const MultiTxCell = (props) => {
   const transactionLogs = TxHashDetailsObj[props.row.transaction_hash]?.transactionData?.logs || [];
   const initiatorAddress = TxHashDetailsObj[props.row.transaction_hash]?.transactionData?.from || [];
   const interactingWithContractAddress = TxHashDetailsObj[props.row.transaction_hash]?.transactionData?.to || [];
+
+  useEffect(() => {
+    // console.log('TxHashDetailsObj: ',TxHashDetailsObj)
+  },[TxHashDetailsObj]);
 
   useEffect(() => {
     // Set the loading status of this cell to true when it mounts
@@ -54,6 +58,106 @@ const MultiTxCell = (props) => {
       }
     }
   }
+
+  const decodeUniswapLiquidityEvent = (log, logs) => {
+    // Event Signatures
+    const v2MintSignature = "<V2_Mint_Event_Signature>";
+    const v2BurnSignature = "<V2_Burn_Event_Signature>";
+    const v3IncreaseLiquiditySignature = "0x3067048beee31b25b2f1681f88dac838c8bba36af25bfb2b7cf7473a5847e35f";
+    const v3DecreaseLiquiditySignature = "<V3_DecreaseLiquidity_Event_Signature>";
+  
+    switch (log.topics[0]) {
+      case v2MintSignature:
+        return {
+          action: 'add',
+          version: 'V2',
+          sender: '0x' + log.topics[1].slice(26),
+          amount0: parseInt(log.data.slice(0, 66), 16),
+          amount1: parseInt('0x' + log.data.slice(66, 130), 16),
+          pairAddress: log.address
+        };
+  
+      case v2BurnSignature:
+        return {
+          action: 'remove',
+          version: 'V2',
+          sender: '0x' + log.topics[1].slice(26),
+          amount0: parseInt(log.data.slice(0, 66), 16),
+          amount1: parseInt('0x' + log.data.slice(66, 130), 16),
+          pairAddress: log.address
+        };
+  
+      case v3IncreaseLiquiditySignature:
+        // console.log('ALL LOGS (v3 add): ',logs)
+        const {token0Address, token1Address} = determineTokenAddresses(logs);
+
+        return {
+          action: 'add',
+          version: 'V3',
+          tokenId: parseInt(log.topics[1], 16),
+          liquidity: parseInt(log.data.slice(0, 66), 16),
+          amount0: parseInt(log.data.slice(66, 130), 16),
+          amount1: parseInt('0x' + log.data.slice(130, 194), 16),
+          token0Address,
+          token1Address
+        };
+  
+      case v3DecreaseLiquiditySignature:
+        return {
+          action: 'remove',
+          version: 'V3',
+          tokenId: parseInt(log.topics[1], 16),
+          liquidity: parseInt(log.data.slice(0, 66), 16),
+          amount0: parseInt(log.data.slice(66, 130), 16),
+          amount1: parseInt('0x' + log.data.slice(130, 194), 16),
+          poolAddress: log.address
+        };
+  
+      default:
+        return null;
+    }
+  };
+  
+
+  const determineTokenAddresses = (allLogs) => {
+    let token0Address = null;
+    let token1Address = null;
+  
+    // Event Signatures for token Transfer or other relevant events
+    const transferEventSignature = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+  
+    for (const log of allLogs) {
+      // Check if the log is a token Transfer event
+      if (log.topics[0] === transferEventSignature) {
+        // Assuming the token address is the log's address field
+        const tokenAddress = log.address;
+  
+        // Assign token0Address and token1Address based on the order they appear
+        if (!token0Address) {
+          token0Address = tokenAddress;
+        } else if (!token1Address && tokenAddress !== token0Address) {
+          token1Address = tokenAddress;
+          break; // Exit the loop once both addresses are found
+        }
+      }
+    }
+  
+    // console.log('0: ', token0Address, '1: ',token1Address)
+    return { token0Address, token1Address };
+  };
+  
+  const formatAmount = (amount, tokenAddress) => {
+    const decimals = cachedErc20TokenMetadata[tokenAddress]?.data.detail_platforms.ethereum.decimal_place || 18; // Default to 18 decimals if not specified
+    return parseFloat(amount / Math.pow(10, decimals)).toFixed(3);
+  };
+  
+  const getTokenSymbol = (tokenAddress) => {
+    return cachedErc20TokenMetadata[tokenAddress]?.data.symbol || getEllipsisTxt(tokenAddress, 6);
+  };
+
+
+
+
 
   // Decode ERC20 Transfer
   const decodeERC20Transfer = (log) => {
@@ -86,25 +190,52 @@ const MultiTxCell = (props) => {
     .map(decodeERC20Transfer)
     .filter(transfer => transfer !== null); // Filter out non-transfer logs or undecodable logs
 
+
+  const decodedUniswapEvents = transactionLogs
+  .map(log => decodeUniswapLiquidityEvent(log, transactionLogs)) // Assuming you've implemented this function
+  .filter(event => event !== null);
+  
+  // const uniswapLiquidityTable = decodedUniswapEvents.length > 0 ? (
+  //   <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', backgroundColor: 'rgba(100,100,255,0.3)', borderRadius: '5px', textAlign: 'center' }}>
+  //     <table style={{ width: '100%' }}>
+  //       <thead>
+  //         <tr>
+  //           <th>Liquidity Action</th>
+  //           <th>{getTokenSymbol(decodedUniswapEvents[0].token0Address)}</th>
+  //           <th>{getTokenSymbol(decodedUniswapEvents[0].token1Address)}</th>
+  //         </tr>
+  //       </thead>
+  //       <tbody>
+  //         <tr>
+  //           <td>{decodedUniswapEvents[0].action}</td>
+  //           <td>{formatAmount(decodedUniswapEvents[0].amount0, decodedUniswapEvents[0].token0Address)}</td>
+  //           <td>{formatAmount(decodedUniswapEvents[0].amount1, decodedUniswapEvents[0].token1Address)}</td>
+  //         </tr>
+  //       </tbody>
+  //     </table>
+  //   </div>
+  // ) : <></>;
+  
+  
+  
+
+
+
+
+
+
+
+
+
   return (
       
 
       
-            <div style={{ position: 'relative',  backgroundColor: 'rgba(50,50,65,0.5)', borderRadius: '5px', padding: '0.5vw', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'right', width: '100%', border: '1px solid #660', height: '100%', marginBottom:'0.2vw', }}>
-
-                <div style={{color:'#fff', backgroundColor:'rgba(100,255,100,0.3)',borderRadius:'0.25vw', position:'absolute', top:'3%', padding:'0.25vw 0.6vw 0.25vw 0.6vw', textAlign:'left',}}>
-                    BUY    
-                </div>
-                {/* <div style={{color:'#fff', backgroundColor:'rgba(100,100,255,0.2)',borderRadius:'0.25vw', position:'absolute', top:'3%', padding:'0.25vw 0.6vw 0.25vw 0.6vw', textAlign:'left',}}>
-                    GAME DEPOSIT    
-                </div> */}
-                {/* <div style={{color:'#fff', backgroundColor:'rgba(100,255,100,0.3)',borderRadius:'0.25vw', position:'absolute', top:'3%', padding:'0.25vw 0.6vw 0.25vw 0.6vw', textAlign:'left',}}>
-                    STAKE  
-                </div> */}
+            <div className={decodedUniswapEvents.length > 0 ? "LiqAddCell" : "GenericContractCell"} style={{ position: 'relative',  backgroundColor: 'rgba(50,50,65,0.5)', borderRadius: '5px', padding: '0.5vw', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'right', width: '100%', height: '100%', marginBottom:'0.2vw', }}>
 
 
-                <div style={{display:'flex', textAlign:'center', position:'absolute',top:'0',left:'0',width:'5vw',height:'2.7vh',backgroundColor:'rgba(255,255,0,0.3)',color:'#fff', padding:'0.15vw', borderRadius:'0 0 0.15vw 0'}}>
-                    &nbsp;CONTRACT
+                <div className={decodedUniswapEvents.length > 0 ? "LiqAddTab" : "GenericContractTab"} style={{display:'flex', textAlign:'center', position:'absolute',top:'0',left:'0',width:'5vw',height:'2.7vh',color:'#fff', padding:'0.15vw', borderRadius:'0 0 0.15vw 0'}}>
+                    &nbsp;{decodedUniswapEvents.length > 0 ? " +Liquidity" : "CONTRACT"}
                 </div>
 
                 <div title="transaction hash" style={{ position:'absolute', right:'0.25vw', top:'0.25vw',backgroundColor:'rgba(255,255,255,0.1)', padding:'0vw 0.25vw 0vw 0.25vw',borderRadius:'0.15vw' }}>
@@ -152,6 +283,9 @@ const MultiTxCell = (props) => {
                         const usdPrice = cachedErc20TokenMetadata[transfer.contractAddress]?.data.market_data.current_price.usd || 0;
                         const estimatedValue = (adjustedAmount * usdPrice).toFixed(2);
 
+                        const isInitiator = (address) => address.toLowerCase() === initiatorAddress.toLowerCase();
+
+
                         return (
                             <React.Fragment key={idx}>
                                 <div style={{textAlign:'center'}}>
@@ -159,12 +293,30 @@ const MultiTxCell = (props) => {
                                 </div>
                                 
                                 {/* From Address */}
-                                <div style={{ border: '0px solid #0f0' }}>{CacheFriendlyLabels[transfer.from]?.manuallyDefined || getEllipsisTxt(transfer.from, 6)}</div>
+                                <div style={{ border: '0px solid #0f0' }}>
+                                    {isInitiator(transfer.from) ? (
+                                        <span style={{ color: 'cyan', fontWeight: 'bold' }}>
+                                            {CacheFriendlyLabels[transfer.from]?.manuallyDefined || getEllipsisTxt(transfer.from, 6)}
+                                        </span>
+                                    ) : (
+                                        <span style={{ color: addressTags[transfer.from]?.isUniswapV2Pool || addressTags[transfer.from]?.isUniswapV3Pool ? 'magenta' : 'inherit', textDecoration: addressTags[transfer.from]?.isUniswapV2Pool || addressTags[transfer.from]?.isUniswapV3Pool ? 'underline' : 'none' }}>
+                                            {CacheFriendlyLabels[transfer.from]?.manuallyDefined || getEllipsisTxt(transfer.from, 6)}
+                                        </span>
+                                    )}
+                                </div>
 
                                 {/* To Address */}
-                                <div>{CacheFriendlyLabels[transfer.to]?.manuallyDefined || getEllipsisTxt(transfer.to, 6)}</div>
-
-                                
+                                <div>
+                                    {isInitiator(transfer.to) ? (
+                                        <span style={{ color: 'cyan', fontWeight: 'bold' }}>
+                                            {CacheFriendlyLabels[transfer.to]?.manuallyDefined || getEllipsisTxt(transfer.to, 6)}
+                                        </span>
+                                    ) : (
+                                        <span style={{ color: addressTags[transfer.to]?.isUniswapV2Pool || addressTags[transfer.to]?.isUniswapV3Pool ? 'magenta' : 'inherit', textDecoration: addressTags[transfer.to]?.isUniswapV2Pool || addressTags[transfer.to]?.isUniswapV3Pool ? 'underline' : 'none' }}>
+                                            {CacheFriendlyLabels[transfer.to]?.manuallyDefined || getEllipsisTxt(transfer.to, 6)}
+                                        </span>
+                                    )}
+                                </div>
 
                                 {/* Amount */}
                                 <div>{adjustedAmount.toLocaleString()}</div>
@@ -185,6 +337,7 @@ const MultiTxCell = (props) => {
                         );
                     })}
                 </div>
+
             </div>
      
 

@@ -12,39 +12,28 @@ const EldersPanelStats = () => {
 
     const tokenDecimals = clickedToken?.data?.data?.detail_platforms?.ethereum?.decimal_place || 0;
     const tokenPriceUSD = clickedToken?.data?.data?.market_data?.current_price?.usd     || 0;
-    
-    const calculateVolumeAndColor = () => {
-        let volumesByGroup = Array(50).fill(null).map(() => ({ buyVolume: 0, sellVolume: 0 }));
+    const calculateVolume = () => {
+        let volumeByElderRank = Array(100).fill(0);
 
         txData?.forEach(tx => {
             const actionType = txHashActionCache[tx.transaction_hash];
             if (actionType === 'BUY' || actionType === 'SELL') {
+                // Check for CEX or DEX tags
                 if (!isCEXOrDEX(tx.from_address) && !isCEXOrDEX(tx.to_address)) {
                     const fromElderRank = getNormalizedElderRank(tx.from_address);
                     const toElderRank = getNormalizedElderRank(tx.to_address);
-    
+                    const value = parseInt(tx.value, 10);
+
                     const valueInTokens = parseInt(tx.value, 10) / (10 ** tokenDecimals);
                     const valueInUSD = valueInTokens * tokenPriceUSD;
 
-                    // Determine the group based on ElderRank (1-50)
-                    const groupIndex = (elderRank) => Math.ceil(elderRank / 2) - 1;
-
-                    if (fromElderRank) {
-                        const group = groupIndex(fromElderRank);
-                        actionType === 'BUY' ? volumesByGroup[group].buyVolume += valueInUSD : volumesByGroup[group].sellVolume += valueInUSD;
-                    }
-                    if (toElderRank) {
-                        const group = groupIndex(toElderRank);
-                        actionType === 'BUY' ? volumesByGroup[group].buyVolume += valueInUSD : volumesByGroup[group].sellVolume += valueInUSD;
-                    }
-                            }
-                        }
+                    if (fromElderRank) volumeByElderRank[fromElderRank - 1] += valueInUSD;
+                    if (toElderRank) volumeByElderRank[toElderRank - 1] += valueInUSD;
+                }
+            }
         });
-    
-        const barData = volumesByGroup.flatMap(group => [group.buyVolume, group.sellVolume]);
-        const backgroundColors = volumesByGroup.flatMap(() => ['#0f0', '#f00']); // Green for buy, Red for sell
 
-        return { barData, backgroundColors };
+        return volumeByElderRank.map(volume => volume); // Adjust for token's decimals
     };
 
     const isCEXOrDEX = (address) => {
@@ -60,14 +49,12 @@ const EldersPanelStats = () => {
         return null;
     };
 
-    const { barData, backgroundColors } = calculateVolumeAndColor();
-
     const data = {
-        labels: Array.from({ length: 100 }, (_, i) => i % 2 === 0 ? `Buy ${(i / 2) + 1}` : `Sell ${(i / 2) + 1}`),
+        labels: Array.from({ length: 100 }, (_, i) => `${i + 1}`),
         datasets: [{
             label: 'Elders Data',
-            data: barData,
-            backgroundColor: backgroundColors,
+            data: calculateVolume(),
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
             borderColor: 'rgba(255, 255, 255, 1)',
             borderWidth: 1,
         }],
@@ -78,15 +65,7 @@ const EldersPanelStats = () => {
             y: {
                 beginAtZero: true,
                 grid: {
-                    color: '#333', // Set grid line color
-                },
-                ticks: {
-                    // Custom formatter for Y-axis ticks
-                    callback: function(value, index, values) {
-                        // Format the value as a USD currency string
-                        return '$' + value.toLocaleString('en-US', { maximumFractionDigits: 2 });
-                    },
-                    color: 'white', // Set tick color to white
+                    color: '#888', // Set grid line color to white for y-axis
                 },
             },
             x: {

@@ -37,6 +37,7 @@ const [uniqueContractAddresses, setUniqueContractAddresses] = useState([]);
 
 const [areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded] = useState({});
 const [txHashActionCache, settxHashActionCache,] = useState({});
+const [AddressStats, setAddressStats] = useState({});
 
 
 
@@ -182,7 +183,9 @@ const txIngestionEngine = {
 
 const contextObj = {
   ServicesErrorMessages, setServicesErrorMessages,
-
+  
+  
+  AddressStats, setAddressStats,
   txHashActionCache, settxHashActionCache,
   elderCount, setElderCount,
   addressTags, setAddressTags,

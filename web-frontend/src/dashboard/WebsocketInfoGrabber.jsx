@@ -30,6 +30,7 @@ const WebsocketInfoGrabber = () => {
     const { uniqueContractAddresses, setUniqueContractAddresses } = useContext(GeneralContext);
     const { areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded } = useContext(GeneralContext);
 
+    const { setAddressStats } = useContext(GeneralContext); 
 
     
     const {addressTags, setAddressTags} = useContext(GeneralContext); 
@@ -59,7 +60,9 @@ const WebsocketInfoGrabber = () => {
         setcachedErc20TokenMetadata,
         setTxHashDetailsObj,
         setcachedErc20TokenMetadata,
-        setElderCount, 
+        setElderCount,
+        setAddressStats,
+        addressTags
     });
 
     
@@ -206,6 +209,7 @@ const WebsocketInfoGrabber = () => {
     const getUniqueAddresses = useCallback((transactions) => {
         const addresses = new Set();
     
+        // Process transaction addresses
         transactions.forEach(tx => {
             if (!isTagCached(tx.from_address)) {
                 addresses.add(tx.from_address);
@@ -215,8 +219,33 @@ const WebsocketInfoGrabber = () => {
             }
         });
     
+        // Count before processing ERC20 transfer event logs
+        const countBeforeERC20 = addresses.size;
+        console.log(`Count of unique addresses before processing ERC20 transfer logs: ${countBeforeERC20}`);
+    
+        // Process ERC20 transfer event logs
+        Object.values(TxHashDetailsObj).forEach(txDetails => {
+            txDetails.transactionData.logs.forEach(log => {
+                const transferInfo = decodeERC20Transfer(log);
+                if (transferInfo) {
+                    const { from, to } = transferInfo;
+                    if (!isTagCached(from)) {
+                        addresses.add(from);
+                    }
+                    if (!isTagCached(to)) {
+                        addresses.add(to);
+                    }
+                }
+            });
+        });
+    
+        // Count after processing ERC20 transfer event logs
+        const countAfterERC20 = addresses.size;
+        console.log(`Count of unique addresses after processing ERC20 transfer logs: ${countAfterERC20}`);
+    
         return Array.from(addresses);
-    }, [isTagCached]);
+    }, [isTagCached, TxHashDetailsObj]);
+        
     
     useEffect(() => {
         if (txDataRef.current) {
@@ -229,12 +258,26 @@ const WebsocketInfoGrabber = () => {
             const newAddressesToLookup = getUniqueAddresses(txData);
         
             if (newAddressesToLookup.length > 0) {
+                console.log('AYY REQUESTING NEW ADDYS TO LOOKUP')
                 requestGetBulkTagsRequest(newAddressesToLookup);
             }
         }
     
     }, [txData]);
     
+
+  const decodeERC20Transfer = (log) => {
+    const transferEventSignature = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+    if (log.topics[0] === transferEventSignature) {
+      return {
+        from: '0x' + log.topics[1].slice(26),
+        to: '0x' + log.topics[2].slice(26),
+        amount: parseInt(log.data, 16),
+        contractAddress: log.address
+      };
+    }
+    return null;
+  };
     
     const connectWebSocket = () => {
         const hostIP = window.location.hostname;
