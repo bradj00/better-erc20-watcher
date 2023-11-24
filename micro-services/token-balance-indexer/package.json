@@ -1,0 +1,18 @@
+{
+  "name": "txie-wrangler",
+  "version": "1.0.0",
+  "description": "tx-ingestion-engine WRANGLER service:",
+  "main": "txie-wrangler.js",
+  "scripts": {
+    "start": "node txie-wrangler.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "kafkajs": "^2.2.4",
+    "mongodb": "^6.2.0"
+  }
+}

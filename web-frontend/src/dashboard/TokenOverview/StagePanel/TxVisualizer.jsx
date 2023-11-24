@@ -6,6 +6,7 @@ import { UnrealBloomPass } from '../../helpers/UnrealBloomPass.js';
 import * as THREE from 'three';
 import person from '../../images/person.png';
 import personOld from '../../images/person-old.png';
+import PoolIcon from '../../images/LiqPool.png';
 import '../../../App.css';
 
 const ForceGraphComponent = () => {
@@ -13,6 +14,7 @@ const ForceGraphComponent = () => {
     const {txDataForceGraph, settxDataForceGraph} = useContext(GeneralContext);
     const {txData} = useContext(GeneralContext);
     const {CacheFriendlyLabels} = useContext(GeneralContext);
+    const {addressTags} = useContext(GeneralContext);
 
     const [highlightedNodes, setHighlightedNodes] = useState(new Set());
 
@@ -87,7 +89,7 @@ const ForceGraphComponent = () => {
             if (!nodeExists(tx.to_address)) {
                 newNodes.push({
                     id: tx.to_address,
-                    // ... other properties with default or calculated values
+
                 });
                 newHighlightNodes.add(tx.to_address);
             }
@@ -99,7 +101,7 @@ const ForceGraphComponent = () => {
                     target: tx.to_address,
                     value: tx.value,
                     newlyAdded: true, // Add this line
-                    // ... other properties with default or calculated values
+
                 });
             }
         });
@@ -299,19 +301,26 @@ const ForceGraphComponent = () => {
             showNavInfo={true}
             onNodeClick={handleNodeClick}
             nodeThreeObject={(node) => {
-              // Conditionally choose the texture based on whether the node is highlighted or not
-              const chosenTexture = highlightedNodes.has(node.id) ? person : personOld;
-              const imgTexture = new THREE.TextureLoader().load(chosenTexture);
-          
-              const material = new THREE.SpriteMaterial({ map: imgTexture });
-              const sprite = new THREE.Sprite(material);
-              sprite.scale.set(12, 12); // Adjust the scale as needed
-
-              // Set a high renderOrder to ensure the sprite is always at the front
-              sprite.renderOrder = 9999;
-
-              return sprite;
-          }}
+                // Determine if the node is a Uniswap V2 or V3 pool
+                const isUniswapPool = addressTags[node.id.toLowerCase()]?.isUniswapV2Pool || addressTags[node.id.toLowerCase()]?.isUniswapV3Pool;
+            
+                if (isUniswapPool) {
+                    // Use PoolIcon for Uniswap pools
+                    const imgTexture = new THREE.TextureLoader().load(PoolIcon);
+                    const material = new THREE.SpriteMaterial({ map: imgTexture });
+                    const sprite = new THREE.Sprite(material);
+                    sprite.scale.set(12, 12);
+                    sprite.renderOrder = 9999;
+                    return sprite;
+                } else {
+                    // Create a green dot for other nodes
+                    const geometry = new THREE.SphereGeometry(1, 5, 5); // Adjust size as needed
+                    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); // Green color
+                    return new THREE.Mesh(geometry, material);
+                }
+            }}
+            
+              
           linkWidth={link => link.newlyAdded ? 10 : 1}
           linkColor={link => link.newlyAdded ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,1)'}
         />

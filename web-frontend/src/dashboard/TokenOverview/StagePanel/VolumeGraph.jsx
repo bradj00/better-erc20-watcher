@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Bar } from 'recharts';
 import { GeneralContext } from '../../../App.js';
 
 import TimeAgo from 'javascript-time-ago';
@@ -116,12 +116,12 @@ const VolumeGraph = () => {
 
     
             if (action === 'BUY') {
-                segments[segmentIndex].uniqueBuyers.add(tx.from_address); // Add buyer
-                segments[segmentIndex].uniqueSellers.add(tx.to_address); // Add seller
+                segments[segmentIndex].uniqueBuyers.add(tx.to_address); // Add buyer
+                // segments[segmentIndex].uniqueSellers.add(tx.to_address); // Add seller
                 segments[segmentIndex].buyerVolume += valueInUSD;
             } else if (action === 'SELL') {
                 segments[segmentIndex].uniqueSellers.add(tx.from_address); // Add seller
-                segments[segmentIndex].uniqueBuyers.add(tx.to_address); // Add buyer
+                // segments[segmentIndex].uniqueBuyers.add(tx.to_address); // Add buyer
                 segments[segmentIndex].sellerVolume += valueInUSD; // Add USD value instead of raw token value
             }
             // Add more conditions if there are other types of actions
