@@ -16,7 +16,8 @@
 
 
 ![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/53669b13-6af8-4915-a7b2-b7d70b0d4b12)
-![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/b55128d6-e5ce-4b8f-9ed7-fe9c0d3ddbad)
+![image](https://github.com/bradj00/better-erc20-watcher/assets/99688245/a7a0d4fd-ca17-45c6-871e-55f35cc4b841)
+
 
 
 
