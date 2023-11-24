@@ -398,7 +398,7 @@ const [activeStageTab, setActiveStageTab] = useState('Volume');
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              height: '50vh',
+              height: '26vh',
               backgroundColor: 'rgba(0,0,0,0.2)',
               left: '1vw',
               top: '11vh',
