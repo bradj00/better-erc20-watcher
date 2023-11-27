@@ -8,6 +8,9 @@ const WebsocketInfoGrabber = () => {
     const ws = useRef(null);
     const [status, setStatus] = useState("Disconnected");
     const hasConnectedBefore = useRef(false);
+    
+    const { holdersOverTimeData, setHoldersOverTimeData } = useContext(GeneralContext);
+
 
     const { watchedTokenList, setWatchedTokenList } = useContext(GeneralContext);
     const {searchInputLookup} = useContext(GeneralContext);
@@ -29,6 +32,8 @@ const WebsocketInfoGrabber = () => {
     
     const { uniqueContractAddresses, setUniqueContractAddresses } = useContext(GeneralContext);
     const { areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded } = useContext(GeneralContext);
+
+    const { requestFetchHoldersOverTimeData, setRequestFetchHoldersOverTimeData} = useContext(GeneralContext);
 
     const { setAddressStats } = useContext(GeneralContext); 
 
@@ -62,7 +67,8 @@ const WebsocketInfoGrabber = () => {
         setcachedErc20TokenMetadata,
         setElderCount,
         setAddressStats,
-        addressTags
+        addressTags,
+        setHoldersOverTimeData
     });
 
     
@@ -112,6 +118,14 @@ const WebsocketInfoGrabber = () => {
             requestTokenLookup(tokenLookupRequestAddy)           
         }
     },[tokenLookupRequestAddy]);
+    
+    useEffect(() => {
+        if (requestFetchHoldersOverTimeData  ){
+            console.log('request to lookup FetchHoldersOverTimeData: ',holdersOverTimeData)
+            FetchHoldersOverTimeData(viewingTokenAddress); 
+            setRequestFetchHoldersOverTimeData(false);        
+        }
+    },[requestFetchHoldersOverTimeData]);
 
 
     useEffect(() => {
@@ -442,6 +456,16 @@ const WebsocketInfoGrabber = () => {
         }
     }
 
+    const FetchHoldersOverTimeData = (watchedToken) => {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            const requestPayload = {
+                service: 'general',
+                method: 'FetchHoldersOverTimeData',
+                data: {watchedToken}
+            };
+            ws.current.send(JSON.stringify(requestPayload));
+        }
+    }
     
     
 

@@ -54,6 +54,7 @@ import VolumeGraph from './StagePanel/VolumeGraph';
 import TokenTransactionsOptions from './TokenTransactionsOptions';
 import EldersPanelStats from './WidgetPanel/ElderPanelStats';
 import ElderTransactionRanks from './ElderTransactionRanks';
+import HoldersOverTime from './StagePanel/HoldersOverTime.jsx';
 
 
 // TimeAgo.addDefaultLocale(en);
@@ -424,6 +425,7 @@ const [activeStageTab, setActiveStageTab] = useState('Volume');
               <div className="tabs-stage-container">
                   <div className={activeStageTab === 'Volume' ? "tab active" : "tab"} onClick={() => setActiveStageTab('Volume')}>Volume</div>
                   <div className={activeStageTab === 'Visualizer' ? "tab active" : "tab"} onClick={() => setActiveStageTab('Visualizer')}>Visualizer</div>
+                  <div className={activeStageTab === 'HoT' ? "tab active" : "tab"} onClick={() => setActiveStageTab('HoT')}>New Uniques Over Time</div>
               </div>
 
 
@@ -431,6 +433,7 @@ const [activeStageTab, setActiveStageTab] = useState('Volume');
                 
                 {activeStageTab === 'Volume' && <VolumeGraph />}
                 {activeStageTab === 'Visualizer' && <ForceGraphComponent />}
+                {activeStageTab === 'HoT' && <HoldersOverTime />}
 
               </div>
 

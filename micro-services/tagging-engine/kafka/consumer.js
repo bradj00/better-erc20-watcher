@@ -89,7 +89,15 @@ const consumeFullTxDetailsEvent = async (message, client) => {
     const eventData = JSON.parse(message.value.toString());
     // console.log(`Consumed Full TX Details Event from Kafka:`, eventData);
 
+
+    //decode erc20 transfers from the tx logs
     const decodedTransfers = await processFullTxDetails(eventData);
+    
+    
+    
+    // create an object summarizing the aggregate token transfers: token contract / to / from / amount
+    // write that object back to the full tx hash document in db 'tx-hash-details' collection 'details' 
+    
     const uniqueAddresses = getUniqueAddresses(decodedTransfers);
 
     // Filter out cached addresses

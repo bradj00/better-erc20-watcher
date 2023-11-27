@@ -2,8 +2,14 @@
 ///////////
 // tag transactions AND involved addresses with useful information
 // probably save to a pivot table db in mongo
-// ideas: 
-//  address rank by timeline of when they first interacted with the token (earlier == more prescient)
+
+// to do: remove logic for elder rank calculation - we moved this straight to the tx-ingestion-engine
+
+// consume a kafka message produced by the tx-ingestion-engine when the full tx is ingested
+// off this message, process the full tx details and come up with tags for the transaction hash
+// append these tags back to the full tx hash document in db 'tx-hash-details' collection 'details'
+
+// for one, webui will no longer have to process this on the frontend
 
 
 console.clear();

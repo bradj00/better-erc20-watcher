@@ -172,6 +172,32 @@ module.exports = {
             callback({ status: 'error', message: 'Internal Server Error' });
         }
     },
+
+    FetchHoldersOverTimeData: async function(payload, callback) {
+        try {
+            console.log('Fetching HoT data for token: ', payload.watchedToken);
+            const database = db.getDb('watchedTokens-HoT');
+            const collectionName = "a_" + payload.watchedToken;
+            const collection = database.collection(collectionName);
+    
+            const results = await collection.find({}).toArray();
+    
+            if (results.length > 0) {
+                console.log(`Found ${results.length} documents in collection: ${collectionName}`);
+                callback({
+                    status: 'success',
+                    data: results // Array of documents
+                });
+            } else {
+                console.log(`No data found in collection: ${collectionName}`);
+                callback({ status: 'error', message: 'No data found' });
+            }
+        } catch (error) {
+            console.error("Error fetching HoT data:", error);
+            callback({ status: 'error', message: 'Internal Server Error' });
+        }
+    },
+    
     
     GetFriendlyName: async function(payload, callback) {
         try {

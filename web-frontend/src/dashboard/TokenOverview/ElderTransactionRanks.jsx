@@ -5,10 +5,16 @@ import { getEllipsisTxt, commaNumber } from '../helpers/h.js';
 const ElderTransactionRanks = () => {
     const { addressStats, addressTags, txData, clickedToken } = useContext(GeneralContext);
     const [processedData, setProcessedData] = useState([]);
+    const {CacheFriendlyLabels} = useContext(GeneralContext);
 
     const isUniswapPool = (address) => {
         const tags = addressTags[address];
         return tags?.isUniswapV2Pool || tags?.isUniswapV3Pool;
+    };
+
+    const convertTokensToUSD = (tokenAmount, tokenDecimals, tokenPriceUSD) => {
+        const valueBigInt = BigInt(tokenAmount);
+        return Number(valueBigInt / BigInt(10 ** tokenDecimals)) * tokenPriceUSD;
     };
 
     useEffect(() => {
@@ -16,7 +22,7 @@ const ElderTransactionRanks = () => {
         const tokenPriceUSD = clickedToken?.data?.data?.market_data?.current_price?.usd || 0;
 
         const transactionSums = {};
-        txData.forEach(tx => {
+        txData?.forEach(tx => {
             if (isUniswapPool(tx.from_address) || isUniswapPool(tx.to_address)) {
                 // Skip if either address is a Uniswap pool
                 return;
@@ -31,15 +37,20 @@ const ElderTransactionRanks = () => {
         });
 
         const combinedData = Object.entries(transactionSums)
-            .map(([address, stats]) => ({
+        .map(([address, stats]) => {
+            const currentTokens = addressTags[address]?.currentTokens || "0";
+            const bagValueUSD = convertTokensToUSD(currentTokens, tokenDecimals, tokenPriceUSD);
+
+            return {
                 address,
                 elderRank: addressTags[address]?.ElderRank || 0,
-                incoming: stats.incoming.toFixed(2),
-                outgoing: stats.outgoing.toFixed(2)
-            }))
-            .filter(item => item.elderRank !== 0);
+                incoming: stats.incoming.toFixed(0),
+                outgoing: stats.outgoing.toFixed(0),
+                bag: bagValueUSD.toFixed(0)
+            };
+        }).filter(item => item.elderRank !== 0);
 
-        combinedData.sort((a, b) => a.elderRank - b.elderRank);
+        combinedData.sort((a, b) => a.bag - b.bag).reverse();
         setProcessedData(combinedData);
     }, [txData, addressStats, addressTags, clickedToken]);
 
@@ -49,8 +60,9 @@ const ElderTransactionRanks = () => {
         color: 'yellow', // Neon bright font color for headers
         borderBottom: '1px solid cyan', // Neon bright border color
         padding: '5px',
-        textAlign: 'left',
-        
+        textAlign: 'right',
+        fontSize: '0.65vw',
+
     };
 
     return (
@@ -78,21 +90,31 @@ const ElderTransactionRanks = () => {
                 <thead style={{position:'sticky', top:'0', backgroundColor:'rgba(5,5,10,1)', }}>
                     <tr>
                         <th style={tableHeaderStyle}>Address</th>
-                        <th style={tableHeaderStyle}>Incoming $</th>
-                        <th style={tableHeaderStyle}>Outgoing $</th>
-                        <th style={tableHeaderStyle}>Elder Rank</th>
+                        <th style={tableHeaderStyle}>In $</th>
+                        <th style={tableHeaderStyle}>Out $</th>
+                        <th style={tableHeaderStyle}>Age</th>
+                        <th style={tableHeaderStyle}>Bag $</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {processedData.map((item, index) => (
-                        <tr key={index}>
-                            <td>{getEllipsisTxt(item.address, 4)}</td>
-                            <td align='right'>{commaNumber(item.incoming)}</td>
-                            <td align='right'>{commaNumber(item.outgoing)}</td>
-                            <td>{item.elderRank}</td>
-                        </tr>
-                    ))}
+                <tbody style={{fontSize:'0.55vw'}}>
+                    {processedData.map((item, index) => {
+                        const displayText = CacheFriendlyLabels[item.address]?.manuallyDefined
+                                            ? CacheFriendlyLabels[item.address].manuallyDefined
+                                            : getEllipsisTxt(item.address, 4);
+                        const truncatedText = displayText.length > 10 ? `${displayText.substring(0, 10)}..` : displayText;
+
+                        return (
+                            <tr key={index}>
+                                <td align='right' title={displayText}>  <a target="__blank" href={`https://etherscan.io/address/${item.address}`}>{truncatedText}</a> </td>
+                                <td align='right'>{commaNumber(item.incoming)}</td>
+                                <td align='right'>{commaNumber(item.outgoing)}</td>
+                                <td>{item.elderRank}</td>
+                                <td align='right'>{item.bag}</td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
+
             </table>
         </div>
     );

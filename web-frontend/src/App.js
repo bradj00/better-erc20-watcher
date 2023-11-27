@@ -81,7 +81,9 @@ const [getUpdatedAddressTokenTxList, setgetUpdatedAddressTokenTxList] = useState
 const [fetchFreshStashedTokenBalance, setfetchFreshStashedTokenBalance] = useState();
 const [txDataChartOverTime, settxDataChartOverTime] = useState();
 const [cachedErc20TokenMetadata, setcachedErc20TokenMetadata] = useState({});
+const [holdersOverTimeData, setHoldersOverTimeData] = useState({});
 
+const [requestFetchHoldersOverTimeData, setRequestFetchHoldersOverTimeData] = useState(false);
 
 const [MinAmountFilterValue, setMinAmountFilterValue] = useState(1);
 const [MaxAmountFilterValue, setMaxAmountFilterValue] = useState(999999999999999999);
@@ -183,7 +185,9 @@ const txIngestionEngine = {
 
 const contextObj = {
   ServicesErrorMessages, setServicesErrorMessages,
-  
+  requestFetchHoldersOverTimeData, setRequestFetchHoldersOverTimeData,
+
+  holdersOverTimeData, setHoldersOverTimeData,
   
   AddressStats, setAddressStats,
   txHashActionCache, settxHashActionCache,

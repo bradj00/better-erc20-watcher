@@ -25,13 +25,13 @@ services:
     networks:
       - better-erc20-watcher-network 
        
-  external-token-lookup-engine:
-    image:  better-erc20-watcher/external-token-lookup-engine:latest
-    restart: always
-    depends_on:
-      - master-rate-limiter
-    networks:
-    - better-erc20-watcher-network 
+  # external-token-lookup-engine:
+  #   image:  better-erc20-watcher/external-token-lookup-engine:latest
+  #   restart: always
+  #   depends_on:
+  #     - master-rate-limiter
+  #   networks:
+  #   - better-erc20-watcher-network 
   
   txie-wrangler:
     image:  better-erc20-watcher/txie-wrangler:latest

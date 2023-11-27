@@ -120,7 +120,7 @@ const EldersPanelStats = () => {
     
         return (
             <div style={tooltipStyle}>
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <table style={{ fontSize:'0.6vw', width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                         <tr>
                             <th style={tableHeaderStyle}>Address</th>

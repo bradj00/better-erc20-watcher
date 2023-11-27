@@ -35,6 +35,11 @@ export const handleCacheFriendlyLabelsRequest = (data, dataSetterObj) => {
     dataSetterObj.setCacheFriendlyLabels(data.data.data);
 };
 
+export const handleFetchHoldersOverTimeData = (data, dataSetterObj) => {
+    console.log('FetchHoldersOverTimeData: ',data)
+    dataSetterObj.setHoldersOverTimeData(data.data.data);
+};
+
 export const handleTxHashDetailsArray = (data, dataSetterObj) => {
     console.log('TxHashDetailsArray: ', data);
 
