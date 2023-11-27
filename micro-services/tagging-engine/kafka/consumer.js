@@ -90,13 +90,23 @@ const consumeFullTxDetailsEvent = async (message, client) => {
     // console.log(`Consumed Full TX Details Event from Kafka:`, eventData);
 
 
-    //decode erc20 transfers from the tx logs
+    //decode erc20 transfers from the tx logs and return in an array of objects [{from, to, amount, contractAddress}, ...]
     const decodedTransfers = await processFullTxDetails(eventData);
     
+    // console.log('EVENT DATA: ',eventData.transaction.transactionHash)
     
+    // // create an object summarizing the aggregate token transfers: contractAddress / to / from / amount
+    const transferSummary = summarizeTokenTransfers(decodedTransfers);
+
+
+    // // add that new object back into to the full tx hash document object in db 'tx-hash-details' collection 'details'
+
+    // console.log('\n\nupdating ',eventData.transaction.transactionHash,'\n\t with summary: ',transferSummary)
+    await client.db('tx-hash-details').collection('details').updateOne(
+      { transactionHash: eventData.transaction.transactionHash }, // Query to find the right document
+      { $set: { tokenTransferSummary: transferSummary } } // Update operation
+    );
     
-    // create an object summarizing the aggregate token transfers: token contract / to / from / amount
-    // write that object back to the full tx hash document in db 'tx-hash-details' collection 'details' 
     
     const uniqueAddresses = getUniqueAddresses(decodedTransfers);
 
@@ -114,31 +124,34 @@ const consumeFullTxDetailsEvent = async (message, client) => {
 };
 
 
+function summarizeTokenTransfers(decodedTransfers) {
+  const summary = {};
+
+  decodedTransfers.forEach(({ from, to, amount, contractAddress }) => {
+      if (!from || !to) {
+          return;
+      }
+
+      summary[contractAddress] = summary[contractAddress] || {};
+      summary[contractAddress][from] = summary[contractAddress][from] || { outgoing: BigInt(0) };
+      summary[contractAddress][to] = summary[contractAddress][to] || { incoming: BigInt(0) };
+
+      summary[contractAddress][from].outgoing += amount; // Already a BigInt
+      summary[contractAddress][to].incoming += amount; // Already a BigInt
+  });
+
+  // // Convert BigInt to String for database compatibility
+  // Object.keys(summary).forEach(contract => {
+  //   Object.keys(summary[contract]).forEach(address => {
+  //     summary[contract][address].outgoing = summary[contract][address].outgoing?.toString();
+  //     summary[contract][address].incoming = summary[contract][address].incoming?.toString();
+  //   });
+  // });
+
+  return summary;
+}
 
 
-// const consumeLookupTokenEvent = async (message, PENDING_JOBS) => {
-//   try {
-//     const eventData = JSON.parse(message.value.toString());
-//     console.log(`Consumed Lookup Token Event from Kafka:`);
-//     console.log(message);
-//     console.log('value (decoded): ',eventData)
-//     console.log('\n\n')
-
-//     const jobID = {
-//       id: Date.now().toString(),
-//       contractAddress: eventData.token,
-//       status: 'Pending'
-//     };
-
-//     console.log('requesting lookup for: ', jobID);
-//     PENDING_JOBS.push(jobID);
-
-//     return eventData;
-//   } catch (error) {
-//     console.error(`Error consuming token transfer event: ${error.message}`);
-//     return null;
-//   }
-// };
 
 const consumeErrorEvent = (message) => {
   try {
@@ -174,18 +187,37 @@ const processFullTxDetails = async (fullTxDetail) => {
   }
 };
 
-// Decoding ERC20 Transfer from log
+
+
+// const decodeERC20Transfer = (log) => {
+//   const transferEventSignature = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+//   if (log.topics[0] === transferEventSignature) {
+//     return {
+//       from: '0x' + log.topics[1].slice(26),
+//       to: '0x' + log.topics[2].slice(26),
+//       amount: BigInt(log.data), // Safely convert string to BigInt
+//       contractAddress: log.address
+//     };
+//   }
+//   return null;
+// };
+
 const decodeERC20Transfer = (log) => {
   const transferEventSignature = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
-  if (log.topics[0] === transferEventSignature) {
-    return {
-      from: '0x' + log.topics[1].slice(26),
-      to: '0x' + log.topics[2].slice(26),
-      amount: parseInt(log.data, 16),
-      contractAddress: log.address
-    };
+  if (log.topics[0] !== transferEventSignature || log.topics.length < 3 || !log.data) {
+    return null; // Not a valid ERC20 transfer or missing data
   }
-  return null;
+
+  try {
+    const from = '0x' + log.topics[1].slice(26);
+    const to = '0x' + log.topics[2].slice(26);
+    const amount = BigInt(log.data); // Convert to BigInt
+
+    return { from, to, amount, contractAddress: log.address };
+  } catch (error) {
+    console.error('Error parsing ERC20 transfer:', error);
+    return null; // Return null if parsing fails
+  }
 };
 
 

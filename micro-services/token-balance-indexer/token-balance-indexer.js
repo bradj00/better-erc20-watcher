@@ -1,3 +1,5 @@
+console.clear();
+
 const { MongoClient } = require('mongodb');
 require('dotenv').config({ path: './.env' });
 
@@ -5,7 +7,6 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 async function ProcessTokenTransactionsAndAddressTally() {
     const client = new MongoClient(MONGODB_URI);
-    let progressInterval;
 
     try {
         await client.connect();
@@ -21,92 +22,83 @@ async function ProcessTokenTransactionsAndAddressTally() {
         console.log("Collections fetched:", collectionNames);
 
         for (let collectionName of collectionNames) {
-            const collection = db.collection(collectionName);
-            const totalDocsInCollection = await collection.countDocuments();
-            console.log(`Processing collection: ${collectionName}`);
+            console.log(`Starting to process collection: ${collectionName}`);
 
-            let currentNumber = 0;
-            let masterUniqueAddresses = new Set();
-
-            progressInterval = setInterval(() => {
-                console.log(`Progress in ${collectionName}: ${currentNumber}/${totalDocsInCollection} processed, Collection Uniques: ${masterUniqueAddresses.size}`);
-            }, 5000);
-
-            const watchedTokensCollection = db.collection(collectionName);
-            const addressStatsCollection = dbStats.collection(collectionName);
             const hotCollection = dbHoT.collection(collectionName);
+            const watchedTokensCollection = db.collection(collectionName);
+            let masterUniqueAddresses = new Set();
+            let progressInterval;
 
-            const transactions = await watchedTokensCollection.find().sort({ block_number: 1 }).toArray();
-            let dailyUniqueAddressCount = {};
+            try {
+                console.log(`Fetching the latest hourly mark from watchedTokens-HoT for collection: ${collectionName}`);
+                const latestDocument = await hotCollection.find().sort({ date: -1 }).limit(1).toArray();
+                let startDateTime = new Date(0); // Unix epoch start if no latestDocument found
 
-            for (let transaction of transactions) {
-                currentNumber++;
-                const { from_address, to_address, value, block_timestamp } = transaction;
-
-                if (typeof value !== 'string') continue;
-
-                const valueBigInt = BigInt(value);
-
-                let fromBalanceBigInt = BigInt(0);
-                let toBalanceBigInt = BigInt(0);
-
-                const fromAddressStats = await addressStatsCollection.findOne({ address: from_address });
-                const toAddressStats = await addressStatsCollection.findOne({ address: to_address });
-
-                if (fromAddressStats && fromAddressStats.currentTokens !== undefined) {
-                    fromBalanceBigInt = BigInt(fromAddressStats.currentTokens);
-                }
-                if (toAddressStats && toAddressStats.currentTokens !== undefined) {
-                    toBalanceBigInt = BigInt(toAddressStats.currentTokens);
+                if (latestDocument.length > 0) {
+                    const completeDateTime = latestDocument[0].date + ":00:00";
+                    startDateTime = new Date(completeDateTime);
+                    console.log(`Resuming from the latest hourly mark: ${startDateTime.toISOString().split(':')[0]} for collection: ${collectionName}`);
+                } else {
+                    console.log(`No previous hourly data found. Starting from the beginning for collection: ${collectionName}`);
                 }
 
-                transaction.from_address_oldBalance = fromAddressStats ? fromAddressStats.currentTokens : "0";
-                transaction.to_address_oldBalance = toAddressStats ? toAddressStats.currentTokens : "0";
+                console.log(`Retrieving unique addresses up to: ${startDateTime.toISOString()}`);
+                const uniqueAddresses = await watchedTokensCollection.aggregate([
+                    { $match: { block_timestamp: { $lt: startDateTime.toISOString() } } },
+                    { $group: { _id: null, uniqueFromAddresses: { $addToSet: "$from_address" }, uniqueToAddresses: { $addToSet: "$to_address" } } }
+                ]).toArray();
 
-                const newFromBalance = fromBalanceBigInt - valueBigInt;
-                const newToBalance = toBalanceBigInt + valueBigInt;
+                if (uniqueAddresses.length > 0) {
+                    uniqueAddresses[0].uniqueFromAddresses.forEach(addr => masterUniqueAddresses.add(addr));
+                    uniqueAddresses[0].uniqueToAddresses.forEach(addr => masterUniqueAddresses.add(addr));
+                }
 
-                await addressStatsCollection.updateOne({ address: from_address }, { $set: { currentTokens: newFromBalance.toString() } }, { upsert: true });
-                await addressStatsCollection.updateOne({ address: to_address }, { $set: { currentTokens: newToBalance.toString() } }, { upsert: true });
+                const transactions = await watchedTokensCollection.find({ block_timestamp: { $gte: startDateTime.toISOString() } }).sort({ block_number: 1 }).toArray();
+                let hourlyUniqueAddressCount = {};
+                let currentNumber = 0;
 
-                await watchedTokensCollection.updateOne({ _id: transaction._id }, { $set: transaction });
+                progressInterval = setInterval(() => {
+                    console.log(`Progress in ${collectionName}: ${currentNumber} processed, Collection Uniques: ${masterUniqueAddresses.size}`);
+                }, 5000);
 
-                try {
-                    const transactionDate = new Date(block_timestamp).toISOString().split('T')[0];
+                for (let transaction of transactions) {
+                    currentNumber++;
+                    const { from_address, to_address, value, block_timestamp } = transaction;
 
-                    if (!dailyUniqueAddressCount[transactionDate]) {
-                        dailyUniqueAddressCount[transactionDate] = new Set();
+
+                    const transactionHour = new Date(block_timestamp).toISOString().split(':')[0];
+
+                    if (!hourlyUniqueAddressCount[transactionHour]) {
+                        hourlyUniqueAddressCount[transactionHour] = new Set();
                     }
 
                     if (!masterUniqueAddresses.has(from_address)) {
                         masterUniqueAddresses.add(from_address);
-                        dailyUniqueAddressCount[transactionDate].add(from_address);
+                        hourlyUniqueAddressCount[transactionHour].add(from_address);
                     }
 
                     if (!masterUniqueAddresses.has(to_address)) {
                         masterUniqueAddresses.add(to_address);
-                        dailyUniqueAddressCount[transactionDate].add(to_address);
+                        hourlyUniqueAddressCount[transactionHour].add(to_address);
                     }
-                } catch (e) {
-                    console.error(`Error processing transaction with ID ${transaction._id}:`, e);
-                    continue;
                 }
-            }
 
-            // Insert each day's unique address count as a separate document
-            for (const [day, addresses] of Object.entries(dailyUniqueAddressCount)) {
-                await hotCollection.insertOne({
-                    date: day,
-                    uniqueCount: addresses.size
-                });
-            }
+                for (const [hour, addresses] of Object.entries(hourlyUniqueAddressCount)) {
+                    await hotCollection.insertOne({
+                        date: hour,
+                        uniqueCount: addresses.size
+                    });
+                }
 
-            clearInterval(progressInterval);
-            console.log(`Final Progress in ${collectionName}: ${currentNumber}/${totalDocsInCollection} processed, Collection Uniques: ${masterUniqueAddresses.size}`);
+                clearInterval(progressInterval);
+                console.log(`Final Progress in ${collectionName}: ${currentNumber} processed, Collection Uniques: ${masterUniqueAddresses.size}`);
+            } catch (error) {
+                console.error("An error occurred in collection:", collectionName, error);
+                clearInterval(progressInterval);
+            }
         }
     } catch (error) {
-        console.error("An error occurred:", error);
-        clearInterval(progressInterval);
+        console.error("An error occurred while connecting to MongoDB:", error);
     } finally {
         console.log("Closing MongoDB connection.");
         await client.close();

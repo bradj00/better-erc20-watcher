@@ -10,7 +10,7 @@
 // append these tags back to the full tx hash document in db 'tx-hash-details' collection 'details'
 
 // for one, webui will no longer have to process this on the frontend
-
+    
 
 console.clear();
 
