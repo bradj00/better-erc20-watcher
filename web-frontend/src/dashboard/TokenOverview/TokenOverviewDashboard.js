@@ -365,7 +365,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
 }
 
 const [activeWidgetTab, setActiveWidgetTab] = useState('Elders');
-const [activeStageTab, setActiveStageTab] = useState('HoT');
+const [activeStageTab, setActiveStageTab] = useState('Elders');
 
   return (
     <div style={{width:'100%', position:'absolute', border:'0px solid #ff0'}}>

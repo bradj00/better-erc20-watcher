@@ -30,6 +30,7 @@
     "react-force-graph": "^1.44.0",
     "react-scripts": "^5.0.1",
     "react-slider": "^2.0.6",
+    "react-table": "^7.8.0",
     "react-timeago": "^7.2.0",
     "recharts": "^2.9.0",
     "styled-components": "^6.1.0",
