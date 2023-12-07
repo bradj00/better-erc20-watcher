@@ -1,11 +1,8 @@
-// THIS IS PROBABLY SOMETHING WE'LL WANT TO PRE-PROCESS ON THE SERVER SIDE AND SERVE UP
-
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { GeneralContext } from '../../../App.js';
-import {getEllipsisTxt} from '../../helpers/h.js';
-import {formatNumber} from '../../helpers/h.js';
+import { getEllipsisTxt, formatNumber } from '../../helpers/h.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -13,10 +10,74 @@ const EldersPanelStats = () => {
     const { txData, txHashActionCache, addressTags, elderCount, clickedToken, CacheFriendlyLabels, TxHashDetailsObj } = useContext(GeneralContext);
 
     const tokenDecimals = clickedToken?.data?.data?.detail_platforms?.ethereum?.decimal_place || 0;
-    const tokenPriceUSD = clickedToken?.data?.data?.market_data?.current_price?.usd     || 0;
-    
+    const tokenPriceUSD = clickedToken?.data?.data?.market_data?.current_price?.usd || 0;
+
     const [tooltipInfo, setTooltipInfo] = useState({ visible: false, content: null, position: { x: 0, y: 0 } });
-    
+    const [sortState, setSortState] = useState({ field: null, ascending: true });
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [data, setData] = useState({
+        labels: Array.from({ length: 100 }, (_, i) => `${i + 1}`),
+        datasets: []
+    });
+
+
+    const [showCexVolume, setShowCexVolume] = useState(true);
+    const [showLiquidityVolume, setShowLiquidityVolume] = useState(true);
+    const [showIncomingVolume, setShowIncomingVolume] = useState(true);
+    const [showOutgoingVolume, setShowOutgoingVolume] = useState(true);
+
+
+
+
+    // Define state for chart data
+    const [chartData, setChartData] = useState({
+        labels: Array.from({ length: 100 }, (_, i) => `${i + 1}`),
+        datasets: [
+            {
+                label: 'Incoming Volume',
+                data: [],
+                backgroundColor: 'rgba(0, 255, 0, 0.6)',
+                borderColor: 'rgba(0, 255, 0, 1)',
+                borderWidth: 2,
+            },
+            // ... other datasets
+        ],
+    });
+
+
+    useEffect(() => {
+        // This function will be called whenever txData changes.
+        const updateChartData = () => {
+            // Call your calculateVolume or any other function that needs to be updated with the new txData
+            const { incomingVolumes, outgoingVolumes, liquidityVolumes, cexVolumes, addressDetails } = calculateVolume();
+            
+            // Update your chart's data state here, if you have a state for it
+            // For example, if you have a state called 'chartData' you would do the following:
+            setChartData({
+                ...data, // Spread in the existing data properties
+                datasets: [
+                    { ...data.datasets[0], data: incomingVolumes },
+                    { ...data.datasets[1], data: outgoingVolumes },
+                    { ...data.datasets[2], data: liquidityVolumes },
+                    { ...data.datasets[3], data: cexVolumes }
+                    // ... any other dataset updates
+                ]
+            });
+        };
+        
+        updateChartData();
+    }, [txData]); // Only re-run the effect if txData changes
+
+
+
+
+
+
+
+
+
+
+
     const calculateVolume = () => {
         let incomingVolumeByElderRank = Array(200).fill(0);
         let outgoingVolumeByElderRank = Array(200).fill(0);
@@ -34,19 +95,27 @@ const EldersPanelStats = () => {
                 const tokenTransferSummary = TxHashDetailsObj[txHash]?.tokenTransferSummary?.[clickedToken.data.contractAddress];
     
                 if (tokenTransferSummary) {
+                    let isCexTransaction = false;
+    
+                    // Check if any address in the transaction is a CEX
+                    Object.keys(tokenTransferSummary).forEach(address => {
+                        if (addressTags[address]?.isCEX) {
+                            isCexTransaction = true;
+                        }
+                    });
+    
                     Object.keys(tokenTransferSummary).forEach(address => {
                         let incoming = tokenTransferSummary[address]?.incoming;
                         let outgoing = tokenTransferSummary[address]?.outgoing;
     
-                        // Convert to float if defined, else default to 0
                         incoming = incoming !== undefined ? Number(incoming) / decimalFactor : 0;
                         outgoing = outgoing !== undefined ? Number(outgoing) / decimalFactor : 0;
     
                         const elderRank = getNormalizedElderRank(address);
     
                         if (elderRank) {
-                            if (addressTags[address]?.isCEX) {
-                                // Add to CEX volume
+                            if (isCexTransaction) {
+                                // Add total volume to CEX volume if it's a CEX transaction
                                 cexVolumeByElderRank[elderRank - 1] += incoming + outgoing;
                             } else if (isLiquidityMove) {
                                 // Add to liquidity volume if it's a liquidity move
@@ -64,15 +133,22 @@ const EldersPanelStats = () => {
         }
     
         return {
-            incomingVolumes: incomingVolumeByElderRank,
-            outgoingVolumes: outgoingVolumeByElderRank,
-            liquidityVolumes: liquidityVolumeByElderRank,
-            cexVolumes: cexVolumeByElderRank, // Include the new CEX data
+            incomingVolumes: showIncomingVolume ? incomingVolumeByElderRank : Array(200).fill(0),
+            outgoingVolumes: showOutgoingVolume ? outgoingVolumeByElderRank : Array(200).fill(0),
+            liquidityVolumes: showLiquidityVolume ? liquidityVolumeByElderRank : Array(200).fill(0),
+            cexVolumes: showCexVolume ? cexVolumeByElderRank : Array(200).fill(0),
             addressDetails: addressDetailsByElderRank
         };
     };
     
-    
+
+    const handleSort = (field) => {
+        console.log('CLICKED: ',field)
+        setSortState(prevState => ({
+            field,
+            ascending: prevState.field === field ? !prevState.ascending : true
+        }));
+    };
     
     
     
@@ -146,7 +222,7 @@ const EldersPanelStats = () => {
 
     const { incomingVolumes, outgoingVolumes, liquidityVolumes, addressDetails, cexVolumes } = calculateVolume();
 
-    const data = {
+    const data2 = {
         labels: Array.from({ length: 100 }, (_, i) => `${i + 1}`),
         datasets: [
             {
@@ -166,15 +242,15 @@ const EldersPanelStats = () => {
             {
                 label: 'Liquidity Management Volume',
                 data: liquidityVolumes,
-                backgroundColor: 'rgba(0, 255, 255, 0.1)',
-                borderColor: 'rgba(0, 255, 255, 0.1)',
+                backgroundColor: 'rgba(0, 255, 255, 1)',
+                borderColor: 'rgba(0, 255, 255, 1)',
                 borderWidth: 2,
             },
             {
                 label: 'CEX Volume',
                 data: cexVolumes,
-                backgroundColor: 'rgba(255, 255, 0, 0.1)', // Yellow color for CEX
-                borderColor: 'rgba(255, 255, 0, 0.1)',
+                backgroundColor: 'rgba(255, 255, 0, 1)', // Yellow color for CEX
+                borderColor: 'rgba(255, 255, 0, 1)',
                 borderWidth: 2,
             }
         ],
@@ -184,6 +260,23 @@ const EldersPanelStats = () => {
 
 
     const CustomTooltip = ({ visible, position, content }) => {
+
+
+        // Sort the content based on sortState
+        const sortedContent = React.useMemo(() => {
+            if (!sortState.field) return content;
+
+            const sorted = [...content].sort((a, b) => {
+                const aValue = a[sortState.field];
+                const bValue = b[sortState.field];
+                const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+                return sortState.ascending ? comparison : -comparison;
+            });
+
+            console.log("Sorted Content: ", sorted); // Debugging line
+            return sorted;
+        }, [content, sortState]);
+
         if (!visible) {
             return null;
         }
@@ -202,10 +295,10 @@ const EldersPanelStats = () => {
             padding: '10px',
         } : {
             position: 'absolute',
-            top: '9%',
-            left: 0,
-            width: '100%',
-            height: '15vh',
+            top: '0%',
+            left: '0%',
+            width: '30%',
+            height: '75%',
             backgroundColor: 'rgba(10, 10, 30, 0.9)',
             color: 'cyan',
             overflow: 'auto', // In case content overflows
@@ -219,23 +312,20 @@ const EldersPanelStats = () => {
                 <table style={{ fontSize:'0.4vw', width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                         <tr>
-                            <th style={tableHeaderStyle}>Address</th>
-                            <th style={tableHeaderStyle}>In</th>
-                            <th style={tableHeaderStyle}>Out</th>
-                            <th style={tableHeaderStyle}>Elder</th>
+                            <th style={tableHeaderStyle} onClick={() => handleSort('address')}>Address</th>
+                            <th style={tableHeaderStyle} onClick={() => handleSort('incomingUSD')}>In</th>
+                            <th style={tableHeaderStyle} onClick={() => handleSort('outgoingUSD')}>Out</th>
+                            <th style={tableHeaderStyle} onClick={() => handleSort('elderRank')}>Elder</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {content}
+                        {sortedContent}
                     </tbody>
                 </table>
             </div>
         );
-    };
+    }
 
-
-    // State to manage whether the component is expanded or not
-    const [isExpanded, setIsExpanded] = useState(false);
 
     // Function to toggle the expanded state
     const toggleExpand = () => {
@@ -278,9 +368,24 @@ const EldersPanelStats = () => {
 
 
 
-
-
-
+    const handleCheckboxChange = (event) => {
+        switch (event.target.name) {
+            case "cexVolume":
+                setShowCexVolume(event.target.checked);
+                break;
+            case "liquidityVolume":
+                setShowLiquidityVolume(event.target.checked);
+                break;
+            case "incomingVolume":
+                setShowIncomingVolume(event.target.checked);
+                break;
+            case "outgoingVolume":
+                setShowOutgoingVolume(event.target.checked);
+                break;
+            default:
+                break;
+        }
+    };
 
 
 
@@ -297,7 +402,7 @@ const EldersPanelStats = () => {
     
     const tableDataStyle = {
         borderBottom: '1px solid cyan',
-        padding: '5px',
+        padding: '1px',
         textAlign: 'right',
         color: 'white'
     };
@@ -367,10 +472,48 @@ const EldersPanelStats = () => {
     else {
         return (
             <div style={containerStyle}>
-                <button onClick={toggleExpand} style={{ position: 'absolute', top: '10px', right: '10px' }}>
-                    {isExpanded ? 'Normal View' : 'Expand'}
-                </button>
-                <Bar data={data} options={options} height={400} />
+                <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="incomingVolume"
+                            checked={showIncomingVolume}
+                            onChange={handleCheckboxChange}
+                        />
+                        Incoming
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="outgoingVolume"
+                            checked={showOutgoingVolume}
+                            onChange={handleCheckboxChange}
+                        />
+                        Outgoing
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="cexVolume"
+                            checked={showCexVolume}
+                            onChange={handleCheckboxChange}
+                        />
+                        CEX
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="liquidityVolume"
+                            checked={showLiquidityVolume}
+                            onChange={handleCheckboxChange}
+                        />
+                        Liquidity
+                    </label>
+                    <button onClick={toggleExpand}>
+                        {isExpanded ? 'Normal View' : 'Expand'}
+                    </button>
+                </div>
+                <Bar data={data2} options={options} height={400} />
                 <CustomTooltip visible={tooltipInfo.visible} position={tooltipInfo.position} content={tooltipInfo.content} />
             </div>
         );
