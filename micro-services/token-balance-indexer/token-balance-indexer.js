@@ -1,11 +1,12 @@
-console.clear();
-
 const { MongoClient } = require('mongodb');
 require('dotenv').config({ path: './.env' });
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-async function ProcessTokenTransactionsAndAddressTally() {
+async function ProcessUniqueHoldersOverTime() {
+    console.clear();
+    console.log(new Date().toLocaleTimeString()+'\n\n');
+
     const client = new MongoClient(MONGODB_URI);
 
     try {
@@ -15,7 +16,12 @@ async function ProcessTokenTransactionsAndAddressTally() {
         const db = client.db("watchedTokens");
         const dbStats = client.db("watchedTokens-addressStats");
         const dbHoT = client.db("watchedTokens-HoT");
-        console.log("Databases selected.");
+
+
+        console.log("Dropping 'watchedTokens-HoT' database...");
+        await dbHoT.dropDatabase();
+        // console.log("'watchedTokens-HoT' database dropped.");
+
 
         const collections = await db.listCollections().toArray();
         const collectionNames = collections.map(col => col.name);
@@ -30,17 +36,17 @@ async function ProcessTokenTransactionsAndAddressTally() {
             let progressInterval;
 
             try {
-                console.log(`Fetching the latest hourly mark from watchedTokens-HoT for collection: ${collectionName}`);
-                const latestDocument = await hotCollection.find().sort({ date: -1 }).limit(1).toArray();
-                let startDateTime = new Date(0); // Unix epoch start if no latestDocument found
-
-                if (latestDocument.length > 0) {
-                    const completeDateTime = latestDocument[0].date + ":00:00";
-                    startDateTime = new Date(completeDateTime);
-                    console.log(`Resuming from the latest hourly mark: ${startDateTime.toISOString().split(':')[0]} for collection: ${collectionName}`);
-                } else {
-                    console.log(`No previous hourly data found. Starting from the beginning for collection: ${collectionName}`);
-                }
+                let startDateTime = new Date(0);
+                // console.log(`Fetching the latest hourly mark from watchedTokens-HoT for collection: ${collectionName}`);
+                // const latestDocument = await hotCollection.find().sort({ date: -1 }).limit(1).toArray();
+                
+                // if (latestDocument.length > 0) {
+                //     const completeDateTime = latestDocument[0].date + ":00:00";
+                //     startDateTime = new Date(completeDateTime);
+                //     console.log(`Resuming from the latest hourly mark: ${startDateTime.toISOString().split(':')[0]} for collection: ${collectionName}`);
+                // } else {
+                //     console.log(`No previous hourly data found. Starting from the beginning for collection: ${collectionName}`);
+                // } 
 
                 console.log(`Retrieving unique addresses up to: ${startDateTime.toISOString()}`);
                 const uniqueAddresses = await watchedTokensCollection.aggregate([
@@ -63,8 +69,7 @@ async function ProcessTokenTransactionsAndAddressTally() {
 
                 for (let transaction of transactions) {
                     currentNumber++;
-                    const { from_address, to_address, value, block_timestamp } = transaction;
-
+                    const { from_address, to_address, block_timestamp } = transaction;
 
                     const transactionHour = new Date(block_timestamp).toISOString().split(':')[0];
 
@@ -91,7 +96,7 @@ async function ProcessTokenTransactionsAndAddressTally() {
                 }
 
                 clearInterval(progressInterval);
-                console.log(`Final Progress in ${collectionName}: ${currentNumber} processed, Collection Uniques: ${masterUniqueAddresses.size}`);
+                console.log(`Final Progress in ${collectionName}: ${currentNumber} processed, Collection Uniques: ${masterUniqueAddresses.size}\n\n`);
             } catch (error) {
                 console.error("An error occurred in collection:", collectionName, error);
                 clearInterval(progressInterval);
@@ -105,6 +110,12 @@ async function ProcessTokenTransactionsAndAddressTally() {
     }
 }
 
+// Run the function immediately on startup
 (async () => {
-   await ProcessTokenTransactionsAndAddressTally();
+    await ProcessUniqueHoldersOverTime();
 })();
+
+// Set up an interval to run the function every 1 minute
+setInterval(async () => {
+    await ProcessUniqueHoldersOverTime();
+}, 60000); // 60000 milliseconds = 1 minute

@@ -37,7 +37,9 @@ export const handleCacheFriendlyLabelsRequest = (data, dataSetterObj) => {
 
 export const handleFetchHoldersOverTimeData = (data, dataSetterObj) => {
     console.log('FetchHoldersOverTimeData: ',data)
-    dataSetterObj.setHoldersOverTimeData(data.data.data);
+    if (data?.data?.data){
+        dataSetterObj.setHoldersOverTimeData(data.data.data);
+    }
 };
 
 export const handleTxHashDetailsArray = (data, dataSetterObj) => {
@@ -200,7 +202,7 @@ export const handleAppendTransactions = (data, dataSetterObj, txData) => {
     const newTransaction = data.data.data;
 
     // Check if the transaction already exists in txData based on transaction_hash.
-    const transactionExists = txData.some(
+    const transactionExists = txData?.some(
         existingTransaction => existingTransaction.transaction_hash === newTransaction.transaction_hash
     );
 
@@ -211,7 +213,7 @@ export const handleAppendTransactions = (data, dataSetterObj, txData) => {
     const updatedTxData = [newTransaction, ...txData];
 
     // Clip off the oldest entries, keeping the size of txData to a maximum of 200
-    const clippedTxData = updatedTxData.slice(0, 200);
+    const clippedTxData = updatedTxData.slice(0, 600);
 
     // Update the state with the clipped data
     dataSetterObj.settxData(clippedTxData); 

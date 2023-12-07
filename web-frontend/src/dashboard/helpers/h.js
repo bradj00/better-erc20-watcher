@@ -13,6 +13,32 @@ export const commaNumber = (x) => {
   return parts.join(".");
 }
 
+export const formatNumber = (x) => {
+  // Convert the number to a float for accurate comparisons
+  const num = parseFloat(x);
+
+  // Format for millions (mm)
+  if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'mm';
+  }
+
+  // Format for thousands (k)
+  if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'k';
+  }
+
+  // Format with commas for numbers less than 1000
+  let parts = num.toString().split(".");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join(".");
+};
+
+// Example usage
+console.log(formatNumber(1234567));  // Outputs: "1.2mm"
+console.log(formatNumber(12345));    // Outputs: "12.3k"
+console.log(formatNumber(123));      // Outputs: "123"
+
+
 export const displayAddressFN = (clickedDetailsAddressFN) => {
   let firstAddress;
   Object.keys(clickedDetailsAddressFN).map(key => {

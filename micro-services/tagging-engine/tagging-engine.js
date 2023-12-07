@@ -188,16 +188,47 @@ async function analyzeTransactions(collectionName) {
 async function updateAddressStats(addresses, collectionName) {
     const db = client.db('watchedTokens-addressStats');
     const statsCollection = db.collection(collectionName);
-    
+
+    let currentIndex = 0;
+    const totalAddresses = addresses.length;
+
+    // Set up periodic logging
+    const logInterval = setInterval(() => {
+        console.log(`Processing: ${currentIndex}/${totalAddresses}`);
+    }, 3000); // Log progress every 3 seconds
+
+    const bulkOps = [];
+
     for (const { address, firstBlockNumberSeen, txFrequencyCount } of addresses) {
-        // Update or insert address stats
-        await statsCollection.updateOne(
-            { address },
-            { $set: { firstBlockNumberSeen, txFrequencyCount } },
-            { upsert: true }
-        );
+        bulkOps.push({
+            updateOne: {
+                filter: { address },
+                update: { $set: { firstBlockNumberSeen, txFrequencyCount } },
+                upsert: true
+            }
+        });
+
+        currentIndex++;
+
+        // Periodically execute bulk operations
+        if (bulkOps.length >= 1000) { // Adjust the batch size as needed
+            await statsCollection.bulkWrite(bulkOps);
+            bulkOps.length = 0; // Clear the array for the next batch
+        }
     }
+
+    // Process any remaining operations in the last batch
+    if (bulkOps.length > 0) {
+        await statsCollection.bulkWrite(bulkOps);
+    }
+
+    // Clear the interval after loop completion
+    clearInterval(logInterval);
+
+    // Final log to indicate completion
+    console.log(`Processing completed: ${totalAddresses}/${totalAddresses}`);
 }
+
 
 
 async function assignAndUpdateElderRank(collectionName) {
@@ -208,20 +239,35 @@ async function assignAndUpdateElderRank(collectionName) {
     const sortedDocs = await statsCollection.find({}).sort({ firstBlockNumberSeen: 1 }).toArray();
 
     let currentRank = 1;
-    let previousElderRank = null;
+    let currentIndex = 0;
+    const totalDocs = sortedDocs.length;
+
+    // Set up periodic logging
+    const logInterval = setInterval(() => {
+        console.log(`Processing: ${currentIndex}/${totalDocs} (Current Rank: ${currentRank})`);
+    }, 3000); // Log progress every 3 seconds
 
     for (const doc of sortedDocs) {
-        if (previousElderRank !== null && doc.firstBlockNumberSeen !== previousElderRank) {
-            // Increment rank only if the firstBlockNumberSeen changes
-            currentRank++;
-        }
         await statsCollection.updateOne(
             { _id: doc._id },
             { $set: { ElderRank: currentRank } }
         );
-        previousElderRank = doc.firstBlockNumberSeen;
+
+        currentRank++;
+        currentIndex++;
+
+        // Optional: If you want to slow down the loop to see the logging, you can use the following line
+        // await new Promise(resolve => setTimeout(resolve, 10)); // Wait for 10 milliseconds
     }
+
+    // Clear the interval after loop completion
+    clearInterval(logInterval);
+
+    // Final log to indicate completion
+    console.log(`Processing completed: ${totalDocs}/${totalDocs}`);
 }
+
+
 
 
 

@@ -88,24 +88,45 @@ const consumeFullTxDetailsEvent = async (message, client) => {
   try {
     const eventData = JSON.parse(message.value.toString());
     // console.log(`Consumed Full TX Details Event from Kafka:`, eventData);
+    console.log(`Consumed Full TX Details Event from Kafka TO:`, eventData.transaction.to);
 
 
-    //decode erc20 transfers from the tx logs and return in an array of objects [{from, to, amount, contractAddress}, ...]
+    // decode erc20 transfers from the tx logs and return in an array of objects [{from, to, amount, contractAddress}, ...]
     const decodedTransfers = await processFullTxDetails(eventData);
     
     // console.log('EVENT DATA: ',eventData.transaction.transactionHash)
     
-    // // create an object summarizing the aggregate token transfers: contractAddress / to / from / amount
+    // create an object summarizing the aggregate token transfers: contractAddress / to / from / amount
     const transferSummary = summarizeTokenTransfers(decodedTransfers);
 
 
-    // // add that new object back into to the full tx hash document object in db 'tx-hash-details' collection 'details'
+    // add that new object back into to the full tx hash document object in db 'tx-hash-details' collection 'details'
+    
+      let isUniswapPositionManagement = false; // might have to set to false but I dont want to fill up the db needlessly with explicit vs implicit false
+
+      //if uniswap v3 position manager
+      // will be more scalably useful when we have multiple position manager contracts to watch for...
+      if (eventData.transaction.to?.toLowerCase() == '0xc36442b4a4522e871399cd717abdd847ab11fe88'){
+        console.log('\t DETECTED LIQUIDITY MANAGEMENT OPERATION\n')
+        isUniswapPositionManagement = true;           
+      }
+      else {
+        console.log('\t ...no liquidity operation...\n')
+      }
+
 
     // console.log('\n\nupdating ',eventData.transaction.transactionHash,'\n\t with summary: ',transferSummary)
     await client.db('tx-hash-details').collection('details').updateOne(
       { transactionHash: eventData.transaction.transactionHash }, // Query to find the right document
-      { $set: { tokenTransferSummary: transferSummary } } // Update operation
+      { $set: {
+         tokenTransferSummary: transferSummary,
+         isUniswapPositionManagement: isUniswapPositionManagement
+        } 
+      } 
     );
+
+
+
     
     
     const uniqueAddresses = getUniqueAddresses(decodedTransfers);

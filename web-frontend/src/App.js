@@ -36,7 +36,10 @@ const [elderCount, setElderCount] = useState(); //count of total addresses inter
 const [uniqueContractAddresses, setUniqueContractAddresses] = useState([]); 
 
 const [areAllMultiTxCellsLoaded, setareAllMultiTxCellsLoaded] = useState({});
+
+//cached determined actions of a given transaction hash. key name is txhash
 const [txHashActionCache, settxHashActionCache,] = useState({});
+
 const [AddressStats, setAddressStats] = useState({});
 
 
@@ -99,6 +102,8 @@ const [megaPriceUsd, setMegaPriceUsd] = useState();
 const [LpChartData, setLpChartData] = useState([]);
 const [RequestLiquidityPoolPrice, setRequestLiquidityPoolPrice] = useState({});
 const [SummarizedTxsRequest, setSummarizedTxsRequest] = useState([]);
+
+// contains all cached known full transaction hash data
 const [TxHashDetailsObj, setTxHashDetailsObj] = useState({});
 
 const [LpTotalTokensHeld, setLpTotalTokensHeld] = useState();

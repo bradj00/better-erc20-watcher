@@ -111,7 +111,7 @@ module.exports = {
                         { $match: query },
                         { $addFields: { int_block_number: { $toInt: "$block_number" } } },
                         { $sort: { int_block_number: -1 } },
-                        { $limit: 200 },
+                        { $limit: 600 },
                         { $skip: parameters.offset }
                     ])
                     .toArray();

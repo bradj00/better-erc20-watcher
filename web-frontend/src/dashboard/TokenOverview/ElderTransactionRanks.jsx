@@ -61,7 +61,7 @@ const ElderTransactionRanks = () => {
         borderBottom: '1px solid cyan', // Neon bright border color
         padding: '5px',
         textAlign: 'right',
-        fontSize: '0.65vw',
+        textDecoration:'none', 
 
     };
 
@@ -89,14 +89,14 @@ const ElderTransactionRanks = () => {
             }}>
                 <thead style={{position:'sticky', top:'0', backgroundColor:'rgba(5,5,10,1)', }}>
                     <tr>
-                        <th style={tableHeaderStyle}>Address</th>
+                        <th align="left" style={{color:'yellow', textDecoration:'none', paddingLeft:'3%',borderBottom: '1px solid cyan',}}>Address</th>
                         <th style={tableHeaderStyle}>In $</th>
                         <th style={tableHeaderStyle}>Out $</th>
-                        <th style={tableHeaderStyle}>Age</th>
-                        <th style={tableHeaderStyle}>Bag $</th>
+                        <th style={tableHeaderStyle}>Elder</th>
+                        {/* <th style={tableHeaderStyle}>Bag $</th> */}
                     </tr>
                 </thead>
-                <tbody style={{fontSize:'0.55vw'}}>
+                <tbody style={{fontSize:'0.75vw'}}>
                     {processedData.map((item, index) => {
                         const displayText = CacheFriendlyLabels[item.address]?.manuallyDefined
                                             ? CacheFriendlyLabels[item.address].manuallyDefined
@@ -105,11 +105,11 @@ const ElderTransactionRanks = () => {
 
                         return (
                             <tr key={index}>
-                                <td align='right' title={displayText}>  <a target="__blank" href={`https://etherscan.io/address/${item.address}`}>{truncatedText}</a> </td>
+                                <td align='left' title={displayText}>&nbsp;  <a target="__blank" href={`https://etherscan.io/address/${item.address}`}>{truncatedText}</a> </td>
                                 <td align='right'>{commaNumber(item.incoming)}</td>
                                 <td align='right'>{commaNumber(item.outgoing)}</td>
-                                <td>{item.elderRank}</td>
-                                <td align='right'>{item.bag}</td>
+                                <td align='right'>{commaNumber(item.elderRank)}</td>
+                                {/* <td align='right'>{item.bag}</td> */}
                             </tr>
                         );
                     })}

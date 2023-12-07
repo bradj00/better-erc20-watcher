@@ -244,10 +244,11 @@ const customFormatter = (value, unit, suffix) => {
             renderedHashes.add(row.transaction_hash);
 
             const timeAgoText = getTimeAgoText(row.block_timestamp);
-            const isMultiTx = TxHashDetailsObj[row.transaction_hash] && TxHashDetailsObj[row.transaction_hash].transactionData.logs.length > 1;
+            const isMultiTx = TxHashDetailsObj[row.transaction_hash] && TxHashDetailsObj[row.transaction_hash].transactionData.logs?.length > 1;
 
             return isMultiTx ?
-              <MultiTxCell index={index} row={row} timeAgo={timeAgoText} />
+              // <MultiTxCell index={index} row={row} timeAgo={timeAgoText} />
+              <RegularCell index={index} row={row} timeAgo={timeAgoText} />
               :
               <RegularCell index={index} row={row} timeAgo={timeAgoText} />;
           }

@@ -224,7 +224,7 @@ const WebsocketInfoGrabber = () => {
         const addresses = new Set();
     
         // Process transaction addresses
-        transactions.forEach(tx => {
+        transactions?.forEach(tx => {
             if (!isTagCached(tx.from_address)) {
                 addresses.add(tx.from_address);
             }
@@ -238,8 +238,8 @@ const WebsocketInfoGrabber = () => {
         console.log(`Count of unique addresses before processing ERC20 transfer logs: ${countBeforeERC20}`);
     
         // Process ERC20 transfer event logs
-        Object.values(TxHashDetailsObj).forEach(txDetails => {
-            txDetails.transactionData.logs.forEach(log => {
+        Object.values(TxHashDetailsObj)?.forEach(txDetails => {
+            txDetails.transactionData.logs?.forEach(log => {
                 const transferInfo = decodeERC20Transfer(log);
                 if (transferInfo) {
                     const { from, to } = transferInfo;

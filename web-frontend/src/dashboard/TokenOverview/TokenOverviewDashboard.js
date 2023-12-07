@@ -365,7 +365,7 @@ function determineLpHeldCount(friendlyNameObj, LpArray) {
 }
 
 const [activeWidgetTab, setActiveWidgetTab] = useState('Elders');
-const [activeStageTab, setActiveStageTab] = useState('Volume');
+const [activeStageTab, setActiveStageTab] = useState('HoT');
 
   return (
     <div style={{width:'100%', position:'absolute', border:'0px solid #ff0'}}>
@@ -407,13 +407,13 @@ const [activeStageTab, setActiveStageTab] = useState('Volume');
             }}
           > 
            <div className="tabs-widget-container">
-                <div className={activeWidgetTab === 'Elders'       ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Elders')}>Elders</div>
+                
                 <div className={activeWidgetTab === 'Stats'        ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Stats')}>Stats</div>
                 <div className={activeWidgetTab === 'Distribution' ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Distribution')}>Distribution</div>
                 <div className={activeWidgetTab === 'Social'       ? "tab active" : "tab"} onClick={() => setActiveWidgetTab('Social')}>Social</div>
             </div>
 
-            {activeWidgetTab === 'Elders' && <EldersPanelStats />}
+            {/* {activeWidgetTab === 'Elders' && <EldersPanelStats />} */}
             {activeWidgetTab === 'Stats' && <WidgetPanelStats />}
             {activeWidgetTab === 'Distribution' && <WidgetPanelDistribution />}
             {activeWidgetTab === 'Social' && <WidgetPanelSocial />}
@@ -423,9 +423,10 @@ const [activeStageTab, setActiveStageTab] = useState('Volume');
 
             <div style={{position:'absolute', width:'80%', right:'2vw', top:'10vh', border:'0px solid #ff0'}}>
               <div className="tabs-stage-container">
-                  <div className={activeStageTab === 'Volume' ? "tab active" : "tab"} onClick={() => setActiveStageTab('Volume')}>Volume</div>
+                  <div className={activeStageTab === 'Volume' ? "tab active" : "tab"} onClick={() =>     setActiveStageTab('Volume')}>Buy/Sell Volume</div>
                   <div className={activeStageTab === 'Visualizer' ? "tab active" : "tab"} onClick={() => setActiveStageTab('Visualizer')}>Visualizer</div>
-                  <div className={activeStageTab === 'HoT' ? "tab active" : "tab"} onClick={() => setActiveStageTab('HoT')}>New Uniques Over Time</div>
+                  <div className={activeStageTab === 'HoT' ?     "tab active" : "tab"} onClick={() =>    setActiveStageTab('HoT')}>New Uniques Over Time</div>
+                  <div className={activeWidgetTab === 'Elders' ? "tab active" : "tab"} onClick={() =>    setActiveStageTab('Elders')}>Volume By Elder</div>
               </div>
 
 
@@ -434,6 +435,7 @@ const [activeStageTab, setActiveStageTab] = useState('Volume');
                 {activeStageTab === 'Volume' && <VolumeGraph />}
                 {activeStageTab === 'Visualizer' && <ForceGraphComponent />}
                 {activeStageTab === 'HoT' && <HoldersOverTime />}
+                {activeStageTab === 'Elders' && <EldersPanelStats />}
 
               </div>
 
