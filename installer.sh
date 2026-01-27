@@ -124,6 +124,13 @@ echo "$IP_ADDRESSES\n"
 # Confirm the IP address for MongoDB
 read -p "Please confirm the IP address for MongoDB from the above list, or specify a reachable Mongo host IP: " MONGO_IP
 
+# Confirm the IP address for Redis
+read -p "Please enter the IP address for Redis (default: same as MongoDB): " REDIS_IP
+# Use MongoDB IP as default if no input provided
+if [ -z "$REDIS_IP" ]; then
+    REDIS_IP=$MONGO_IP
+fi
+
 # Output to .env file
 cat <<EOL > .env
 INFURA_ENDPOINT_URL=https://mainnet.infura.io/v3/$INFURA_API_KEY
